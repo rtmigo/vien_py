@@ -24,6 +24,7 @@ class Test(unittest.TestCase):
 		os.chdir(Path(__file__).parent)
 		runmain(["path"])
 
+# todo test run
 
 class TestsInsideTempProjectDir(unittest.TestCase):
 
