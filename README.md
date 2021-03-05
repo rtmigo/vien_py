@@ -104,6 +104,7 @@ $ svet reinit
 ```
 Or point the interpreter:
 ```bash
+$ cd /path/to/myProject
 $ svet reinit /path/to/bin/python3
 ```
 
