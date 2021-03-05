@@ -53,7 +53,7 @@ $ vep init python3
 ```
 
 The `python3` here is the exactly the interpreter will be used for that virtualenv. If you have 
-more than one Python version, you can use something like
+more than one Python version, just tell somehow where to get the binary
 
 ```bash
 $ vep init python39
