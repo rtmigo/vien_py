@@ -1,10 +1,18 @@
 # SPDX-FileCopyrightText: (c) 2020 Art Galkin <ortemeo@gmail.com>
 # SPDX-License-Identifier: BSD-3-Clause
 
-
 import argparse
 import datetime as dt
+import json
+import os
+import shutil
+import subprocess
 import sys
+import unittest
+from pathlib import Path
+from typing import *
+
+verbose = False
 
 from svet import __version__
 
@@ -67,18 +75,6 @@ See HELP with other options:
 	doc = text.strip()
 	aboveFirstLine = ("-" * len(doc.splitlines()[0]))
 	return f"{aboveFirstLine}\n{doc}\n"
-
-
-import json
-import os
-import shutil
-import subprocess
-from pathlib import Path
-from typing import *
-
-verbose = False
-
-import unittest
 
 
 def getVepsDir() -> Path:
@@ -149,8 +145,6 @@ def init(venvDir: Path, version: str):
 
 	subprocess.run([exe, "-m", "venv", str(venvDir)])
 
-	# runWithBashAliases(f'{exe} -m venv "{str(venvDir)}"')
-
 	print()
 	print("The Python executable:")
 	print(str(venvDirToExe(venvDir)))
@@ -220,10 +214,6 @@ def runmain():
 
 	subparsers.add_parser('path',
 						  help="show the supposed path of the virtualenv for the current directory")
-
-	# parser.add_argument('-v', '--version',  # action="store_true",
-	# 					action='version',
-	# 					version=version())
 
 	args = parser.parse_args()
 
