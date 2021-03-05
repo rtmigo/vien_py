@@ -94,7 +94,7 @@ See HELP with other options:
 	return f"{aboveFirstLine}\n{doc}\n"
 
 
-def getVepsDir() -> Path:
+def getSvetDir() -> Path:
 	s = os.environ.get("SVETDIR")
 	if s:
 		return Path(os.path.expanduser(os.path.expandvars(s)))
@@ -106,24 +106,24 @@ class TestVenvsDir(unittest.TestCase):
 
 	def test_if_set_plain(self):
 		os.environ["SVETDIR"] = "/path/to/veps"
-		self.assertEqual(getVepsDir(), Path('/path/to/veps'))
+		self.assertEqual(getSvetDir(), Path('/path/to/veps'))
 
 	def test_if_set_with_vars(self):
 		os.environ["SVETDIR"] = "$HOME/subfolder"
-		s = str(getVepsDir())
+		s = str(getSvetDir())
 		self.assertTrue("$" not in s)
 		self.assertGreater(len(s), len("/home/"))
 
 	def test_if_set_with_user(self):
 		os.environ["SVETDIR"] = "~/subfolder"
-		s = str(getVepsDir())
+		s = str(getSvetDir())
 		self.assertTrue("~" not in s)
 		self.assertGreater(len(s), len("/home/"))
 
 	def test_if_not_n(self):
 		if "SVETDIR" in os.environ:
 			del os.environ["SVETDIR"]
-		p = str(getVepsDir())
+		p = str(getSvetDir())
 		self.assertTrue(p.endswith("svet"))
 		self.assertGreater(len(p), len("/.svet"))
 
@@ -134,12 +134,12 @@ def run(args: List[str]):
 	subprocess.run(args, shell=True)
 
 
-def runseqOld(commands: List[str]):
-	joined = ' && '.join(commands)
-	if verbose:
-		print(f"Running '{joined}'")
-	# return os.system(joined)
-	subprocess.run(joined)
+# def runseqOld(commands: List[str]):
+# 	joined = ' && '.join(commands)
+# 	if verbose:
+# 		print(f"Running '{joined}'")
+# 	# return os.system(joined)
+# 	subprocess.run(joined)
 
 
 def runseq(commands: List[str]):
@@ -151,6 +151,7 @@ def runseq(commands: List[str]):
 	bashLines.extend(commands)
 
 	subprocess.call("\n".join(bashLines), shell=True)
+
 
 def quote(arg: str) -> str:
 	return json.dumps(arg)
@@ -262,7 +263,7 @@ def runmain(args: Optional[List[str]] = None):
 	###########
 
 	projectDir = Path(".").absolute()
-	venvDir = getVepsDir() / (
+	venvDir = getSvetDir() / (
 			projectDir.name + "_venv")  # venvsParentDir / (projectDir.name + "_venv")
 
 	if verbose:
