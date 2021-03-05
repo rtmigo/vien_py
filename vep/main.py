@@ -139,18 +139,18 @@ def runmain():
 	parser = argparse.ArgumentParser()
 	subparsers = parser.add_subparsers(dest='command', required=True)
 
-	parser_init = subparsers.add_parser('init', help="Create new virtual environment")
+	parser_init = subparsers.add_parser('init', help="Create new virtualenv")
 	parser_init.add_argument('python', type=str)
 
-	parser_reinit = subparsers.add_parser('reinit', help="Remove existing virtual environment and create new")
+	parser_reinit = subparsers.add_parser('reinit', help="Remove existing virtualenv and create new")
 	parser_reinit.add_argument('python', type=str)
 
-	subparsers.add_parser('shell', help="Dive into Bash subshell using the virtual environment")
+	subparsers.add_parser('shell', help="Dive into Bash subshell using the virtualenv")
 
-	parser_run =subparsers.add_parser('run', help="Run a command inside the virtual environment")
+	parser_run =subparsers.add_parser('run', help="Run a command inside the virtualenv")
 	parser_run.add_argument('otherargs', nargs='*')
 
-	subparsers.add_parser('path', help="Show the supposed path of the virtual environment for the current directory")
+	subparsers.add_parser('path', help="Show the supposed path of the virtualenv for the current directory")
 	subparsers.add_parser('ver', help="Print program version")
 
 	args = parser.parse_args()
