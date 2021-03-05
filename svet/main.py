@@ -162,19 +162,26 @@ def runargs(venvDir: Path, otherargs):
 	exit(runseq(commands))
 
 
-# def ver():
-# 	#m = max(p.stat().st_mtime for p in Path(__file__).parent.glob("*"))
-# 	#y = dt.datetime.fromtimestamp(m).year
-# 	print(f"SVET {__version__} : (c) 2020-{y} Art Galkin <ortemeo@gmail.com>")
-# 	print(f"https://github.com/rtmigo/vep#readme")
+def version() -> str:
+	modTimestamp = (Path(__file__).parent / "constants.py").stat().st_mtime
+	modYear = dt.datetime.fromtimestamp(modTimestamp).year
+	return "\n".join([
+		f"SVET: Simple Virtual Environments Tool {__version__}",
+		f"(c) 2020-{modYear} Art Galkin <ortemeo@gmail.com>",
+		f"See https://github.com/rtmigo/svet#readme"
+	])
 
-import textwrap
+
+# print(f"SVET {__version__} : (c) 2020-{y} Art Galkin <ortemeo@gmail.com>")
+# print(f"https://github.com/rtmigo/vep#readme")
+
 
 class RawFormatter(argparse.HelpFormatter):
 	"""Allows no use newline characters in ArgumentParser description.
 	Unlike argparse.RawTextHelpFormatter wraps long lines to fit width."""
 
 	def _fill_text(self, text, width, indent):
+		import textwrap
 
 		# to make the use of indented docstrings more convenient
 		text = "\n".join([line.strip() for line in text.splitlines()])
@@ -184,32 +191,35 @@ class RawFormatter(argparse.HelpFormatter):
 			textwrap.fill(line, width)
 			for line in textwrap.indent(textwrap.dedent(text), indent).splitlines()])
 
+
 def runmain():
 	# noinspection PyTypeChecker
 	parser = argparse.ArgumentParser(
 		description=f"""
-		SVET: Simple Virtual Environments Tool {__version__}
-		(c) 2020 Art Galkin <ortemeo@gmail.com>
-		See https://github.com/rtmigo/svet#readme""",
+		SVET: Simple Virtual Environments Tool""",
 		formatter_class=RawFormatter
 	)
 
 	subparsers = parser.add_subparsers(dest='command', required=True)
 
-	parser_init = subparsers.add_parser('init', help="Create new virtualenv")
+	parser_init = subparsers.add_parser('init', help="create new virtualenv")
 	parser_init.add_argument('python', type=str)
 
 	parser_reinit = subparsers.add_parser('reinit',
-										  help="Remove existing virtualenv and create new")
+										  help="remove existing virtualenv and create new")
 	parser_reinit.add_argument('python', type=str)
 
-	subparsers.add_parser('shell', help="Dive into Bash subshell using the virtualenv")
+	subparsers.add_parser('shell', help="dive into Bash subshell using the virtualenv")
 
-	parser_run = subparsers.add_parser('run', help="Run a command inside the virtualenv")
+	parser_run = subparsers.add_parser('run', help="run a command inside the virtualenv")
 	parser_run.add_argument('otherargs', nargs='*')
 
 	subparsers.add_parser('path',
-						  help="Show the supposed path of the virtualenv for the current directory")
+						  help="show the supposed path of the virtualenv for the current directory")
+
+	parser.add_argument('-v', '--version',  # action="store_true",
+						action='version',
+						version=version())
 
 	args = parser.parse_args()
 
@@ -217,7 +227,7 @@ def runmain():
 
 	projectDir = Path(".").absolute()
 	venvDir = getVepsDir() / (
-				projectDir.name + "_venv")  # venvsParentDir / (projectDir.name + "_venv")
+			projectDir.name + "_venv")  # venvsParentDir / (projectDir.name + "_venv")
 
 	if verbose:
 		print(f"Proj dir: {projectDir}")
@@ -225,6 +235,9 @@ def runmain():
 
 	##########
 
+	#	if args.version:
+	#		ver()
+	#		exit(0)
 	if args.command == "init":
 		init(venvDir, args.python)
 	elif args.command == "reinit":
@@ -235,7 +248,5 @@ def runmain():
 		runargs(venvDir, args.otherargs)
 	elif args.command == "shell":
 		shell(venvDir, projectDir.name)
-	elif args.command == "ver":
-		ver()
 	else:
 		raise ValueError
