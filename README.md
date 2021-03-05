@@ -23,7 +23,7 @@ $ source /where/is/that/damn/directory/.venv/bin/activate
 
 But
 ```base
-$ svet init python39
+$ svet init 
 $ svet shell
 ```
 
@@ -80,10 +80,10 @@ $ pip3 install svet --upgrade
 
 ```bash
 $ cd /path/to/myProject
-$ svet init python3
+$ svet init 
 ```
 
-The `python3` here is the exactly the interpreter will be used for that virtualenv. If you have 
+By default `svet` will try to use `python3` as the interpreter will be used for virtualenv. If you have 
 more than one Python version, just point to the proper binary the way you execute it:
 
 ```bash
@@ -98,7 +98,11 @@ $ svet init /usr/local/opt/python@3.8/bin/python
 
 ```bash
 $ cd /path/to/myProject
-$ svet reinit python3
+$ svet reinit 
+```
+Or point the interpreter:
+```bash
+$ svet reinit python3.8
 ```
 
 ### Run a python script inside the virtualenv 
