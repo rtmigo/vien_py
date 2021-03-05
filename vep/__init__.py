@@ -1,1 +1,1 @@
-from ._constants import __version__
+from .constants import __version__

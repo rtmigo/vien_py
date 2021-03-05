@@ -3,7 +3,7 @@ from pathlib import Path
 
 from setuptools import setup, find_packages
 
-constants = SourceFileLoader('constants', 'vep/_constants.py').load_module()
+constants = SourceFileLoader('constants', 'vep/constants.py').load_module()
 
 # transform GitHub spoilers into markdown
 

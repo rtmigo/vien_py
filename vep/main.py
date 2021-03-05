@@ -47,6 +47,30 @@ from typing import *
 
 verbose = False
 
+import unittest
+
+def getVepsDir() -> Path:
+	s = os.environ["VEPDIR"]
+	if s:
+		return Path(s)
+	else:
+		return Path(os.path.expandvars("$HOME"))/".vepvep"
+
+class TestVenvsDir(unittest.TestCase):
+
+	def test_if_set_plain(self):
+		os.environ["VEPDIR"] = "/path/to/veps"
+		self.assertEqual(getVepsDir(), Path('/path/to/veps'))
+
+	def test_if_not(self):
+		os.environ["VEPDIR"] = ""
+		p = str(getVepsDir())
+		self.assertTrue(p.endswith("vepvep"))
+		self.assertGreater(len(p), len("/.vepvep"))
+
+
+
+
 
 def run(args: List[str]):
 	if verbose:

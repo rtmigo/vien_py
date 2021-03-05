@@ -33,7 +33,7 @@ So I made `vep`. A stupidly simple tool for a half asleep developer.
 `vep` offers a simple rule of where to place the virtualenv.
 
 For a Python project located in directory `aaa` the virtualenv will be located in 
-in `$HOME/.vep/aaa_venv`. For `bbb` it will be `$HOME/.vep/bbb_venv`. 
+in `$HOME/.vepvep/aaa_venv`. For `bbb` it will be `$HOME/.vepvep/bbb_venv`. 
 
 # Usage
 
@@ -64,19 +64,19 @@ $ vep reinit python3
 
 To **run** a **python script** inside `myProject_venv` environment: 
 ```bash 		
-cd /path/to/myProject
-pyvnv run python ./myProgram.py
+$ cd /path/to/myProject
+$ vep run python ./myProgram.py
 ```
 
 To **run** a **bash subshell** inside `myProject_venv` environment:
 ```bash	
-cd /path/to/myProject
-pyvnv shell
+$ cd /path/to/myProject
+$ vep shell
 ```
 
 # $VEPDIR
 
-If you don't like `$HOME/.vep`, you can define the environment variable `VEPDIR` like that:
+If you don't like `$HOME/.vepvep`, you can define the environment variable `VEPDIR` like that:
 ```bash
 $ export VEPDIR="/x/y/z"
 ```
