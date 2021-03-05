@@ -112,7 +112,7 @@ $ svet run python ./my_program.py arg1 arg2 ...
 ```
 
 <details>
-  <summary>[click to open] is an equivalent to</summary><br/>
+  <summary>is an equivalent to</summary><br/>
 
 ```bash 		
 $ cd /path/to/myProject
