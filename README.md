@@ -27,9 +27,18 @@ $ svet init python39
 $ svet shell
 ```
 
+<details>
+  <summary>[click to open] Ready-made solutions did not help.</summary><br/>
+
+
 As a ready-made solution to the problem, I tried [pipenv](https://pipenv.pypa.io/). It kind of 
 solved the problem, but also brought new challenges that dwarfed the old ones. I didn't sign 
 up for this.
+
+I also tried [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/). 
+A package whose name is easier to copy than to type. I hoped it was only a name. Alas, this is the philosophy of the whole package.
+
+</details>
 
 So I made `svet`. A stupidly simple tool for a half asleep developer.
 
