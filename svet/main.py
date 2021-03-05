@@ -190,8 +190,11 @@ def runargs(venvDir: Path, otherargs):
 	exit(runseq(commands))
 
 
-def runmain():
-	if len(sys.argv) <= 1:
+def runmain(args: Optional[List[str]] = None):
+	if args is None:
+		args = sys.argv[1:]
+
+	if not args:
 		print(usageDoc())
 		exit(1)
 
@@ -215,7 +218,7 @@ def runmain():
 	subparsers.add_parser('path',
 						  help="show the supposed path of the virtualenv for the current directory")
 
-	args = parser.parse_args()
+	args = parser.parse_args(args)
 
 	###########
 
