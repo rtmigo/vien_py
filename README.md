@@ -43,14 +43,6 @@ are in `$HOME/.vepvep`.
 
 <details>
   <summary>[click to open] This directory can be changed.</summary><br/>
-  
-If you don't like `$HOME/.vepvep`, you can define the environment variable `VEPDIR` like that:
-```bash
-$ export VEPDIR="/x/y/z"
-```
-So for the project `aaa` the virtualenv will be located in `/x/y/z/aaa_venv`.
-
-The `_venv` suffix is really important. It tells the utility that this directory can be safely removed.  
 </details>  
 
 
@@ -92,3 +84,13 @@ $ vep run python ./myProgram.py
 $ cd /path/to/myProject
 $ vep shell
 ```
+
+# $VEPDIR
+
+If you don't like `$HOME/.vepvep`, you can define the environment variable `VEPDIR` like that:
+```bash
+$ export VEPDIR="/x/y/z"
+```
+So for the project `aaa` the virtualenv will be located in `/x/y/z/aaa_venv`.
+
+The `_venv` suffix is really important. It tells the utility that this directory can be safely removed.
