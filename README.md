@@ -39,9 +39,7 @@ So I made `vep`. A stupidly simple tool for a half asleep developer.
 |`/moved/to/otherProject`|`$HOME/.vepvep/otherProject_venv`|
 
 So only the local name of the project directory matters. And all the virtualenvs 
-are in `$HOME/.vepvep`. 
-
-* Until you [change it](#vepdir).
+are in `$HOME/.vepvep`. Until you [change it](#vepdir).
 
 
 
