@@ -88,9 +88,7 @@ def init(venvDir: Path, version: str):
 	print("Configure PyCharm with Python executable:")
 	print(str(venvDirToExe(venvDir)))
 
-
-if __name__ == "__main__":
-
+def runmain():
 	import sys
 
 	command = sys.argv[1]
@@ -167,3 +165,5 @@ if __name__ == "__main__":
 
 	print("Error: Unexpected argument(s)")
 	exit(1)
+
+
