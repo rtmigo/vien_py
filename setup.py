@@ -5,8 +5,6 @@ from setuptools import setup, find_packages
 
 constants = SourceFileLoader('constants', 'vep/constants.py').load_module()
 
-# transform GitHub spoilers into markdown
-
 setup(
   name="depz",
   version=constants.__version__,
@@ -18,7 +16,7 @@ setup(
   packages=find_packages(),
   install_requires=[],
 
-  description="Command-line shortcuts for Python virtual environments ",
+  description="Command-line shortcuts for Python virtual environments",
 
   long_description=(Path(__file__).parent / 'README.md').read_text(),
   long_description_content_type='text/markdown',
@@ -31,7 +29,7 @@ setup(
     ]},
 
   keywords="""
-     
+     virtual-environment venv virtualenv python
   	""".split(),
 
   # https://pypi.org/classifiers/
