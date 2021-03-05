@@ -35,12 +35,6 @@ So I made `vep`. A stupidly simple tool for a half asleep developer.
 For a Python project located in directory `aaa` the virtualenv will be located in 
 in `$HOME/.vep/aaa_venv`. For `bbb` it will be `$HOME/.vep/bbb_venv`. 
 
-If you don't like `$HOME/.vep`, you can define the environment variable `$VEPDIR`. So 
-for the project `aaa` the virtualenv will be located in `$VEPDIR/aaa`.
-
-But ok, there are existing solu
-
-
 # Usage
 
 To **create** new virtualenv with Python 3.8 in `$VEPDIR/myProject_venv`:
@@ -79,3 +73,8 @@ To **run** a **bash subshell** inside `myProject_venv` environment:
 cd /path/to/myProject
 pyvnv shell
 ```
+
+# $VEPDIR
+
+If you don't like `$HOME/.vep`, you can define the environment variable `$VEPDIR`. So 
+for the project `aaa` the virtualenv will be located in `$VEPDIR/aaa`.
