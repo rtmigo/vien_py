@@ -185,16 +185,25 @@ def shell(venvDir: Path, venvName: str):
 		raise VenvDoesNotExistError
 
 	useColor = True
-	YELLOW = "\e[33m"
-	CYAN = r"\e[36m"
-	NOCOLOR = r"\e[0m"  #
+	# YELLOW = "\e[33m"
+	# CYAN = r"\e[36m"
+	# NOCOLOR = r"\e[0m"  #
+
+	GREEN = "\e[32m\]"
+	MAGENDA = "\e[35m\]"
+	YELLOW = "\e[33m\]"
+	CYAN = r"\e[36m\]"
+	BLUE = r"\e[34m\]"
+	NOCOLOR = r"\e[0m\]"  #
 
 	activatePathQuoted = quote(str(venvDir / "bin" / "activate"))
 
+	venvName = "(" + venvName + ")"
+
 	if useColor:
-		ps = f"\\[{CYAN}svet@{venvName}> {NOCOLOR}\\]"  # fancy but buggy
+		ps = f"\\[{YELLOW}{venvName}{NOCOLOR}:{CYAN}\\W{NOCOLOR}$ \\]"  # fancy but buggy
 	else:
-		ps = f"vep@{venvName}> "
+		ps = f"vep@{venvName}$ "
 
 	commands = [
 		f'source {activatePathQuoted}',
