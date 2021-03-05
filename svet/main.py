@@ -129,14 +129,6 @@ def run(args: List[str]):
 	subprocess.run(args, shell=True)
 
 
-# def runseqOld(commands: List[str]):
-# 	joined = ' && '.join(commands)
-# 	if verbose:
-# 		print(f"Running '{joined}'")
-# 	# return os.system(joined)
-# 	subprocess.run(joined)
-
-
 def runseq(commands: List[str]):
 	bashLines = [
 		"#!/bin/bash"
