@@ -6,7 +6,7 @@ Command-line shortcuts for managing Python virtualenvs.
 
 # Why
 
-Switching between different projects in Python should be simple. I wanted a short command 
+Switching between different projects in Python should be simple. A short command 
 that I would type even half asleep.
 
 Not something like
