@@ -43,9 +43,7 @@ setup(
       'svet = svet:runmain',
     ]},
 
-  keywords="""
-	 virtual-environment venv virtualenv python
-	""".split(),
+  keywords="virtual-environment venv virtualenv python".split(),
 
   # https://pypi.org/classifiers/
   classifiers=[
