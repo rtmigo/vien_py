@@ -1,4 +1,4 @@
-# [depz](https://github.com/rtmigo/depz)
+# [vep](https://github.com/rtmigo/vep)
 
 [![Generic badge](https://img.shields.io/badge/ready_for_use-no-red.svg)](#)
 
