@@ -95,19 +95,6 @@ $ svet create python3.8
 $ svet create /path/to/bin/python3
 ```
 
-	
-### Remove old and create new virtualenv
-
-```bash
-$ cd /path/to/myProject
-$ svet recreate 
-```
-Or point the interpreter:
-```bash
-$ cd /path/to/myProject
-$ svet recreate /path/to/bin/python3
-```
-
 ### Run a python script inside the virtualenv 
 ```bash 		
 $ cd /path/to/myProject
@@ -140,3 +127,25 @@ $ export SVETDIR="/x/y/z"
 So for the project `aaa` the virtualenv will be located in `/x/y/z/aaa_venv`.
 
 The `_venv` suffix tells the utility that this directory can be safely removed.
+
+# Other commands
+
+### Delete virtualenv
+
+```bash
+$ cd /path/to/myProject
+$ svet delete 
+```
+
+### Delete old and create new virtualenv (reset everything)
+
+```bash
+$ cd /path/to/myProject
+$ svet recreate 
+```
+Or point the interpreter:
+```bash
+$ cd /path/to/myProject
+$ svet recreate /path/to/bin/python3
+```
+
