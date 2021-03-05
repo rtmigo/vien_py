@@ -142,7 +142,7 @@ def shell(venvDir: Path, venvName:str):
 	if useColor:
 		ps = f"\\[{CYAN}venv@{venvName}>{NOCOLOR} \\]" # fancy but buggy
 	else:
-		ps = f"venv@{venvName}"
+		ps = f"vep@{venvName}"
 
 	commands = [
 		f'source {activatePathQuoted}',

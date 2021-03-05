@@ -1,6 +1,9 @@
 # [vep](https://github.com/rtmigo/vep)
 
 [![Generic badge](https://img.shields.io/badge/ready_for_use-no-red.svg)](#)
+[![Actions Status](https://github.com/rtmigo/vep/workflows/CI/badge.svg?branch=master)](https://github.com/rtmigo/vep/actions)
+[![Generic badge](https://img.shields.io/badge/CI_OS-MacOS,_Ubuntu-blue.svg)](#)
+[![Generic badge](https://img.shields.io/badge/CI_Python-3.7--3.9-blue.svg)](#)
 
 Command-line shortcuts for managing Python virtualenvs.
 
