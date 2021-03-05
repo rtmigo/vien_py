@@ -4,15 +4,24 @@
 
 import argparse
 import datetime as dt
+import sys
 import textwrap
 
 from svet import __version__
 
 
-usageDoc = f"""
-SVET: Simple Virtual Environments Tool {__version__}
-(c) 2020-2021 Art Galkin <ortemeo@gmail.com>
-See https://github.com/rtmigo/svet#readme
+def version() -> str:
+	modTimestamp = (Path(__file__).parent / "constants.py").stat().st_mtime
+	modYear = dt.datetime.fromtimestamp(modTimestamp).year
+	return "\n".join([
+		f"SVET: Simple Virtual Environments Tool {__version__}",
+		f"(c) 2020-{modYear} Art Galkin <ortemeo@gmail.com>",
+		f"See https://github.com/rtmigo/svet#readme"
+	])
+
+
+def usageDoc():
+	text = f"""{version()}
 
 SVETDIR
 -------
@@ -30,29 +39,36 @@ By default $SVETDIR is "~/.svet". You can redefine in with
 RUNNING
 -------
 
-To CREATE new virtualenv with python3 in $SVETDIR/myProject_venv/:
+CREATE new virtualenv with python3 in $SVETDIR/myProject_venv/:
 
-	cd /abc/myProject
-	svet init python3
+  cd /abc/myProject
+  svet init python3
 	
-To REMOVE old and CREATE new virtualenv:
+REMOVE old and CREATE new virtualenv:
 
-	cd /abc/myProject
-	svet reinit python3
+  cd /abc/myProject
+  svet reinit python3
  		
-To RUN a PYTHON SCRIPT inside "myProject_venv" environment:	
+RUN a PYTHON SCRIPT inside "myProject_venv" environment:	
 
-	cd /abc/myProject
-	svet run python ./myProgram.py
+  cd /abc/myProject
+  svet run python ./myProgram.py
 	
-To RUN a BASH SUBSHELL inside "myProject_venv" environment:	
+RUN a BASH SUBSHELL inside "myProject_venv" environment:	
 
-	cd /abc/myProject
-	svet shell
+  cd /abc/myProject
+  svet shell
 
--------
+See HELP with other options:	
+
+  svet -h
 
 """
+
+	doc = text.strip()
+	aboveFirstLine = ("-" * len(doc.splitlines()[0]))
+	return f"{aboveFirstLine}\n{doc}\n"
+
 
 import json
 import os
@@ -181,14 +197,7 @@ def runargs(venvDir: Path, otherargs):
 	exit(runseq(commands))
 
 
-def version() -> str:
-	modTimestamp = (Path(__file__).parent / "constants.py").stat().st_mtime
-	modYear = dt.datetime.fromtimestamp(modTimestamp).year
-	return "\n".join([
-		f"SVET: Simple Virtual Environments Tool {__version__}",
-		f"(c) 2020-{modYear} Art Galkin <ortemeo@gmail.com>",
-		f"See https://github.com/rtmigo/svet#readme"
-	])
+
 
 
 def rewrap(text: str):
@@ -211,13 +220,26 @@ def rewrap(text: str):
 # 			textwrap.fill(line, width)
 # 			for line in textwrap.indent(textwrap.dedent(text), indent).splitlines()])
 
-class VersionedHelp(argparse.HelpFormatter):
-
-	def _format_usage(self, *args):
-		"""A hack using non-public method."""
-		doc = usageDoc.strip()
-		aboveFirstLine = ("-" * len(doc.splitlines()[0]))
-		return aboveFirstLine + "\n" + doc + "\n\n" + super()._format_usage(*args)
+# class VersionedHelp(argparse.HelpFormatter):
+#
+# 	# def add_usage(self, usage, actions, groups, prefix=None):
+# 	# 	if prefix is None:
+# 	# 		print("USAGE", usage)
+# 	# 		print("ACTIONS", actions)
+# 	# 		prefix = usageDoc()
+# 	# 	return super().add_usage(usage, actions, groups, prefix=prefix)
+#
+# 	def _format_usage(self, usage, actions, groups, prefix):
+# 		"""A hack using non-public method.
+# 		Inserts a text ABOVE the usage message.
+# 		"""
+# 		#doc = usageDoc.strip()
+# 		#aboveFirstLine = ("-" * len(doc.splitlines()[0]))
+#
+# 		print("ACTIONS", groups)
+# 		print("GROUPS", groups)
+#
+# 		return usageDoc() + "\n\n" + super()._format_usage(usage, actions, groups, prefix)
 
 
 # def _format_usage(self, usage, actions, groups, prefix=None):
@@ -226,8 +248,12 @@ class VersionedHelp(argparse.HelpFormatter):
 #	return #argparse.HelpFormatter._format_usage(self, usage, actions, groups, prefix)
 
 def runmain():
+	if len(sys.argv) <= 1:
+		print(usageDoc())
+		exit(1)
+
 	# noinspection PyTypeChecker
-	parser = argparse.ArgumentParser(formatter_class=VersionedHelp)
+	parser = argparse.ArgumentParser()
 
 	subparsers = parser.add_subparsers(dest='command', required=True)
 
@@ -246,9 +272,9 @@ def runmain():
 	subparsers.add_parser('path',
 						  help="show the supposed path of the virtualenv for the current directory")
 
-	parser.add_argument('-v', '--version',  # action="store_true",
-						action='version',
-						version=version())
+	# parser.add_argument('-v', '--version',  # action="store_true",
+	# 					action='version',
+	# 					version=version())
 
 	args = parser.parse_args()
 
