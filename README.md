@@ -22,6 +22,11 @@ $ vep init python39
 $ vep shell
 ```
 
+As a ready-made solution to the problem, I tried [pipenv](https://pipenv.pypa.io/). But it is not 
+a simple solution. This mighty tool brings new challenges that dwarf old ones. I didn't sign up for this.
+
+So I made `vep`. A stupidly simple tool for a half asleep developer.
+
 # What is does
 
 `vep` offers a simple rule of where to place the virtualenv.
@@ -31,6 +36,9 @@ in `$HOME/.vep/aaa_venv`. For `bbb` it will be `$HOME/.vep/bbb_venv`.
 
 If you don't like `$HOME/.vep`, you can define the environment variable `$VEPDIR`. So 
 for the project `aaa` the virtualenv will be located in `$VEPDIR/aaa`.
+
+But ok, there are existing solu
+
 
 # Usage
 
