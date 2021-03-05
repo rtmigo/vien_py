@@ -1,6 +1,11 @@
 # SPDX-FileCopyrightText: (c) 2020 Art Galkin <ortemeo@gmail.com>
 # SPDX-License-Identifier: BSD-3-Clause
 
+
+import argparse
+
+from vep import __version__
+
 venvsRoot = "~/.pyvnv/"
 
 helptxt = f"""
@@ -88,74 +93,37 @@ def init(venvDir: Path, version: str):
 	print("Configure PyCharm with Python executable:")
 	print(str(venvDirToExe(venvDir)))
 
-def runmain():
-	import sys
+def reinit(venvDir: Path, version: str):
+	if not "venv" in str(venvDir.absolute()):
+		raise Exception
+	if venvDir.exists():
+		print(f"Removing {venvDir}")
+		shutil.rmtree(str(venvDir))
+	init(venvDir=venvDir, version=version)
 
-	command = sys.argv[1]
+def shell(venvDir: Path, venvName:str):
 
-	venvsParentDir = Path(os.path.expanduser(venvsRoot)).absolute()
+	useColor = False
+	YELLOW = ""  # "\e[33m"
+	CYAN = r"\e[36m"
+	NOCOLOR = r"\e[0m"  #
 
-	projectDir = Path(".").absolute()
-	venvDir = venvsParentDir / (projectDir.name + "_venv")
+	activatePathQuoted = quote(str(venvDir / "bin" / "activate"))
 
-	venvName = projectDir.name
-	if venvName.endswith("_py"):
-		venvName = venvName[:-3]
+	if useColor:
+		ps = f"\\[{CYAN}venv@{venvName}>{NOCOLOR} \\]" # fancy but buggy
+	else:
+		ps = f"venv@{venvName}> "
 
-	if verbose:
-		print(f"Proj dir: {projectDir}")
-		print(f"Venv dir: {venvDir}")
+	commands = [
+		f'source {activatePathQuoted}',
+		f'export PS1="{ps}> "',
+		'exec bash'
+	]
 
-	if command == "path":
-		print(venvDir)
-		exit(0)
+	exit(runseq(commands))
 
-	if command == "reinit":
-
-		if len(sys.argv) < 3:
-			print("Usage: pyvnv reinit X.X")
-			exit(1)
-		version = sys.argv[2]
-
-		if os.path.exists(venvDir):
-			print(f"Removing {venvDir}")
-			shutil.rmtree(str(venvDir))
-		init(venvDir=venvDir, version=version)
-		exit(0)
-
-	if command == "init":
-
-		if len(sys.argv) < 3:
-			print("Usage: pyvnv init X.X")
-			exit(1)
-		version = sys.argv[2]
-
-		init(venvDir=venvDir, version=version)
-
-		exit(0)
-
-	if command == "shell":
-		useColor = False
-		YELLOW = ""  # "\e[33m"
-		CYAN = r"\e[36m"
-		NOCOLOR = r"\e[0m"  #
-
-		activatePathQuoted = quote(str(venvDir / "bin" / "activate"))
-
-
-
-		commands = [
-			f'source {activatePathQuoted}',
-			f'export PS1="venv@{venvName}> "',
-			# f'export PS1="\\[{CYAN}venv@{venvName}>{NOCOLOR} \\]"', # fancy but buggy
-			'exec bash'
-		]
-
-		exit(runseq(commands))
-
-	if command == "run":
-		otherargs = sys.argv[2:]
-
+def runargs(venvDir: Path, otherargs):
 		commands = [
 			f'source "{venvDir}/bin/activate"',
 			" ".join(quote(a) for a in otherargs)
@@ -163,7 +131,58 @@ def runmain():
 
 		exit(runseq(commands))
 
-	print("Error: Unexpected argument(s)")
-	exit(1)
+def ver():
+	print(__version__)
+
+def runmain():
+
+	parser = argparse.ArgumentParser()
+	subparsers = parser.add_subparsers(dest='command', required=True)
+
+	parser_init = subparsers.add_parser('init', help="Create new virtual environment")
+	parser_init.add_argument('python', type=str)
+
+	parser_reinit = subparsers.add_parser('reinit', help="Remove existing virtual environment and create new")
+	parser_reinit.add_argument('python', type=str)
+
+	subparsers.add_parser('shell', help="Dive into Bash subshell using the virtual environment")
+
+	parser_run =subparsers.add_parser('run', help="Run a command inside the virtual environment")
+	parser_run.add_argument('otherargs', nargs='*')
+
+	subparsers.add_parser('path', help="Show the supposed path of the virtual environment for the current directory")
+	subparsers.add_parser('ver', help="Print program version")
+
+	args = parser.parse_args()
+
+	###########
+
+	venvsParentDir = Path(os.path.expanduser(venvsRoot)).absolute()
+	projectDir = Path(".").absolute()
+	venvDir = venvsParentDir / (projectDir.name + "_venv")
+
+	if verbose:
+		print(f"Proj dir: {projectDir}")
+		print(f"Venv dir: {venvDir}")
+
+	##########
+
+	if args.command == "init":
+		init(venvDir, args.python)
+	elif args.command == "reinit":
+		reinit(venvDir, args.python)
+	elif args.command == "path":
+		print(venvDir)
+	elif args.command == "run":
+		runargs(venvDir, args.otherargs)
+	elif args.command == "shell":
+		shell(venvDir, projectDir.name)
+	elif args.command == "ver":
+		ver()
+	else:
+		raise ValueError
+
+
+
 
 
