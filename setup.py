@@ -18,7 +18,7 @@ setup(
   packages=find_packages(),
   install_requires=[],
 
-  description="Command-line shortcuts for python virtual environments",
+  description="Command-line shortcuts for Python virtual environments ",
 
   long_description=(Path(__file__).parent / 'README.md').read_text(),
   long_description_content_type='text/markdown',
