@@ -4,39 +4,50 @@
 
 import argparse
 import datetime as dt
+import textwrap
 
 from svet import __version__
 from svet.bashAliasRunner import runWithBashAliases
 
-venvsRoot = "~/.pyvnv/"
 
-__doc__ = f"""
-# 
+def usage():
+	return f"""
 
-VEP helps managing virtual environments located in {venvsRoot} 
+SVETDIR
+-------
 
-For a Python project /path/to/myProject/ virtualenv will be located in 
-in {venvsRoot}myProject_venv/
+SVET maps project directory names to virtualenv paths.
 
-To CREATE new virtualenv with Python 3.8 in {venvsRoot}myProject_venv/:
+  /here/myProject       -> $SVETDIR/myProject_venv
+  /there/myProject      -> $SVETDIR/myProject_venv
+  /there/otherProject   -> $SVETDIR/otherProject_venv
 
-	cd /path/to/myProject
-	vep init 3.8
+By default $SVETDIR is "~/.svet". You can redefine in with
+
+  export SVETDIR="/other/location"
+
+RUNNING
+-------
+
+To CREATE new virtualenv with python3 in $SVETDIR/myProject_venv/:
+
+	cd /abc/myProject
+	svet init python3
 	
 To REMOVE old and CREATE new virtualenv:
 
-	cd /path/to/myProject
-	vep reinit 3.8
+	cd /abc/myProject
+	svet reinit python3
  		
 To RUN a PYTHON SCRIPT inside "myProject_venv" environment:	
 
-	cd /path/to/myProject
-	vep run python ./myProgram.py
+	cd /abc/myProject
+	svet run python ./myProgram.py
 	
 To RUN a BASH SUBSHELL inside "myProject_venv" environment:	
 
-	cd /path/to/myProject
-	vep shell
+	cd /abc/myProject
+	svet shell
 
 """
 
@@ -53,37 +64,37 @@ import unittest
 
 
 def getVepsDir() -> Path:
-	s = os.environ.get("VEPDIR")
+	s = os.environ.get("SVETDIR")
 	if s:
 		return Path(os.path.expanduser(os.path.expandvars(s)))
 	else:
-		return Path(os.path.expandvars("$HOME")) / ".vepvep"
+		return Path(os.path.expandvars("$HOME")) / ".svet"
 
 
 class TestVenvsDir(unittest.TestCase):
 
 	def test_if_set_plain(self):
-		os.environ["VEPDIR"] = "/path/to/veps"
+		os.environ["SVETDIR"] = "/path/to/veps"
 		self.assertEqual(getVepsDir(), Path('/path/to/veps'))
 
 	def test_if_set_with_vars(self):
-		os.environ["VEPDIR"] = "$HOME/subfolder"
+		os.environ["SVETDIR"] = "$HOME/subfolder"
 		s = str(getVepsDir())
 		self.assertTrue("$" not in s)
 		self.assertGreater(len(s), len("/home/"))
 
 	def test_if_set_with_user(self):
-		os.environ["VEPDIR"] = "~/subfolder"
+		os.environ["SVETDIR"] = "~/subfolder"
 		s = str(getVepsDir())
 		self.assertTrue("~" not in s)
 		self.assertGreater(len(s), len("/home/"))
 
 	def test_if_not_n(self):
-		if "VEPDIR" in os.environ:
-			del os.environ["VEPDIR"]
+		if "SVETDIR" in os.environ:
+			del os.environ["SVETDIR"]
 		p = str(getVepsDir())
-		self.assertTrue(p.endswith("vepvep"))
-		self.assertGreater(len(p), len("/.vepvep"))
+		self.assertTrue(p.endswith("svet"))
+		self.assertGreater(len(p), len("/.svet"))
 
 
 def run(args: List[str]):
@@ -140,7 +151,7 @@ def shell(venvDir: Path, venvName: str):
 	activatePathQuoted = quote(str(venvDir / "bin" / "activate"))
 
 	if useColor:
-		ps = f"\\[{CYAN}vep@{venvName}> {NOCOLOR}\\]"  # fancy but buggy
+		ps = f"\\[{CYAN}svet@{venvName}> {NOCOLOR}\\]"  # fancy but buggy
 	else:
 		ps = f"vep@{venvName}> "
 
@@ -172,9 +183,15 @@ def version() -> str:
 	])
 
 
-# print(f"SVET {__version__} : (c) 2020-{y} Art Galkin <ortemeo@gmail.com>")
-# print(f"https://github.com/rtmigo/vep#readme")
+def rewrap(text: str):
+	# to make the use of indented docstrings more convenient
+	return "\n".join([textwrap.fill(line.strip(), 80) for line in text.splitlines()])
 
+
+# # https://stackoverflow.com/a/64102901
+# return "\n".join([
+# 	textwrap.fill(line, width)
+# 	for line in textwrap.indent(textwrap.dedent(text), indent).splitlines()])
 
 class RawFormatter(argparse.HelpFormatter):
 	"""Allows no use newline characters in ArgumentParser description.
@@ -195,9 +212,7 @@ class RawFormatter(argparse.HelpFormatter):
 def runmain():
 	# noinspection PyTypeChecker
 	parser = argparse.ArgumentParser(
-		description=f"""
-		SVET: Simple Virtual Environments Tool""",
-		formatter_class=RawFormatter
+		usage=usage(),
 	)
 
 	subparsers = parser.add_subparsers(dest='command', required=True)
@@ -235,9 +250,6 @@ def runmain():
 
 	##########
 
-	#	if args.version:
-	#		ver()
-	#		exit(0)
 	if args.command == "init":
 		init(venvDir, args.python)
 	elif args.command == "reinit":

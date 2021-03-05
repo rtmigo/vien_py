@@ -4,7 +4,7 @@ set -e
 scriptParentDir="$(dirname "$(perl -MCwd -e 'print Cwd::abs_path shift' "$0")")"
 cd "$scriptParentDir"
 
-python3 -m unittest discover -t . -s "vep" -p "*.py" --buffer
+python3 -m unittest discover -t . -s "svet" -p "*.py" --buffer
 
 # to run tests on particular file:
 # python3 -m unittest discover -t . -s "depz" -p filename.py
