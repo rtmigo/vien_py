@@ -74,3 +74,21 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
 		runmain(["reinit", "python3"])
 		self.assertTrue(self.expectedVenvBin.exists())
+
+	def test_init_wo_argument(self):
+		self.assertFalse(self.expectedVenvDir.exists())
+		self.assertFalse(self.expectedVenvBin.exists())
+
+		runmain(["init"])
+
+		self.assertTrue(self.expectedVenvDir.exists())
+		self.assertTrue(self.expectedVenvBin.exists())
+
+	def test_reinit_wo_argument(self):
+		self.assertFalse(self.expectedVenvDir.exists())
+		self.assertFalse(self.expectedVenvBin.exists())
+
+		runmain(["reinit"])
+
+		self.assertTrue(self.expectedVenvDir.exists())
+		self.assertTrue(self.expectedVenvBin.exists())

@@ -204,11 +204,11 @@ def runmain(args: Optional[List[str]] = None):
 	subparsers = parser.add_subparsers(dest='command', required=True)
 
 	parser_init = subparsers.add_parser('init', help="create new virtualenv")
-	parser_init.add_argument('python', type=str)
+	parser_init.add_argument('python', type=str, default="python3", nargs='?')
 
 	parser_reinit = subparsers.add_parser('reinit',
 										  help="remove existing virtualenv and create new")
-	parser_reinit.add_argument('python', type=str)
+	parser_reinit.add_argument('python', type=str, default="python3", nargs='?')
 
 	subparsers.add_parser('shell', help="dive into Bash subshell using the virtualenv")
 
