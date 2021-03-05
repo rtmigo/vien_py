@@ -161,7 +161,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 		with self.assertRaises(SystemExit):
 			# just check the argparser handles --version properly
 			# (was failing with nargs='*', ok with nargs=argparse.REMAINDER)
-			runmain(["run", "python", "--version"])
+			runmain(["run", "python3", "--version"])
 
 	def test_run_create_dir(self):
 		runmain(["create"])
@@ -173,7 +173,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
 		runme = f"import os; os.mkdir({repr(str(markerDir))})"
 		with self.assertRaises(SystemExit):
-			runmain(["run", "python", "-c", runme])
+			runmain(["run", "python3", "-c", runme])
 
 		# check it created
 		self.assertTrue(markerDir.exists())
