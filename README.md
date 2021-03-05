@@ -110,13 +110,17 @@ $ svet reinit python3.8
 $ cd /path/to/myProject
 $ svet run python ./my_program.py arg1 arg2 ...
 ```
-is an equivalent to
+
+<details>
+  <summary>[click to open] is an equivalent to</summary><br/>
+
 ```bash 		
 $ cd /path/to/myProject
 $ source /path/to/the/venv/bin/activate
 $ python ./my_program.py arg1 arg2 ...
 $ /path/to/the/venv/bin/deactivate
 ```
+</details>
 
 ### Run a bash subshell inside the virtualenv 
 ```bash	
