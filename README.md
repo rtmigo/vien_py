@@ -32,8 +32,12 @@ So I made `vep`. A stupidly simple tool for a half asleep developer.
 
 `vep` offers a simple rule of where to place the virtualenv.
 
-For a Python project in the directory `aaa` the virtualenv will be in 
-in `$HOME/.vepvep/aaa_venv`. For `bbb` it will be `$HOME/.vepvep/bbb_venv`. 
+|project dir|virtualenv dir|
+|-----|----|
+|/abc/thisProject|$HOME/.vepvep/thisProject_venv|
+|/abc/otherProject|$HOME/.vepvep/otherProject_venv|
+|/moved/otherProject|$HOME/.vepvep/otherProject_venv|
+
 
 # Usage
 
