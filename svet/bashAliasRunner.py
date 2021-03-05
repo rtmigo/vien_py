@@ -16,8 +16,8 @@ def iterExistingProfileFiles() -> Iterator[str]:
 		"~/.profile"]:
 		possibleProfileFile = os.path.expanduser(possibleProfileFile)
 		if os.path.exists(possibleProfileFile):
-			yield possibleProfileFile
-
+			yield possiblePro
+# todo make separate package from it?
 
 def runWithBashAliases(commands: Union[str, List[str]]):
 	# AG 2021-03: this the only way I found on MacOS 10.13 to run

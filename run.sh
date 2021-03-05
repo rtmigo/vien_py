@@ -6,4 +6,4 @@ set -e
 thisFileParentDir="$(dirname "$(perl -MCwd -e 'print Cwd::abs_path shift' "$0")")"
 cd "$thisFileParentDir"
 
-python3 vep "$@"
+python3 svet "$@"
