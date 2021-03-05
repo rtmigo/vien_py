@@ -3,8 +3,10 @@
 
 
 import argparse
+from tempfile import TemporaryDirectory
 
 from vep import __version__
+from vep.bashAliasRunner import runWithBashAliases
 
 venvsRoot = "~/.pyvnv/"
 
@@ -88,7 +90,7 @@ class TestVenvsDir(unittest.TestCase):
 def run(args: List[str]):
 	if verbose:
 		print(f"Running {args}")
-	subprocess.run(args)
+	subprocess.run(args, shell=True)
 
 
 def runseq(commands: List[str]):
@@ -102,17 +104,6 @@ def quote(arg: str) -> str:
 	return json.dumps(arg)
 
 
-def findPython(version: str):
-	for path in [
-		"/Library/Frameworks/Python.framework/Versions/VER/bin/python3",
-		"/usr/local/opt/python@VER/bin/python3",
-	]:
-		path = path.replace("VER", version)
-		if os.path.exists(path):
-			return path
-	raise FileNotFoundError(f"Cannot find Python version {version}")
-
-
 def venvDirToExe(venvDir: Path) -> Path:
 	return venvDir / "bin" / "python"
 
@@ -121,17 +112,18 @@ def init(venvDir: Path, version: str):
 	if venvDir.exists():
 		raise Exception("Venv already exists.")
 
-	exe = findPython(version)
+	exe = version
 
 	print(f"Creating {venvDir}")
-	args = [exe, "-m", "venv", str(venvDir)]
-	run(args)
+
+	runWithBashAliases(f'{exe} -m venv "{str(venvDir)}"')
+
 	print()
 	print("Configure PyCharm with Python executable:")
 	print(str(venvDirToExe(venvDir)))
 
 def reinit(venvDir: Path, version: str):
-	if not "venv" in str(venvDir.absolute()):
+	if not "_venv" in venvDir.name:
 		raise Exception
 	if venvDir.exists():
 		print(f"Removing {venvDir}")
@@ -150,7 +142,7 @@ def shell(venvDir: Path, venvName:str):
 	if useColor:
 		ps = f"\\[{CYAN}venv@{venvName}>{NOCOLOR} \\]" # fancy but buggy
 	else:
-		ps = f"venv@{venvName}> "
+		ps = f"venv@{venvName}"
 
 	commands = [
 		f'source {activatePathQuoted}',
