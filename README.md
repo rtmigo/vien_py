@@ -56,7 +56,7 @@ The `python3` here is the exactly the interpreter will be used for that virtuale
 more than one Python version, just point to the binary in some way:
 
 ```bash
-$ vep init python39
+$ vep init python3.9
 ```
 ```bash
 $ vep init /usr/local/opt/python@3.8/bin/python

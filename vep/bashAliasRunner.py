@@ -59,7 +59,7 @@ def runWithBashAliases(commands: Union[str, List[str]]):
 	bashLines = [
 		"#!/bin/bash"
 		"set -e",  # fail on first error
-		"shopt -s expand_aliases",  # expand aliases
+		"shopt -s expand_aliases",  # turn on expansion
 	]
 
 	# the bash session still have no idea where to take the aliases.
