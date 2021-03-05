@@ -76,5 +76,8 @@ pyvnv shell
 
 # $VEPDIR
 
-If you don't like `$HOME/.vep`, you can define the environment variable `$VEPDIR`. So 
-for the project `aaa` the virtualenv will be located in `$VEPDIR/aaa`.
+If you don't like `$HOME/.vep`, you can define the environment variable `VEPDIR` like that:
+```bash
+$ export VEPDIR="/x/y/z"
+```
+So for the project `aaa` the virtualenv will be located in `/x/y/z/aaa_venv`.
