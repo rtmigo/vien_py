@@ -134,12 +134,23 @@ def run(args: List[str]):
 	subprocess.run(args, shell=True)
 
 
-def runseq(commands: List[str]):
+def runseqOld(commands: List[str]):
 	joined = ' && '.join(commands)
 	if verbose:
 		print(f"Running '{joined}'")
-	return os.system(joined)
+	# return os.system(joined)
+	subprocess.run(joined)
 
+
+def runseq(commands: List[str]):
+	bashLines = [
+		"#!/bin/bash"
+		"set -e",  # fail on first error
+	]
+
+	bashLines.extend(commands)
+
+	subprocess.call("\n".join(bashLines), shell=True)
 
 def quote(arg: str) -> str:
 	return json.dumps(arg)
