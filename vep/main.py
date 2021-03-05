@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
+import datetime as dt
 import argparse
 from tempfile import TemporaryDirectory
 
@@ -161,11 +162,14 @@ def runargs(venvDir: Path, otherargs):
 		exit(runseq(commands))
 
 def ver():
-	print(__version__)
+	m = max(p.stat().st_mtime for p in Path(__file__).parent.glob("*"))
+	y = dt.datetime.fromtimestamp(m).year
+	print(f"VEP {__version__} : (c) 2020-{y} Art Galkin <ortemeo@gmail.com>")
+	print(f"https://github.com/rtmigo/vep#readme")
 
 def runmain():
 
-	parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser(description="See https://github.com/rtmigo/vep#readme for details.")
 	subparsers = parser.add_subparsers(dest='command', required=True)
 
 	parser_init = subparsers.add_parser('init', help="Create new virtualenv")
