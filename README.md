@@ -32,7 +32,7 @@ $ svet shell
 
 
 I tried [pipenv](https://pipenv.pypa.io/). It kind of solved the problem, but also brought new 
-challenges that dwarfed the old ones. I just wanted to manage virtualenvs.
+challenges that dwarfed the old ones. I did not sign up to this. I just wanted to manage virtualenvs.
 
 I also tried [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/). 
 A package whose name is easier to copy than to type. I hoped it was only a name. Alas, this is the philosophy of the whole package.
