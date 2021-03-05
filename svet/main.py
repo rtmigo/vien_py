@@ -5,7 +5,6 @@
 import argparse
 import datetime as dt
 import sys
-import textwrap
 
 from svet import __version__
 
@@ -196,56 +195,6 @@ def runargs(venvDir: Path, otherargs):
 
 	exit(runseq(commands))
 
-
-
-
-
-def rewrap(text: str):
-	# to make the use of indented docstrings more convenient
-	return "\n".join([textwrap.fill(line.strip(), 80) for line in text.splitlines()])
-
-
-# class RawFormatter(argparse.HelpFormatter):
-# 	"""Allows no use newline characters in ArgumentParser description.
-# 	Unlike argparse.RawTextHelpFormatter wraps long lines to fit width."""
-#
-# 	def _fill_text(self, text, width, indent):
-# 		import textwrap
-#
-# 		# to make the use of indented docstrings more convenient
-# 		text = "\n".join([line.strip() for line in text.splitlines()])
-#
-# 		# https://stackoverflow.com/a/64102901
-# 		return "\n".join([
-# 			textwrap.fill(line, width)
-# 			for line in textwrap.indent(textwrap.dedent(text), indent).splitlines()])
-
-# class VersionedHelp(argparse.HelpFormatter):
-#
-# 	# def add_usage(self, usage, actions, groups, prefix=None):
-# 	# 	if prefix is None:
-# 	# 		print("USAGE", usage)
-# 	# 		print("ACTIONS", actions)
-# 	# 		prefix = usageDoc()
-# 	# 	return super().add_usage(usage, actions, groups, prefix=prefix)
-#
-# 	def _format_usage(self, usage, actions, groups, prefix):
-# 		"""A hack using non-public method.
-# 		Inserts a text ABOVE the usage message.
-# 		"""
-# 		#doc = usageDoc.strip()
-# 		#aboveFirstLine = ("-" * len(doc.splitlines()[0]))
-#
-# 		print("ACTIONS", groups)
-# 		print("GROUPS", groups)
-#
-# 		return usageDoc() + "\n\n" + super()._format_usage(usage, actions, groups, prefix)
-
-
-# def _format_usage(self, usage, actions, groups, prefix=None):
-#	if prefix is None:
-#		prefix = usageDoc
-#	return #argparse.HelpFormatter._format_usage(self, usage, actions, groups, prefix)
 
 def runmain():
 	if len(sys.argv) <= 1:
