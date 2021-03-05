@@ -38,7 +38,21 @@ So I made `vep`. A stupidly simple tool for a half asleep developer.
 |`/abc/otherProject`|`$HOME/.vepvep/otherProject_venv`|
 |`/moved/to/otherProject`|`$HOME/.vepvep/otherProject_venv`|
 
-So only the local name of the project directory matters. And all the virtualenvs are in `$HOME/.vepvep`
+So only the local name of the project directory matters. And all the virtualenvs 
+are in `$HOME/.vepvep`.
+
+<details>
+  <summary>[click to open] This directory can be changed.</summary><br/>
+  
+If you don't like `$HOME/.vepvep`, you can define the environment variable `VEPDIR` like that:
+```bash
+$ export VEPDIR="/x/y/z"
+```
+So for the project `aaa` the virtualenv will be located in `/x/y/z/aaa_venv`.
+
+The `_venv` suffix is really important. It tells the utility that this directory can be safely removed.  
+</details>  
+
 
 # Usage
 
@@ -78,13 +92,3 @@ $ vep run python ./myProgram.py
 $ cd /path/to/myProject
 $ vep shell
 ```
-
-# $VEPDIR
-
-If you don't like `$HOME/.vepvep`, you can define the environment variable `VEPDIR` like that:
-```bash
-$ export VEPDIR="/x/y/z"
-```
-So for the project `aaa` the virtualenv will be located in `/x/y/z/aaa_venv`.
-
-The `_venv` suffix is really important. It tells the utility that this directory can be safely removed.
