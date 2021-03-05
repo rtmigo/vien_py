@@ -5,6 +5,21 @@ from setuptools import setup, find_packages
 
 constants = SourceFileLoader('constants', 'svet/constants.py').load_module()
 
+
+def readDocText():
+  """Reads README.md and returns the text after first empty line.
+  It helps to skip the header with badges intended only for GitHub.
+  """
+  doctext = (Path(__file__).parent / 'README.md').read_text()
+
+  # skipping until first empty line
+  lines = [l.strip() for l in doctext.splitlines()]
+  firstEmptyLineIndex = lines.index("")
+  lines = lines[firstEmptyLineIndex + 1:]
+
+  return "\n".join(lines)
+
+
 setup(
   name="svet",
   version=constants.__version__,
@@ -18,7 +33,7 @@ setup(
 
   description="Command-line shortcuts for Python virtual environments",
 
-  long_description=(Path(__file__).parent / 'README.md').read_text(),
+  long_description=readDocText(),
   long_description_content_type='text/markdown',
 
   license='BSD-3-Clause',
@@ -29,8 +44,8 @@ setup(
     ]},
 
   keywords="""
-     virtual-environment venv virtualenv python
-  	""".split(),
+	 virtual-environment venv virtualenv python
+	""".split(),
 
   # https://pypi.org/classifiers/
   classifiers=[
@@ -49,5 +64,5 @@ setup(
 
   # test_suite='nose.collector',
   # tests_require=['nose'],
-  #zip_safe=False
+  # zip_safe=False
 )

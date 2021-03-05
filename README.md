@@ -1,5 +1,4 @@
 # [svet](https://github.com/rtmigo/svet#readme)
-
 [![Generic badge](https://img.shields.io/badge/ready_for_use-maybe-orange.svg)](#)
 [![PyPI version shields.io](https://img.shields.io/pypi/v/svet.svg)](https://pypi.python.org/pypi/svet/)
 [![Actions Status](https://github.com/rtmigo/svet/workflows/CI/badge.svg?branch=master)](https://github.com/rtmigo/svet/actions)
