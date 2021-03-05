@@ -1,4 +1,4 @@
-# [vep](https://github.com/rtmigo/vep)
+# [vep](https://github.com/rtmigo/vep#readme)
 
 [![Generic badge](https://img.shields.io/badge/ready_for_use-no-red.svg)](#)
 [![Actions Status](https://github.com/rtmigo/vep/workflows/CI/badge.svg?branch=master)](https://github.com/rtmigo/vep/actions)
