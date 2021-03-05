@@ -36,7 +36,7 @@ So I made `vep`. A stupidly simple tool for a half asleep developer.
 |-----|----|
 |/abc/thisProject|$HOME/.vepvep/thisProject_venv|
 |/abc/otherProject|$HOME/.vepvep/otherProject_venv|
-|/moved/otherProject|$HOME/.vepvep/otherProject_venv|
+|/moved/to/otherProject|$HOME/.vepvep/otherProject_venv|
 
 
 # Usage
