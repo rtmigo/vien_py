@@ -111,7 +111,7 @@ $ /path/to/the/venv/bin/deactivate
 ```
 </details>
 
-### Run a bash subshell inside the virtualenv 
+### Get into interactive bash with the virtualenv 
 ```bash	
 $ cd /path/to/myProject
 $ svet shell
