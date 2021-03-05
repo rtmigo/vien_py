@@ -108,7 +108,14 @@ $ svet reinit python3.8
 ### Run a python script inside the virtualenv 
 ```bash 		
 $ cd /path/to/myProject
-$ svet run python ./myProgram.py
+$ svet run python ./my_program.py arg1 arg2 ...
+```
+is an equivalent to
+```bash 		
+$ cd /path/to/myProject
+$ source /path/to/the/venv/bin/activate
+$ python ./my_program.py arg1 arg2 ...
+$ /path/to/the/venv/bin/deactivate
 ```
 
 ### Run a bash subshell inside the virtualenv 
