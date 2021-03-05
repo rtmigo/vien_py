@@ -133,21 +133,21 @@ def reinit(venvDir: Path, version: str):
 
 def shell(venvDir: Path, venvName:str):
 
-	useColor = False
-	YELLOW = ""  # "\e[33m"
+	useColor = True
+	YELLOW = "\e[33m"
 	CYAN = r"\e[36m"
 	NOCOLOR = r"\e[0m"  #
 
 	activatePathQuoted = quote(str(venvDir / "bin" / "activate"))
 
 	if useColor:
-		ps = f"\\[{CYAN}venv@{venvName}>{NOCOLOR} \\]" # fancy but buggy
+		ps = f"\\[{CYAN}vep@{venvName}> {NOCOLOR}\\]" # fancy but buggy
 	else:
-		ps = f"vep@{venvName}"
+		ps = f"vep@{venvName}> "
 
 	commands = [
 		f'source {activatePathQuoted}',
-		f'export PS1="{ps}> "',
+		f'export PS1="{ps}"',
 		'exec bash'
 	]
 

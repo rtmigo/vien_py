@@ -14,7 +14,7 @@ that I would type even half asleep.
 
 Not something like
 ```base
-# python3 -m venv ./i/have/no/idea/where/to/put/this/.venv
+$ python3 -m venv ./i/have/no/idea/where/to/put/this/.venv
 $ source /where/is/that/damn/directory/.venv/bin/activate
 ```
 
