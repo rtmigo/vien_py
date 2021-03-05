@@ -11,7 +11,7 @@ setup(
 
   author="Art Galkin",
   author_email="ortemeo@gmail.com",
-  url='https://github.com/rtmigo',
+  url='https://github.com/rtmigo/svet',
 
   packages=find_packages(),
   install_requires=[],
