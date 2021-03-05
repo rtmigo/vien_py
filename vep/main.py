@@ -8,8 +8,8 @@ from vep import __version__
 
 venvsRoot = "~/.pyvnv/"
 
-helptxt = f"""
-# -- PYVNV --------------------------------------------------------------------
+__doc__ = f"""
+# 
 
 VEP helps managing virtual environments located in {venvsRoot} 
 
@@ -19,22 +19,22 @@ in {venvsRoot}myProject_venv/
 To CREATE new virtualenv with Python 3.8 in {venvsRoot}myProject_venv/:
 
 	cd /path/to/myProject
-	pyvnv init 3.8
+	vep init 3.8
 	
 To REMOVE old and CREATE new virtualenv:
 
 	cd /path/to/myProject
-	pyvnv reinit 3.8
+	vep reinit 3.8
  		
 To RUN a PYTHON SCRIPT inside "myProject_venv" environment:	
 
 	cd /path/to/myProject
-	pyvnv run python ./myProgram.py
+	vep run python ./myProgram.py
 	
 To RUN a BASH SUBSHELL inside "myProject_venv" environment:	
 
 	cd /path/to/myProject
-	pyvnv shell
+	vep shell
 
 """
 
@@ -50,9 +50,10 @@ verbose = False
 import unittest
 
 def getVepsDir() -> Path:
-	s = os.environ["VEPDIR"]
+
+	s = os.environ.get("VEPDIR")
 	if s:
-		return Path(s)
+		return Path(os.path.expanduser(os.path.expandvars(s)))
 	else:
 		return Path(os.path.expandvars("$HOME"))/".vepvep"
 
@@ -62,12 +63,24 @@ class TestVenvsDir(unittest.TestCase):
 		os.environ["VEPDIR"] = "/path/to/veps"
 		self.assertEqual(getVepsDir(), Path('/path/to/veps'))
 
-	def test_if_not(self):
-		os.environ["VEPDIR"] = ""
+	def test_if_set_with_vars(self):
+		os.environ["VEPDIR"] = "$HOME/subfolder"
+		s = str(getVepsDir())
+		self.assertTrue("$" not in s)
+		self.assertGreater(len(s), len("/home/"))
+
+	def test_if_set_with_user(self):
+		os.environ["VEPDIR"] = "~/subfolder"
+		s = str(getVepsDir())
+		self.assertTrue("~" not in s)
+		self.assertGreater(len(s), len("/home/"))
+
+	def test_if_not_n(self):
+		if "VEPDIR" in os.environ:
+			del os.environ["VEPDIR"]
 		p = str(getVepsDir())
 		self.assertTrue(p.endswith("vepvep"))
 		self.assertGreater(len(p), len("/.vepvep"))
-
 
 
 
@@ -181,9 +194,9 @@ def runmain():
 
 	###########
 
-	venvsParentDir = Path(os.path.expanduser(venvsRoot)).absolute()
+	#venvsParentDir = Path(os.path.expanduser(venvsRoot)).absolute()
 	projectDir = Path(".").absolute()
-	venvDir = venvsParentDir / (projectDir.name + "_venv")
+	venvDir = getVepsDir()/(projectDir.name + "_venv") #venvsParentDir / (projectDir.name + "_venv")
 
 	if verbose:
 		print(f"Proj dir: {projectDir}")
