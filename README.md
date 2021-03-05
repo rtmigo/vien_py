@@ -22,8 +22,9 @@ $ vep init python39
 $ vep shell
 ```
 
-As a ready-made solution to the problem, I tried [pipenv](https://pipenv.pypa.io/). But it is not 
-the simple solution. This mighty tool brings new challenges that dwarf old ones. I didn't sign up for this.
+As a ready-made solution to the problem, I tried [pipenv](https://pipenv.pypa.io/). It kind of 
+solved the problem, but also brought new challenges that dwarfed the old ones. I didn't sign 
+up for this.
 
 So I made `vep`. A stupidly simple tool for a half asleep developer.
 
