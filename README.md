@@ -62,13 +62,13 @@ $ cd /path/to/myProject
 $ vep reinit python3
 ```
 
-### Run a python script inside `myProject_venv` environment 
+### Run a python script with myProject_venv  
 ```bash 		
 $ cd /path/to/myProject
 $ vep run python ./myProgram.py
 ```
 
-### Run a bash subshell inside `myProject_venv` environment
+### Run a bash subshell with myProject_venv 
 ```bash	
 $ cd /path/to/myProject
 $ vep shell
