@@ -89,10 +89,10 @@ By default `svet` will try to use `python3` as the interpreter will be used for 
 more than one Python version, just point to the proper binary the way you execute it:
 
 ```bash
-$ svet init python3.9
+$ svet init python3.8
 ```
 ```bash
-$ svet init /usr/local/opt/python@3.8/bin/python
+$ svet init /path/to/bin/python3
 ```
 
 	
@@ -104,7 +104,7 @@ $ svet reinit
 ```
 Or point the interpreter:
 ```bash
-$ svet reinit python3.8
+$ svet reinit /path/to/bin/python3
 ```
 
 ### Run a python script inside the virtualenv 
