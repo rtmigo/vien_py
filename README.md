@@ -90,4 +90,4 @@ $ export VEPDIR="/x/y/z"
 ```
 So for the project `aaa` the virtualenv will be located in `/x/y/z/aaa_venv`.
 
-Ypu may wonder, why the `_venv` suffix. It tells the utility that this directory can be safely removed.
+The `_venv` suffix tells the utility that this directory can be safely removed.
