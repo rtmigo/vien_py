@@ -84,7 +84,7 @@ $ vep shell
 
 # $VEPDIR
 
-If you don't like `$HOME/.vepvep`, you can define the environment variable `VEPDIR` like that:
+You can set the directory where `vep` places the virtualenvs. By default, it's `$HOME/.vepvep`. If you're not happy with this, you can define the environment variable `VEPDIR`:
 ```bash
 $ export VEPDIR="/x/y/z"
 ```
