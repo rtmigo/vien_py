@@ -15,17 +15,19 @@ It provides command-line shortcuts for managing Python [virtualenvs](https://doc
 Switching between different projects in Python should be simple. A short command 
 that I would type even half asleep.
 
-Not
-```base
-$ python3 -m venv ./i/have/no/idea/where/to/put/this/.venv
-$ source /where/is/that/damn/directory/.venv/bin/activate
-```
-
-But
+Something like
 ```base
 $ svet init 
 $ svet shell
 ```
+
+And definitely not like
+```base
+$ python3 -m venv ./i/have/no/idea/where/to/put/this/.venv
+$ source /where/is/that/damn/directory/.venv/bin/activate
+$ /omg/forget/it/i/will/not/.venv/bin/deactivate
+```
+
 
 <details>
   <summary>[click to open] Ready-made solutions did not help.</summary><br/>
