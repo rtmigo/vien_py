@@ -3,22 +3,22 @@ from pathlib import Path
 
 from setuptools import setup, find_packages
 
-ver = SourceFileLoader('ver', 'depz/x00_version.py').load_module()
+constants = SourceFileLoader('constants', 'vep/_constants.py').load_module()
 
 # transform GitHub spoilers into markdown
 
 setup(
   name="depz",
-  version=ver.__version__,
+  version=constants.__version__,
 
   author="Art Galkin",
   author_email="ortemeo@gmail.com",
-  url='https://github.com/rtmigo/depz',
+  url='https://github.com/rtmigo/vep',
 
   packages=find_packages(),
   install_requires=[],
 
-  description="Command-line tool for symlinking directories with reusable code into the project",
+  description="Command-line shortcuts for python virtual environments",
 
   long_description=(Path(__file__).parent / 'README.md').read_text(),
   long_description_content_type='text/markdown',
@@ -27,19 +27,18 @@ setup(
 
   entry_points={
     'console_scripts': [
-      'depz = depz:runmain',
+      'vep = vep:runmain',
     ]},
 
   keywords="""
-      files package library programming local project symlink dependencies directories 
-      library-management package-management source-code reusable-code 
+     
   	""".split(),
 
   # https://pypi.org/classifiers/
   classifiers=[
     # "Development Status :: 4 - Beta",
-    # "Development Status :: 2 - Pre-Alpha",
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 2 - Pre-Alpha",
+    #"Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     'License :: OSI Approved :: BSD License',
     "Programming Language :: Python :: 3.7",
