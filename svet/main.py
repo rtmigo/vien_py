@@ -207,8 +207,9 @@ def shell(venvDir: Path, venvName: str):
 
 
 def runargs(venvDir: Path, otherargs):
+	vd = str(venvDir.absolute())
 	commands = [
-		f'source "{venvDir}/bin/activate"',
+		f'source "{vd}/bin/activate"',
 		" ".join(quote(a) for a in otherargs)
 	]
 
