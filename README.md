@@ -23,7 +23,7 @@ $ vep shell
 ```
 
 As a ready-made solution to the problem, I tried [pipenv](https://pipenv.pypa.io/). But it is not 
-a simple solution. This mighty tool brings new challenges that dwarf old ones. I didn't sign up for this.
+the simple solution. This mighty tool brings new challenges that dwarf old ones. I didn't sign up for this.
 
 So I made `vep`. A stupidly simple tool for a half asleep developer.
 
