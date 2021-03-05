@@ -45,6 +45,24 @@ So I made `svet`. A stupidly simple tool for a half asleep developer.
 So only the local name of the project directory matters. And all the virtualenvs 
 are in `$HOME/.svet`. Until you decide to [change this dir](#vepdir).
 
+# Install
+
+Get a working [Python](https://www.python.org/) ≥3.7 and [pip](https://pip.pypa.io/en/stable/installing/). You may also need a computer. Then:
+
+```bash
+$ pip3 install svet
+```
+
+Make sure that it is installed:
+
+```bash
+$ svet --help
+```
+
+Upgrade it later:
+```bash
+$ pip3 install svet --upgrade
+```
 
 
 # Usage
