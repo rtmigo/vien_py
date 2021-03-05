@@ -8,7 +8,7 @@
 
 SVET is an acronym for Simple Virtual Environments Tool.
 
-It provides command-line shortcuts for managing Python virtualenvs.
+It provides command-line shortcuts for managing Python [virtualenvs](https://docs.python.org/3/library/venv.html).
 
 # Why
 
