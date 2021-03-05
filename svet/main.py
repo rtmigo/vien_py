@@ -63,25 +63,20 @@ By default $SVETDIR is "~/.svet". You can redefine in with
 RUNNING
 -------
 
-CREATE new virtualenv with python3 in $SVETDIR/myProject_venv/:
+CREATE new virtualenv with python3 in $SVETDIR/myProject_venv:
 
   cd /abc/myProject
   svet create python3
-	
-REMOVE old and CREATE new virtualenv:
 
-  cd /abc/myProject
-  svet reinit python3
- 		
-RUN a PYTHON SCRIPT inside "myProject_venv" environment:	
-
-  cd /abc/myProject
-  svet run python ./myProgram.py
-	
-RUN a BASH SUBSHELL inside "myProject_venv" environment:	
+RUN an interactive BASH SUBSHELL inside "myProject_venv":	
 
   cd /abc/myProject
   svet shell
+		
+RUN a PYTHON SCRIPT inside "myProject_venv":	
+
+  cd /abc/myProject
+  svet run python ./myProgram.py arg1 arg2 ...
 
 See HELP with other options:	
 
