@@ -122,14 +122,19 @@ def init(venvDir: Path, version: str):
 	if venvDir.exists():
 		raise Exception("Venv already exists.")
 
-	exe = version
+	exe = shutil.which(version)
+	if not exe:
+		print(f"Cannot resolve '{version}' to an excutable file.")
+		exit(1)
 
 	print(f"Creating {venvDir}")
 
-	runWithBashAliases(f'{exe} -m venv "{str(venvDir)}"')
+	subprocess.run([exe, "-m", "venv", str(venvDir)])
+
+	# runWithBashAliases(f'{exe} -m venv "{str(venvDir)}"')
 
 	print()
-	print("Configure PyCharm with Python executable:")
+	print("The Python executable:")
 	print(str(venvDirToExe(venvDir)))
 
 
