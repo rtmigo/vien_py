@@ -86,3 +86,5 @@ If you don't like `$HOME/.vepvep`, you can define the environment variable `VEPD
 $ export VEPDIR="/x/y/z"
 ```
 So for the project `aaa` the virtualenv will be located in `/x/y/z/aaa_venv`.
+
+The `_venv` suffix is really important. It tells the utility that this directory can be safely removed.
