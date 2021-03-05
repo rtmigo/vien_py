@@ -29,7 +29,7 @@ $ /omg/forget/it/i/will/not/.venv/bin/deactivate
 
 
 <details>
-  <summary>[click to open] Ready-made solutions did not help.</summary><br/>
+  <summary>Ready-made solutions did not help.</summary><br/>
 
 
 I tried [pipenv](https://pipenv.pypa.io/). It kind of solved the problem, but also brought new 
