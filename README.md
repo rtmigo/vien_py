@@ -37,7 +37,7 @@ in `$HOME/.vepvep/aaa_venv`. For `bbb` it will be `$HOME/.vepvep/bbb_venv`.
 
 # Usage
 
-To **create** new virtualenv with Python 3.8 in `$VEPDIR/myProject_venv`:
+### Create a new virtualenv
 
 ```bash
 $ cd /path/to/myProject
@@ -55,20 +55,20 @@ $ vep init /usr/local/opt/python@3.8/bin/python
 ```
 
 	
-To **remove** old and **create** new virtualenv:
+### Remove old and create new virtualenv
 
 ```bash
 $ cd /path/to/myProject
 $ vep reinit python3
 ```
 
-To **run** a **python script** inside `myProject_venv` environment: 
+### Run a python script inside `myProject_venv` environment 
 ```bash 		
 $ cd /path/to/myProject
 $ vep run python ./myProgram.py
 ```
 
-To **run** a **bash subshell** inside `myProject_venv` environment:
+### Run a bash subshell inside `myProject_venv` environment
 ```bash	
 $ cd /path/to/myProject
 $ vep shell
