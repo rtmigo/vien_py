@@ -137,13 +137,14 @@ $ cd /path/to/myProject
 $ svet delete 
 ```
 
-### Delete old and create new virtualenv (reset everything)
+### Delete old and create new virtualenv
 
+Useful, when you want to start from scratch.
 ```bash
 $ cd /path/to/myProject
 $ svet recreate 
 ```
-Or point the interpreter:
+Optionally point to the interpreter:
 ```bash
 $ cd /path/to/myProject
 $ svet recreate /path/to/bin/python3

@@ -173,7 +173,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
 		runme = f"import os; os.mkdir({repr(str(markerDir))})"
 		with self.assertRaises(SystemExit):
-			runmain(["run", "python3", "-c", runme])
+			runmain(["run", "python", "-c", runme])
 
 		# check it created
 		self.assertTrue(markerDir.exists())
