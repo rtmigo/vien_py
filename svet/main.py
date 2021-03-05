@@ -25,7 +25,9 @@ class SvetError(Exception):
 class VenvExistsError(SvetError): pass
 
 
-class VenvDoesNotExistError(SvetError): pass
+class VenvDoesNotExistError(SvetError):
+	def __init__(self):
+		super().__init__("Virtualenv does not exist")
 
 
 class CannotFindExecutableError(SvetError):
@@ -168,7 +170,7 @@ def remove(venvDir: Path):
 	if not "_venv" in venvDir.name:
 		raise ValueError(venvDir)
 	if not venvDir.exists():
-		raise VenvDoesNotExistError("Virtualenv does not exist.")
+		raise VenvDoesNotExistError
 	print(f"Removing {venvDir}")
 	shutil.rmtree(str(venvDir))
 
@@ -180,6 +182,9 @@ def reinit(venvDir: Path, version: str):
 
 
 def shell(venvDir: Path, venvName: str):
+	if not venvDir.exists():
+		raise VenvDoesNotExistError
+
 	useColor = True
 	YELLOW = "\e[33m"
 	CYAN = r"\e[36m"
@@ -235,7 +240,7 @@ def runmain(args: Optional[List[str]] = None):
 	subparsers.add_parser('shell', help="dive into Bash subshell using the virtualenv")
 
 	parser_run = subparsers.add_parser('run', help="run a command inside the virtualenv")
-	parser_run.add_argument('otherargs', nargs='*')
+	parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)  # nargs='*'
 
 	subparsers.add_parser('path',
 						  help="show the supposed path of the virtualenv for the current directory")
