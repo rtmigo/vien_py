@@ -34,10 +34,11 @@ So I made `vep`. A stupidly simple tool for a half asleep developer.
 
 |project dir|virtualenv dir|
 |-----|----|
-|/abc/thisProject|$HOME/.vepvep/thisProject_venv|
-|/abc/otherProject|$HOME/.vepvep/otherProject_venv|
-|/moved/to/otherProject|$HOME/.vepvep/otherProject_venv|
+|`/abc/thisProject`|`$HOME/.vepvep/thisProject_venv`|
+|`/abc/otherProject`|`$HOME/.vepvep/otherProject_venv`|
+|`/moved/to/otherProject`|`$HOME/.vepvep/otherProject_venv`|
 
+So only the local name of the project directory matters. And all the virtualenvs are in `$HOME/.vepvep`
 
 # Usage
 
