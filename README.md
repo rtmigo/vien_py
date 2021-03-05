@@ -17,7 +17,7 @@ that I would type even half asleep.
 
 Something like
 ```base
-$ svet init 
+$ svet create 
 $ svet shell
 ```
 
@@ -64,7 +64,7 @@ Get a working [Python](https://www.python.org/) ≥3.7 and [pip](https://pip.pyp
 $ pip3 install svet
 ```
 
-Make sure that it is installed:
+create sure that it is installed:
 
 ```bash
 $ svet --help
@@ -82,17 +82,17 @@ $ pip3 install svet --upgrade
 
 ```bash
 $ cd /path/to/myProject
-$ svet init 
+$ svet create 
 ```
 
 By default `svet` will try to use `python3` as the interpreter will be used for virtualenv. If you have 
 more than one Python version, just point to the proper binary the way you execute it:
 
 ```bash
-$ svet init python3.8
+$ svet create python3.8
 ```
 ```bash
-$ svet init /path/to/bin/python3
+$ svet create /path/to/bin/python3
 ```
 
 	
@@ -100,12 +100,12 @@ $ svet init /path/to/bin/python3
 
 ```bash
 $ cd /path/to/myProject
-$ svet reinit 
+$ svet recreate 
 ```
 Or point the interpreter:
 ```bash
 $ cd /path/to/myProject
-$ svet reinit /path/to/bin/python3
+$ svet recreate /path/to/bin/python3
 ```
 
 ### Run a python script inside the virtualenv 

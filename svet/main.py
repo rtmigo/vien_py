@@ -17,6 +17,21 @@ verbose = False
 from svet import __version__
 
 
+class SvetError(Exception):
+	def __init__(self, message: str):
+		super().__init__(message)
+
+
+class VenvExistsError(SvetError): pass
+
+
+class VenvDoesNotExistError(SvetError): pass
+
+
+class CannotFindExecutableError(SvetError):
+	pass
+
+
 def version() -> str:
 	modTimestamp = (Path(__file__).parent / "constants.py").stat().st_mtime
 	modYear = dt.datetime.fromtimestamp(modTimestamp).year
@@ -49,7 +64,7 @@ RUNNING
 CREATE new virtualenv with python3 in $SVETDIR/myProject_venv/:
 
   cd /abc/myProject
-  svet init python3
+  svet create python3
 	
 REMOVE old and CREATE new virtualenv:
 
@@ -134,12 +149,11 @@ def venvDirToExe(venvDir: Path) -> Path:
 
 def init(venvDir: Path, version: str):
 	if venvDir.exists():
-		raise Exception("Venv already exists.")
+		raise VenvExistsError("Virtualenv already exists.")
 
 	exe = shutil.which(version)
 	if not exe:
-		print(f"Cannot resolve '{version}' to an executable file.")
-		exit(1)
+		raise CannotFindExecutableError(f"Cannot resolve '{version}' to an executable file.")
 
 	print(f"Creating {venvDir}")
 
@@ -150,12 +164,18 @@ def init(venvDir: Path, version: str):
 	print(str(venvDirToExe(venvDir)))
 
 
-def reinit(venvDir: Path, version: str):
+def remove(venvDir: Path):
 	if not "_venv" in venvDir.name:
-		raise Exception
+		raise ValueError(venvDir)
+	if not venvDir.exists():
+		raise VenvDoesNotExistError("Virtualenv does not exist.")
+	print(f"Removing {venvDir}")
+	shutil.rmtree(str(venvDir))
+
+
+def reinit(venvDir: Path, version: str):
 	if venvDir.exists():
-		print(f"Removing {venvDir}")
-		shutil.rmtree(str(venvDir))
+		remove(venvDir)
 	init(venvDir=venvDir, version=version)
 
 
@@ -203,11 +223,13 @@ def runmain(args: Optional[List[str]] = None):
 
 	subparsers = parser.add_subparsers(dest='command', required=True)
 
-	parser_init = subparsers.add_parser('init', help="create new virtualenv")
+	parser_init = subparsers.add_parser('create', help="create new virtualenv")
 	parser_init.add_argument('python', type=str, default="python3", nargs='?')
 
-	parser_reinit = subparsers.add_parser('reinit',
-										  help="remove existing virtualenv and create new")
+	subparsers.add_parser('delete', help="delete existing virtualenv")
+
+	parser_reinit = subparsers.add_parser('recreate',
+										  help="delete existing virtualenv and create new")
 	parser_reinit.add_argument('python', type=str, default="python3", nargs='?')
 
 	subparsers.add_parser('shell', help="dive into Bash subshell using the virtualenv")
@@ -232,10 +254,12 @@ def runmain(args: Optional[List[str]] = None):
 
 	##########
 
-	if args.command == "init":
+	if args.command == "create":
 		init(venvDir, args.python)
-	elif args.command == "reinit":
+	elif args.command == "recreate":
 		reinit(venvDir, args.python)
+	elif args.command == "delete":
+		remove(venvDir)
 	elif args.command == "path":
 		print(venvDir)
 	elif args.command == "run":

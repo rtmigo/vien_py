@@ -7,6 +7,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from svet import runmain
+from svet.main import VenvExistsError, VenvDoesNotExistError
 
 
 class Test(unittest.TestCase):
@@ -43,24 +44,37 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
 		os.environ["SVETDIR"] = str(self.svetDir.absolute())
 
+	def assertVenvDoesNotExist(self):
+		self.assertFalse(self.expectedVenvDir.exists())
+		self.assertFalse(self.expectedVenvBin.exists())
+
+	def assertVenvExists(self):
+		self.assertTrue(self.expectedVenvDir.exists())
+		self.assertTrue(self.expectedVenvBin.exists())
+
 	def tearDown(self):
 		self._td.cleanup()
 		del os.environ["SVETDIR"]
 
-	def test_init(self):
+	def test_create_with_argument(self):
 		self.assertFalse(self.expectedVenvDir.exists())
 		self.assertFalse(self.expectedVenvBin.exists())
 
-		runmain(["init", "python3"])
+		runmain(["create", "python3"])
 
 		self.assertTrue(self.expectedVenvDir.exists())
 		self.assertTrue(self.expectedVenvBin.exists())
 
-	def test_reinit(self):
+	def test_create_fails_if_twice(self):
+		runmain(["create"])
+		with self.assertRaises(VenvExistsError):
+			runmain(["create"])
+
+	def test_recreate_with_argument(self):
 		self.assertFalse(self.expectedVenvDir.exists())
 		self.assertFalse(self.expectedVenvBin.exists())
 
-		runmain(["init", "python3"])
+		runmain(["create", "python3"])
 
 		self.assertTrue(self.expectedVenvDir.exists())
 		self.assertTrue(self.expectedVenvBin.exists())
@@ -69,17 +83,17 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
 		self.assertFalse(self.expectedVenvBin.exists())
 
-		runmain(["reinit", "python3"])
+		runmain(["recreate", "python3"])
 		self.assertTrue(self.expectedVenvBin.exists())
 
-		runmain(["reinit", "python3"])
+		runmain(["recreate", "python3"])
 		self.assertTrue(self.expectedVenvBin.exists())
 
 	def test_init_wo_argument(self):
 		self.assertFalse(self.expectedVenvDir.exists())
 		self.assertFalse(self.expectedVenvBin.exists())
 
-		runmain(["init"])
+		runmain(["create"])
 
 		self.assertTrue(self.expectedVenvDir.exists())
 		self.assertTrue(self.expectedVenvBin.exists())
@@ -88,7 +102,19 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 		self.assertFalse(self.expectedVenvDir.exists())
 		self.assertFalse(self.expectedVenvBin.exists())
 
-		runmain(["reinit"])
+		runmain(["recreate"])
 
 		self.assertTrue(self.expectedVenvDir.exists())
 		self.assertTrue(self.expectedVenvBin.exists())
+
+	def test_create_then_delete(self):
+		self.assertVenvDoesNotExist()
+		runmain(["create"])
+		self.assertVenvExists()
+		runmain(["delete"])
+		self.assertVenvDoesNotExist()
+
+	def test_delete_fails_if_not_exist(self):
+		self.assertVenvDoesNotExist()
+		with self.assertRaises(VenvDoesNotExistError):
+			runmain(["delete"])
