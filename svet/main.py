@@ -7,11 +7,12 @@ import datetime as dt
 import textwrap
 
 from svet import __version__
-from svet.bashAliasRunner import runWithBashAliases
 
 
-def usage():
-	return f"""
+usageDoc = f"""
+SVET: Simple Virtual Environments Tool {__version__}
+(c) 2020-2021 Art Galkin <ortemeo@gmail.com>
+See https://github.com/rtmigo/svet#readme
 
 SVETDIR
 -------
@@ -48,6 +49,8 @@ To RUN a BASH SUBSHELL inside "myProject_venv" environment:
 
 	cd /abc/myProject
 	svet shell
+
+-------
 
 """
 
@@ -124,7 +127,7 @@ def init(venvDir: Path, version: str):
 
 	exe = shutil.which(version)
 	if not exe:
-		print(f"Cannot resolve '{version}' to an excutable file.")
+		print(f"Cannot resolve '{version}' to an executable file.")
 		exit(1)
 
 	print(f"Creating {venvDir}")
@@ -193,32 +196,38 @@ def rewrap(text: str):
 	return "\n".join([textwrap.fill(line.strip(), 80) for line in text.splitlines()])
 
 
-# # https://stackoverflow.com/a/64102901
-# return "\n".join([
-# 	textwrap.fill(line, width)
-# 	for line in textwrap.indent(textwrap.dedent(text), indent).splitlines()])
+# class RawFormatter(argparse.HelpFormatter):
+# 	"""Allows no use newline characters in ArgumentParser description.
+# 	Unlike argparse.RawTextHelpFormatter wraps long lines to fit width."""
+#
+# 	def _fill_text(self, text, width, indent):
+# 		import textwrap
+#
+# 		# to make the use of indented docstrings more convenient
+# 		text = "\n".join([line.strip() for line in text.splitlines()])
+#
+# 		# https://stackoverflow.com/a/64102901
+# 		return "\n".join([
+# 			textwrap.fill(line, width)
+# 			for line in textwrap.indent(textwrap.dedent(text), indent).splitlines()])
 
-class RawFormatter(argparse.HelpFormatter):
-	"""Allows no use newline characters in ArgumentParser description.
-	Unlike argparse.RawTextHelpFormatter wraps long lines to fit width."""
+class VersionedHelp(argparse.HelpFormatter):
 
-	def _fill_text(self, text, width, indent):
-		import textwrap
+	def _format_usage(self, *args):
+		"""A hack using non-public method."""
+		doc = usageDoc.strip()
+		aboveFirstLine = ("-" * len(doc.splitlines()[0]))
+		return aboveFirstLine + "\n" + doc + "\n\n" + super()._format_usage(*args)
 
-		# to make the use of indented docstrings more convenient
-		text = "\n".join([line.strip() for line in text.splitlines()])
 
-		# https://stackoverflow.com/a/64102901
-		return "\n".join([
-			textwrap.fill(line, width)
-			for line in textwrap.indent(textwrap.dedent(text), indent).splitlines()])
-
+# def _format_usage(self, usage, actions, groups, prefix=None):
+#	if prefix is None:
+#		prefix = usageDoc
+#	return #argparse.HelpFormatter._format_usage(self, usage, actions, groups, prefix)
 
 def runmain():
 	# noinspection PyTypeChecker
-	parser = argparse.ArgumentParser(
-		usage=usage(),
-	)
+	parser = argparse.ArgumentParser(formatter_class=VersionedHelp)
 
 	subparsers = parser.add_subparsers(dest='command', required=True)
 
