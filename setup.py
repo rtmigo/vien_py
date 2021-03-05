@@ -6,12 +6,12 @@ from setuptools import setup, find_packages
 constants = SourceFileLoader('constants', 'vep/constants.py').load_module()
 
 setup(
-  name="depz",
+  name="svet",
   version=constants.__version__,
 
   author="Art Galkin",
   author_email="ortemeo@gmail.com",
-  url='https://github.com/rtmigo/vep',
+  url='https://github.com/rtmigo',
 
   packages=find_packages(),
   install_requires=[],
@@ -25,7 +25,7 @@ setup(
 
   entry_points={
     'console_scripts': [
-      'vep = vep:runmain',
+      'svet = svet:runmain',
     ]},
 
   keywords="""
@@ -35,8 +35,8 @@ setup(
   # https://pypi.org/classifiers/
   classifiers=[
     # "Development Status :: 4 - Beta",
-    "Development Status :: 2 - Pre-Alpha",
-    #"Development Status :: 3 - Alpha",
+    # "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     'License :: OSI Approved :: BSD License',
     "Programming Language :: Python :: 3.7",
