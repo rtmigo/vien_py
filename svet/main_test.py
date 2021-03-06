@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import os
+import signal
 import sys
 import unittest
 from io import StringIO
@@ -12,6 +13,34 @@ from tempfile import TemporaryDirectory
 
 from svet import main_entry_point
 from svet.main import VenvExistsError, VenvDoesNotExistError
+
+
+# TEST TIMEOUT ##########
+
+class TestTimeout(Exception):
+    pass
+
+
+class test_timeout:
+    #  https://stackoverflow.com/a/49567288
+    def __init__(self, seconds, error_message=None):
+        if error_message is None:
+            error_message = 'test timed out after {}s.'.format(seconds)
+        self.seconds = seconds
+        self.error_message = error_message
+
+    def handle_timeout(self, signum, frame):
+        raise TestTimeout(self.error_message)
+
+    def __enter__(self):
+        signal.signal(signal.SIGALRM, self.handle_timeout)
+        signal.alarm(self.seconds)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        signal.alarm(0)
+
+
+########
 
 
 class CapturedOutput:
@@ -55,8 +84,6 @@ class Test(unittest.TestCase):
         os.chdir(Path(__file__).parent)
         main_entry_point(["path"])
 
-
-# todo test init fails although python found
 
 class TestsInsideTempProjectDir(unittest.TestCase):
 
@@ -173,10 +200,10 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         # file and write the path to interpreter in it
 
         python_program = f"""
-			import os, sys
-			from pathlib import Path
-			Path({repr(str(file_to_be_created))}).write_text(sys.executable)
-		"""
+            import os, sys
+            from pathlib import Path
+            Path({repr(str(file_to_be_created))}).write_text(sys.executable)
+        """
 
         lines = [l.strip() for l in python_program.splitlines()]
         python_program = "; ".join(l for l in lines if l)
@@ -193,3 +220,19 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         self.assertTrue("svetdir" in interpreter_path.parts)
         self.assertTrue("project_venv" in interpreter_path.parts)
+
+    def test_shell_ok(self):
+        # when executed from MacOS terminal, this test makes the tab unusable
+        main_entry_point(["create"])
+
+        # if the function call taking a long time, that means we're in shell
+        with self.assertRaises(TestTimeout):
+            with test_timeout(seconds=3):
+                main_entry_point(["shell"])
+
+    def test_shell_but_no_venv(self):
+        # python3 -m unittest svet.main_test.TestsInsideTempProjectDir.test_shell
+
+        with test_timeout(seconds=10):  # safety net
+            with self.assertRaises(VenvDoesNotExistError):
+                main_entry_point(["shell"])
