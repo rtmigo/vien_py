@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import os
+import unittest
+
 if __name__ == "__main__":
-    import unittest, os
 
     parent_dir = os.path.dirname(__file__)
 
