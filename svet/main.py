@@ -158,11 +158,14 @@ def init(venvDir: Path, version: str):
 
 	print(f"Creating {venvDir}")
 
-	subprocess.run([exe, "-m", "venv", str(venvDir)])
-
-	print()
-	print("The Python executable:")
-	print(str(venvDirToExe(venvDir)))
+	result = subprocess.run([exe, "-m", "venv", str(venvDir)])
+	if result.returncode:
+		print()
+		print("The Python executable:")
+		print(str(venvDirToExe(venvDir)))
+	else:
+		print("svet failed to create the virtualenv")
+		exit(1)
 
 
 def remove(venvDir: Path):
@@ -225,6 +228,9 @@ def runargs(venvDir: Path, otherargs):
 
 
 def runmain(args: Optional[List[str]] = None):
+	# print(sys.argv)
+	# exit()
+
 	if args is None:
 		args = sys.argv[1:]
 

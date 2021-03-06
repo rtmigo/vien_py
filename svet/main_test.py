@@ -56,7 +56,8 @@ class Test(unittest.TestCase):
 		runmain(["path"])
 
 
-# todo test run
+# todo test init fails although python found
+# fixme bash sessions on linux
 
 class TestsInsideTempProjectDir(unittest.TestCase):
 
