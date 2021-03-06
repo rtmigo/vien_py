@@ -13,4 +13,7 @@ if __name__ == "__main__":
         start_dir=os.path.join(parent_dir, "svet"),
         pattern=sys.argv[1] if len(sys.argv) > 1 else "*.py")
 
-    unittest.runner.TextTestRunner(buffer=True).run(tests)
+    result = unittest.runner.TextTestRunner(buffer=True).run(tests)
+
+    if result.failures or result.errors:
+        exit(1)

@@ -41,6 +41,7 @@ class TestRunAsBash(unittest.TestCase):
             self.assertEqual(file_to_create.read_text().strip(), "that is the answer")
 
     def test_input_delay(self):
+
         start = timer()
         # run interactive shell end type "exit" after small delay
         run_as_bash_script("exec bash", input="exit\n".encode(), input_delay=1, timeout=10)
