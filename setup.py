@@ -40,7 +40,7 @@ setup(
 
   entry_points={
     'console_scripts': [
-      'svet = svet:runmain',
+      'svet = svet:main_entry_point',
     ]},
 
   keywords="virtual-environment venv virtualenv python".split(),

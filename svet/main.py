@@ -159,7 +159,7 @@ def init(venvDir: Path, version: str):
 	print(f"Creating {venvDir}")
 
 	result = subprocess.run([exe, "-m", "venv", str(venvDir)])
-	if result.returncode:
+	if result.returncode == 0:
 		print()
 		print("The Python executable:")
 		print(str(venvDirToExe(venvDir)))
@@ -227,7 +227,7 @@ def runargs(venvDir: Path, otherargs):
 	exit(runseq(commands))
 
 
-def runmain(args: Optional[List[str]] = None):
+def main_entry_point(args: Optional[List[str]] = None):
 	# print(sys.argv)
 	# exit()
 

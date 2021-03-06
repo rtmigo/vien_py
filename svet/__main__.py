@@ -1,4 +1,4 @@
-from svet.main import runmain
+from svet.main import main_entry_point
 
 if __name__ == "__main__":
-    runmain()
+    main_entry_point()

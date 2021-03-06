@@ -10,7 +10,7 @@ from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from svet import runmain
+from svet import main_entry_point
 from svet.main import VenvExistsError, VenvDoesNotExistError
 
 
@@ -43,17 +43,17 @@ class CapturedOutput:
 class Test(unittest.TestCase):
 	def test_no_args(self):
 		with self.assertRaises(SystemExit) as cp:
-			runmain()
+			main_entry_point()
 		self.assertEqual(cp.exception.code, 2)
 
 	def test_help(self):
 		with self.assertRaises(SystemExit) as cp:
-			runmain(["-h"])
+			main_entry_point(["-h"])
 		self.assertEqual(cp.exception.code, 0)
 
 	def test_path(self):
 		os.chdir(Path(__file__).parent)
-		runmain(["path"])
+		main_entry_point(["path"])
 
 
 # todo test init fails although python found
@@ -92,21 +92,21 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 		self.assertFalse(self.expectedVenvDir.exists())
 		self.assertFalse(self.expectedVenvBin.exists())
 
-		runmain(["create", "python3"])
+		main_entry_point(["create", "python3"])
 
 		self.assertTrue(self.expectedVenvDir.exists())
 		self.assertTrue(self.expectedVenvBin.exists())
 
 	def test_create_fails_if_twice(self):
-		runmain(["create"])
+		main_entry_point(["create"])
 		with self.assertRaises(VenvExistsError):
-			runmain(["create"])
+			main_entry_point(["create"])
 
 	def test_recreate_with_argument(self):
 		self.assertFalse(self.expectedVenvDir.exists())
 		self.assertFalse(self.expectedVenvBin.exists())
 
-		runmain(["create", "python3"])
+		main_entry_point(["create", "python3"])
 
 		self.assertTrue(self.expectedVenvDir.exists())
 		self.assertTrue(self.expectedVenvBin.exists())
@@ -115,17 +115,17 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
 		self.assertFalse(self.expectedVenvBin.exists())
 
-		runmain(["recreate", "python3"])
+		main_entry_point(["recreate", "python3"])
 		self.assertTrue(self.expectedVenvBin.exists())
 
-		runmain(["recreate", "python3"])
+		main_entry_point(["recreate", "python3"])
 		self.assertTrue(self.expectedVenvBin.exists())
 
 	def test_init_wo_argument(self):
 		self.assertFalse(self.expectedVenvDir.exists())
 		self.assertFalse(self.expectedVenvBin.exists())
 
-		runmain(["create"])
+		main_entry_point(["create"])
 
 		self.assertTrue(self.expectedVenvDir.exists())
 		self.assertTrue(self.expectedVenvBin.exists())
@@ -134,38 +134,38 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 		self.assertFalse(self.expectedVenvDir.exists())
 		self.assertFalse(self.expectedVenvBin.exists())
 
-		runmain(["recreate"])
+		main_entry_point(["recreate"])
 
 		self.assertTrue(self.expectedVenvDir.exists())
 		self.assertTrue(self.expectedVenvBin.exists())
 
 	def test_create_then_delete(self):
 		self.assertVenvDoesNotExist()
-		runmain(["create"])
+		main_entry_point(["create"])
 		self.assertVenvExists()
-		runmain(["delete"])
+		main_entry_point(["delete"])
 		self.assertVenvDoesNotExist()
 
 	def test_delete_fails_if_not_exist(self):
 		self.assertVenvDoesNotExist()
 		with self.assertRaises(VenvDoesNotExistError):
-			runmain(["delete"])
+			main_entry_point(["delete"])
 
 	def test_shell_fails_if_not_exist(self):
 		self.assertVenvDoesNotExist()
 		with self.assertRaises(VenvDoesNotExistError):
-			runmain(["shell"])
+			main_entry_point(["shell"])
 
 	def test_run(self):
-		runmain(["create"])
+		main_entry_point(["create"])
 
 		with self.assertRaises(SystemExit):
 			# just check the argparser handles --version properly
 			# (was failing with nargs='*', ok with nargs=argparse.REMAINDER)
-			runmain(["run", "python3", "--version"])
+			main_entry_point(["run", "python3", "--version"])
 
 	def test_run_create_dir(self):
-		runmain(["create"])
+		main_entry_point(["create"])
 
 		markerDir = self.projectDir / "stub"
 		self.assertFalse(markerDir.exists())
@@ -174,7 +174,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
 		runme = f"import os; os.mkdir({repr(str(markerDir))})"
 		with self.assertRaises(SystemExit):
-			runmain(["run", "python", "-c", runme])
+			main_entry_point(["run", "python", "-c", runme])
 
 		# check it created
 		self.assertTrue(markerDir.exists())
