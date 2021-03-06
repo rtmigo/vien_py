@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: (c) 2021 Art Galkin <ortemeo@gmail.com>
+# SPDX-License-Identifier: BSD-3-Clause
+
 import subprocess
 import time
 from subprocess import Popen, TimeoutExpired, CalledProcessError, CompletedProcess, PIPE
@@ -20,6 +23,7 @@ def _run_with_input_delay(*popenargs, input_delay: float = None,
 
     # This is almost an exact copy of subprocess.run (as of 2021-03-06).
     # Latest version here: https://github.com/python/cpython/blob/master/Lib/subprocess.py
+    # SPDX-FileCopyrightText: (c) 2003-2005 Peter Astrand <astrand@lysator.liu.se>
 
     try:
         import msvcrt
