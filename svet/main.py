@@ -236,7 +236,7 @@ def main_entry_point(args: Optional[List[str]] = None):
 
 	if not args:
 		print(usageDoc())
-		exit(1)
+		exit(2)
 
 	# noinspection PyTypeChecker
 	parser = argparse.ArgumentParser()
