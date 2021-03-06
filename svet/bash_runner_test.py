@@ -4,8 +4,12 @@ from tempfile import TemporaryDirectory
 
 from .bash_runner import *
 
+from timeit import default_timer as timer
+
 
 class TestRunAsBash(unittest.TestCase):
+
+    # python3 -m unittest svet.bash_runner_test
 
     def test_good_command_code_zero(self):
         bash_lines = [
@@ -35,3 +39,12 @@ class TestRunAsBash(unittest.TestCase):
             self.assertEqual(code.returncode, 0)
             self.assertTrue(file_to_create.exists())
             self.assertEqual(file_to_create.read_text().strip(), "that is the answer")
+
+    #def test_timeout(self):
+        #start = timer()
+        #end = timer()
+        #with self.assertRaises(subprocess.TimeoutExpired):
+         #   run_as_bash_script("python", timeout=1)
+        #self.assertGreater(end-start, 0.9)
+
+
