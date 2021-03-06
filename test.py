@@ -2,7 +2,6 @@
 
 if __name__ == "__main__":
     import unittest, os
-
     parent_dir = os.path.dirname(__file__)
     tests = unittest.TestLoader().discover(
         top_level_dir=parent_dir,
