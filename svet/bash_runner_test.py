@@ -8,10 +8,10 @@ from .bash_runner import *
 class TestRunAsBash(unittest.TestCase):
 
     def test_good_command_code_zero(self):
-        bashLines = [
+        bash_lines = [
             f'set -e',
             f"ls"]
-        code = run_as_bash_script(bashLines)
+        code = run_as_bash_script(bash_lines)
         self.assertEqual(code, 0)  # ok
 
     def test_bad_command_error_code(self):
