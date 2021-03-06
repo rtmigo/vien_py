@@ -1,0 +1,1 @@
+/bin/sh: 2: shopt: not found

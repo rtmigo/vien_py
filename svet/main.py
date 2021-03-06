@@ -137,7 +137,15 @@ def runseq(commands: List[str]):
 
 	bashLines.extend(commands)
 
-	subprocess.call("\n".join(bashLines), shell=True)
+	#print("ZZZ")
+
+	# Ubuntu really needs executable='/bin/bash'.
+	# Otherwise the command is executed in /bin/sh, ignoring the hashbang,
+	# but SH fails to execute commands like 'source'
+
+	subprocess.call("\n".join(bashLines), shell=True, executable='/bin/bash')
+
+	#print("XXX")
 
 
 def quote(arg: str) -> str:
@@ -217,7 +225,7 @@ def shell(venvDir: Path, venvName: str):
 	exit(runseq(commands))
 
 
-def runargs(venvDir: Path, otherargs):
+def command_run(venvDir: Path, otherargs):
 	vd = str(venvDir.absolute())
 	commands = [
 		f'source "{vd}/bin/activate"',
@@ -283,7 +291,7 @@ def main_entry_point(args: Optional[List[str]] = None):
 	elif args.command == "path":
 		print(venvDir)
 	elif args.command == "run":
-		runargs(venvDir, args.otherargs)
+		command_run(venvDir, args.otherargs)
 	elif args.command == "shell":
 		shell(venvDir, projectDir.name)
 	else:
