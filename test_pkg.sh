@@ -17,7 +17,7 @@ pip3 install setuptools wheel twine
 python3 setup.py sdist bdist_wheel
 twine check ./dist/* --strict
 
-echo "== INSTALLING & RUNNING =="
+echo "== INSTALLING PACKAGE FROM FILE =="
 
 unset -v latest_whl_file
 for file in ./dist/*.whl; do
@@ -25,6 +25,8 @@ for file in ./dist/*.whl; do
 done
 
 pip3 install "$latest_whl_file" --force-reinstall
+
+echo "== RUNNING INSTALLED PACKAGE =="
 
 vien --help
 
