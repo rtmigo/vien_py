@@ -19,6 +19,9 @@ verbose = False
 
 
 class SvetError(SystemExit):
+    """Base class for all the expected exceptions,
+    that show the error message and stop the program."""
+
     def __init__(self, message: str):
         super().__init__(message)
 
@@ -29,6 +32,11 @@ class VenvExistsError(SvetError): pass
 class VenvDoesNotExistError(SvetError):
     def __init__(self, path: Path):
         super().__init__(f"Virtualenv {path} does not exist.")
+
+
+class FailedToCreateVenvError(SvetError):
+    def __init__(self, path: Path):
+        super().__init__(f"Failed to create virtualenv {path}.")
 
 
 class CannotFindExecutableError(SvetError):
@@ -177,8 +185,9 @@ def init(venv_dir: Path, version: str):
         print("The Python executable:")
         print(str(venv_dir_to_exe(venv_dir)))
     else:
-        print("svet failed to create the virtualenv")
-        exit(1)
+        raise FailedToCreateVenvError(venv_dir)
+        # print("svet failed to create the virtualenv")
+        # exit(1)
 
 
 def remove(venv_dir: Path):
