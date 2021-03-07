@@ -16,7 +16,9 @@ from svet.bash_runner import run_as_bash_script
 
 verbose = False
 
-from svet import __version__
+#from svet import __version__
+
+import svet
 
 
 class SvetError(Exception):
@@ -40,8 +42,8 @@ def version() -> str:
     mod_timestamp = (Path(__file__).parent / "constants.py").stat().st_mtime
     mod_year = dt.datetime.fromtimestamp(mod_timestamp).year
     return "\n".join([
-        f"SVET: Simple Virtual Environments Tool {__version__}",
-        f"(c) 2020-{mod_year} Art Galkin <ortemeo@gmail.com>",
+        f"SVET: Simple Virtual Environments Tool {svet.__version__}",
+        svet.__copyright__.replace("2020", f"2020-{mod_year}"),
         f"See https://github.com/rtmigo/svet#readme"
     ])
 

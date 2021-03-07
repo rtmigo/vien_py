@@ -36,7 +36,7 @@ setup(
     long_description=readDocText(),
     long_description_content_type='text/markdown',
 
-    license='BSD-3-Clause',
+    license=constants.__license__,
 
     entry_points={
         'console_scripts': [
