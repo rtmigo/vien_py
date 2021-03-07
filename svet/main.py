@@ -46,7 +46,7 @@ def version() -> str:
     ])
 
 
-def usageDoc():
+def usage_doc():
     text = f"""{version()}
 
 SVETDIR
@@ -152,43 +152,43 @@ def quote(arg: str) -> str:
     return json.dumps(arg)
 
 
-def venv_dir_to_exe(venvDir: Path) -> Path:
-    return venvDir / "bin" / "python"
+def venv_dir_to_exe(venv_dir: Path) -> Path:
+    return venv_dir / "bin" / "python"
 
 
-def init(venvDir: Path, version: str):
-    if venvDir.exists():
+def init(venv_dir: Path, version: str):
+    if venv_dir.exists():
         raise VenvExistsError("Virtualenv already exists.")
 
     exe = shutil.which(version)
     if not exe:
         raise CannotFindExecutableError(f"Cannot resolve '{version}' to an executable file.")
 
-    print(f"Creating {venvDir}")
+    print(f"Creating {venv_dir}")
 
-    result = subprocess.run([exe, "-m", "venv", str(venvDir)])
+    result = subprocess.run([exe, "-m", "venv", str(venv_dir)])
     if result.returncode == 0:
         print()
         print("The Python executable:")
-        print(str(venv_dir_to_exe(venvDir)))
+        print(str(venv_dir_to_exe(venv_dir)))
     else:
         print("svet failed to create the virtualenv")
         exit(1)
 
 
-def remove(venvDir: Path):
-    if not "_venv" in venvDir.name:
-        raise ValueError(venvDir)
-    if not venvDir.exists():
+def remove(venv_dir: Path):
+    if not "_venv" in venv_dir.name:
+        raise ValueError(venv_dir)
+    if not venv_dir.exists():
         raise VenvDoesNotExistError
-    print(f"Removing {venvDir}")
-    shutil.rmtree(str(venvDir))
+    print(f"Removing {venv_dir}")
+    shutil.rmtree(str(venv_dir))
 
 
 def reinit(venv_dir: Path, version: str):
     if venv_dir.exists():
         remove(venv_dir)
-    init(venvDir=venv_dir, version=version)
+    init(venv_dir=venv_dir, version=version)
 
 
 def get_bash_ps1():
@@ -230,9 +230,9 @@ def get_bash_ps1():
 
 
 class Colors:
-    GREEN = "\e[32m\]"
-    MAGENDA = "\e[35m\]"
-    YELLOW = "\e[33m\]"
+    GREEN = r"\e[32m\]"
+    MAGENTA = r"\e[35m\]"
+    YELLOW = r"\e[33m\]"
     CYAN = r"\e[36m\]"
     BLUE = r"\e[34m\]"
     NOCOLOR = r"\e[0m\]"
@@ -287,10 +287,8 @@ def command_run(venv_dir: Path, otherargs):
 
 
 def main_entry_point(args: Optional[List[str]] = None):
-
     if args is None:
         args = sys.argv[1:]
-
 
     # noinspection PyTypeChecker
     parser = argparse.ArgumentParser()
@@ -316,15 +314,10 @@ def main_entry_point(args: Optional[List[str]] = None):
     subparsers.add_parser('path',
                           help="show the supposed path of the virtualenv for the current directory")
 
-
-
     if not args:
-        print(usageDoc())
+        print(usage_doc())
         parser.print_help()
         exit(2)
-
-
-
 
     args = parser.parse_args(args)
 

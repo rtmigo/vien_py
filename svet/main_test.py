@@ -200,7 +200,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertTrue("svetdir" in interpreter_path.parts)
         self.assertTrue("project_venv" in interpreter_path.parts)
 
-    #@unittest.skip
     def test_shell_ok(self):
 
         main_entry_point(["create"])
