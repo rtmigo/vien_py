@@ -107,6 +107,8 @@ Now you are inside the virtualenv.
 
 (pyProject)$ which python3             # we are using separate copy of Python
 
+(pyProject)$ echo $PATH                # everything runs in virtualenv
+
 ```
 
 Get out of the virtualenv:
