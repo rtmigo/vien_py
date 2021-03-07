@@ -12,11 +12,10 @@ import unittest
 from pathlib import Path
 from typing import *
 
+import svet
 from svet.bash_runner import run_as_bash_script
 
 verbose = False
-
-import svet
 
 
 class SvetError(Exception):

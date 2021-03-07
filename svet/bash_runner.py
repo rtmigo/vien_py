@@ -33,7 +33,7 @@ def _run_with_input_delay(*popenargs, input_delay: float = None,
         _mswindows = True
     except ModuleNotFoundError:
         _mswindows = False
-    # END
+    # END of insert
 
     if input is not None:
         if kwargs.get('stdin') is not None:
