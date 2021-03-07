@@ -157,7 +157,7 @@ bash prompt.
 user@host$ cd /abc/myProject
 user@host$ svet shell
 
-(myProject)user@host$
+(myProject)user@host$ _
 ```
 So can can clearly see, which virtualenv you're using.
 
