@@ -16,8 +16,6 @@ from svet.bash_runner import run_as_bash_script
 
 verbose = False
 
-#from svet import __version__
-
 import svet
 
 
