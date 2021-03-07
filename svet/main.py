@@ -23,7 +23,7 @@ class SvetError(SystemExit):
     that show the error message and stop the program."""
 
     def __init__(self, message: str):
-        super().__init__(message)
+        super().__init__(f"ERROR: {message}")
 
 
 class VenvExistsError(SvetError): pass
@@ -39,8 +39,14 @@ class FailedToCreateVenvError(SvetError):
         super().__init__(f"Failed to create virtualenv {path}.")
 
 
+class FailedToClearVenvError(SvetError):
+    def __init__(self, path: Path):
+        super().__init__(f"Failed to clear virtualenv {path}.")
+
+
 class CannotFindExecutableError(SvetError):
-    pass
+    def __init__(self, version: str):
+        super().__init__(f"Cannot resolve '{version}' to an executable file.")
 
 
 def version() -> str:
@@ -169,13 +175,18 @@ def venv_dir_to_exe(venv_dir: Path) -> Path:
     raise Exception(f"Cannot find the interpreter in {venv_dir}.")
 
 
+def get_python_interpreter(argument: str) -> str:
+    exe = shutil.which(argument)
+    if not exe:
+        raise CannotFindExecutableError(argument)
+    return exe
+
+
 def main_create(venv_dir: Path, version: str):
     if venv_dir.exists():
         raise VenvExistsError("Virtualenv already exists.")
 
-    exe = shutil.which(version)
-    if not exe:
-        raise CannotFindExecutableError(f"Cannot resolve '{version}' to an executable file.")
+    exe = get_python_interpreter(version)
 
     print(f"Creating {venv_dir}")
 
@@ -195,6 +206,12 @@ def main_delete(venv_dir: Path):
         raise ValueError(venv_dir)
     if not venv_dir.exists():
         raise VenvDoesNotExistError(venv_dir)
+    python_exe = venv_dir_to_exe(venv_dir)
+    print(f"Clearing {venv_dir}")
+
+    result = subprocess.run([python_exe, "-m", "venv", str(venv_dir)])
+    if result.returncode != 0:
+        raise FailedToClearVenvError(venv_dir)
     print(f"Deleting {venv_dir}")
     shutil.rmtree(str(venv_dir))
 
@@ -347,24 +364,24 @@ def main_entry_point(args: Optional[List[str]] = None):
 
     ##########
 
-    try:
+    # try:
 
-        if parsed.command == "create":
-            main_create(venv_dir, parsed.python)
-        elif parsed.command == "recreate":
-            main_recreate(venv_dir, parsed.python)
-        elif parsed.command == "delete":
-            main_delete(venv_dir)
-        elif parsed.command == "path":
-            print(venv_dir)
-        elif parsed.command == "run":
-            main_run(venv_dir, parsed.otherargs)
-        elif parsed.command == "shell":
-            main_shell(venv_dir, project_dir.name, parsed.input, parsed.delay)
-        else:
-            raise ValueError
+    if parsed.command == "create":
+        main_create(venv_dir, parsed.python)
+    elif parsed.command == "recreate":
+        main_recreate(venv_dir, parsed.python)
+    elif parsed.command == "delete":
+        main_delete(venv_dir)
+    elif parsed.command == "path":
+        print(venv_dir)
+    elif parsed.command == "run":
+        main_run(venv_dir, parsed.otherargs)
+    elif parsed.command == "shell":
+        main_shell(venv_dir, project_dir.name, parsed.input, parsed.delay)
+    else:
+        raise ValueError
 
-    except SvetError as se:
-
-        print(f"ERROR: {se}")
-        raise
+    # except SvetError as se:
+    #
+    #     print(f"ERROR: {se}")
+    #     raise
