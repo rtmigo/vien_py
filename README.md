@@ -133,11 +133,11 @@ $ vien shell
 Now you are inside the virtual environment.
 
 ```bash	
-(myProject)$ which python3             # we are using separate copy of Python
+(myProject)$ which python3             # now we are using separate copy of Python
 (myProject)$ echo $PATH                # everything is slightly different
 
-(myProject)$ pip3 install requests     # installs packages into virtualenv
-(myProject)$ python3 use_requests.py   # runs inside the virtualenv
+(myProject)$ pip3 install requests     # installs packages into virtual environment
+(myProject)$ python3 use_requests.py   # runs inside the virtual environment
 ```
 
 Get out of the virtual environment:
