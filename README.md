@@ -98,8 +98,10 @@ $ vien create
 
 By default `vien` will try to use `python3` as the interpreter for the virtual environment.
 
-**If you have 
-more than one Python version**, point to the proper interpreter the way you execute it.
+<details>
+  <summary>If you have 
+more than one Python version...</summary><br/>
+Point to the proper interpreter the way you execute it.
 
 If you execute scripts like that
 
@@ -118,6 +120,7 @@ Or provide full path to the interpreter:
 ```bash
 $ vien create /usr/local/opt/python@3.8/bin/python3
 ```
+</details>
 
 ## Dive into interactive bash
 ```bash	
