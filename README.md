@@ -52,12 +52,10 @@ $ sudo apt-get install -y python3 python3-pip python3-venv
 @ macOS
 ```bash
 $ brew install python3
-$ pip3 install virtualenv
 ```
 Check it works
 ```bash
-$ python3 --version
-$ virtualenv --version
+$ python3 -m venv   # shows usage info
 ```
 
 
