@@ -106,13 +106,15 @@ Now you are inside the virtualenv.
 
 ```
 
-```bash	
+Get out of the virtualenv:
+
+```bash
 (pyProject)$ exit
 
 $ _
 ```
 
-Now you're back
+Now you're back.
 
 ## Run a python script inside the virtualenv 
 ```bash 		
