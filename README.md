@@ -24,7 +24,6 @@ And definitely not like
 ```base
 $ python3 -m venv ./where/to/put/this/.venv
 $ source /i/lost/that/.venv/bin/activate
-$ /omg/i/will/not/.venv/bin/deactivate
 ```
 
 
@@ -48,6 +47,12 @@ So I made `svet`. A stupidly simple tool for a half asleep developer.
 Ubuntu:
 ```bash
 $ sudo apt-get install -y python3 python3-pip python3-venv
+```
+
+MasOS
+```bash
+brew install python3
+pip3 install virtualenv
 ```
 
 ----
