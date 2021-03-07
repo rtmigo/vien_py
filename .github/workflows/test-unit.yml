@@ -45,4 +45,5 @@ jobs:
     - name: Run unit tests
       run: |
         ./run.py --help
+        ./run.py path
         ./test.py
