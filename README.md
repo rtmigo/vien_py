@@ -105,7 +105,7 @@ Now you are inside the virtualenv.
 
 (pyProject)$ python3 use_requests.py   # runs in virtualenv
 
-(pyProject)$ which python3             # we are using separate copy of python
+(pyProject)$ which python3             # we are using separate copy of Python
 
 ```
 
