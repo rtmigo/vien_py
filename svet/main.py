@@ -84,6 +84,8 @@ See HELP with other options:
 
   svet -h
 
+--------
+
 """
 
     doc = text.strip()
@@ -221,7 +223,7 @@ def get_bash_ps1():
     # return None for MacOS
     import platform
     if platform.system() == "Darwin":
-        r"\h:\W \u\$"  # default for MacOS up to Catalina
+        return r"\h:\W \u\$"  # default for MacOS up to Catalina
 
     # hope for the best in other systems
     return subprocess.check_output(['/bin/bash', '-i', '-c', 'echo $PS1']).decode().rstrip()
@@ -289,9 +291,6 @@ def main_entry_point(args: Optional[List[str]] = None):
     if args is None:
         args = sys.argv[1:]
 
-    if not args:
-        print(usageDoc())
-        exit(2)
 
     # noinspection PyTypeChecker
     parser = argparse.ArgumentParser()
@@ -316,6 +315,16 @@ def main_entry_point(args: Optional[List[str]] = None):
 
     subparsers.add_parser('path',
                           help="show the supposed path of the virtualenv for the current directory")
+
+
+
+    if not args:
+        print(usageDoc())
+        parser.print_help()
+        exit(2)
+
+
+
 
     args = parser.parse_args(args)
 

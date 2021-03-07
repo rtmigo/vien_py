@@ -148,3 +148,33 @@ Optionally point to the interpreter:
 $ cd /path/to/myProject
 $ svet recreate /path/to/bin/python3
 ```
+
+# The PS1
+
+By default the `svet shell` adds a prefix to the [$PS1](https://wiki.archlinux.org/index.php/Bash/Prompt_customization) 
+bash prompt.
+```bash
+user@host$ cd /abc/myProject
+user@host$ svet shell
+
+(myProject)user@host$
+```
+So can can clearly see, which virtualenv you're using.
+
+If you customized your PS1, it may not work as expected.  
+
+```bash
+custom:prompt> cd /abc/myProject
+custom:prompt> svet shell
+
+(myProject)user@host$ _
+```
+
+It can be fixed by providing `PS1` variable to `svet` like that: 
+
+```bash
+custom:prompt> cd /abc/myProject
+custom:prompt> PS1=$PS1 svet shell
+
+(myProject)custom:prompt> _
+```
