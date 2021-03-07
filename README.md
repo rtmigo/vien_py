@@ -145,10 +145,7 @@ $ /path/to/the/venv/bin/deactivate
 |`/moved/to/otherProject`|`$HOME/.svet/otherProject_venv`|
 
 So only the local name of the project directory matters. And all the virtualenvs 
-are in `$HOME/.svet`. Until you decide to
-
-
-### Change the `$SVETDIR`
+are in `$HOME/.svet`. 
 
 You can set the directory where `svet` places the virtualenvs. By default, it's `$HOME/.svet`. If you're not happy with this, you can define the environment variable `SVETDIR`:
 ```bash
