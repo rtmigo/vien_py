@@ -1,4 +1,4 @@
-name: test pkg build
+name: build pkg test
 
 on:
   push:

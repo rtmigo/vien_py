@@ -1,6 +1,6 @@
 # https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: CI
+name: unit test
 
 on:
   push:
@@ -44,4 +44,6 @@ jobs:
 #        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run unit tests
       run: |
+        ./run.py
+        ./run.py --help
         ./test.py
