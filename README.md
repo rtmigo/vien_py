@@ -5,13 +5,17 @@
 [![Generic badge](https://img.shields.io/badge/CI_OS-MacOS,_Ubuntu-blue.svg)](#)
 [![Generic badge](https://img.shields.io/badge/CI_Python-3.7--3.9-blue.svg)](#)
 
-vien is an acronym for Simple Virtual Environments Tool.
+**VIEN** is a command-line tool for managing [Python Virtual Environments](https://docs.python.org/3/library/venv.html) in bash.
 
-It provides command-line shortcuts for managing Python [virtualenvs](https://docs.python.org/3/library/venv.html).
+It provides one-line shortcuts for:
+- creating and deleting environments
+- running commands inside environments
+- switching between working environments in bash shell
+    
 
 -----
 
-Switching between virtual environments in Python should be simple. A short command 
+Switching between projects with virtualenvs should be simple. A short command 
 that I would type even half asleep.
 
 Something like
