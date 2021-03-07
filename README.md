@@ -36,7 +36,7 @@ $ source /i/lost/that/.venv/bin/activate
 
 </details>
 
-So I made `svet`. A stupidly simple tool for a half asleep developer.
+So I made `svet`. A tool for a half asleep developer.
 
 
 # Install
