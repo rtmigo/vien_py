@@ -6,6 +6,8 @@ from .bash_runner import *
 
 from timeit import default_timer as timer
 
+from .sigtimeout import TimeLimited
+
 
 class TestRunAsBash(unittest.TestCase):
 
@@ -44,7 +46,8 @@ class TestRunAsBash(unittest.TestCase):
 
         start = timer()
         # run interactive shell end type "exit" after small delay
-        run_as_bash_script("exec bash", input="exit\n".encode(), input_delay=1, timeout=10)
+        with TimeLimited(seconds=10):  # safety net
+            run_as_bash_script("exec bash", input="exit\n".encode(), input_delay=1, timeout=10)
         end = timer()
         self.assertGreater(end-start, 0.9)
         self.assertLess(end-start, 5)

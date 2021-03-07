@@ -3,8 +3,8 @@
 
 from __future__ import annotations
 
+from timeit import default_timer as timer
 import os
-import signal
 import sys
 import unittest
 from io import StringIO
@@ -15,29 +15,8 @@ from svet import main_entry_point
 from svet.main import VenvExistsError, VenvDoesNotExistError
 
 
-# TEST TIMEOUT ##########
 
-class TestTimeout(Exception):
-    pass
-
-
-class test_timeout:
-    #  https://stackoverflow.com/a/49567288
-    def __init__(self, seconds, error_message=None):
-        if error_message is None:
-            error_message = 'test timed out after {}s.'.format(seconds)
-        self.seconds = seconds
-        self.error_message = error_message
-
-    def handle_timeout(self, signum, frame):
-        raise TestTimeout(self.error_message)
-
-    def __enter__(self):
-        signal.signal(signal.SIGALRM, self.handle_timeout)
-        signal.alarm(self.seconds)
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        signal.alarm(0)
+from svet.sigtimeout import TimeLimited
 
 
 ########
@@ -221,22 +200,39 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertTrue("svetdir" in interpreter_path.parts)
         self.assertTrue("project_venv" in interpreter_path.parts)
 
-    @unittest.skip
+    #@unittest.skip
     def test_shell_ok(self):
 
-        # fixme fails on ubuntu
-
-        # when executed from MacOS terminal, this test makes the tab unusable
         main_entry_point(["create"])
 
-        # if the function call taking a long time, that means we're in shell
-        with self.assertRaises(TestTimeout):
-            with test_timeout(seconds=3):
-                main_entry_point(["shell"])
+        with TemporaryDirectory() as td:
+            dir_to_create = Path(td) / "to_be_or_not_to_be"
+            self.assertFalse(dir_to_create.exists())
+            dir_to_create_quoted = repr(str(dir_to_create))
+            bash_input = f'mkdir {dir_to_create_quoted}\n'
+
+            # we did not find an easy way to run an interactive sub-shell during testing
+            # and then to kill it. Solutions that were based on signal.SIGALRM or the
+            # subprocess.run(timeout), were harming the MacOS terminal that started the test
+            #
+            # So we provide input and delay arguments to the sub-shell. It makes the
+            # sub-shell peacefully close itself.
+            #
+            # It is not a clean test for "shell" though. The "shell" meant to be run
+            # without parameters.
+
+            start = timer()
+            with TimeLimited(10):  # safety net
+                main_entry_point(["shell", "--input", bash_input, "--delay", "1"])
+            end = timer()
+
+            self.assertGreater(end-start, 0.5)
+            self.assertLess(end-start, 3)
+            self.assertTrue(dir_to_create.exists())
 
     def test_shell_but_no_venv(self):
         # python3 -m unittest svet.main_test.TestsInsideTempProjectDir.test_shell
 
-        with test_timeout(seconds=10):  # safety net
+        with TimeLimited(10):  # safety net
             with self.assertRaises(VenvDoesNotExistError):
                 main_entry_point(["shell"])
