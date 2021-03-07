@@ -37,7 +37,7 @@ $ source /i/lost/that/.venv/bin/activate
 
 
 - [pipenv](https://pipenv.pypa.io/) kind of solved the problem, but brought new challenges unrelated to virtual environments
-- [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) is a package whose name is easier to copy-paste than to type
+- [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) is a package whose name is easier to copy-paste than to type. I gave up when I realized I was starting to automate virtualenvwrapperwrapper for myself 
 
 </details>
 
