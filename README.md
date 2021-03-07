@@ -107,7 +107,7 @@ If you execute scripts like that
 $ python3.8 /path/to/script.py
 ```
 
-Create virtual environment like that
+Create virtual environment like that:
 
 ```bash
 $ vien create python3.8
