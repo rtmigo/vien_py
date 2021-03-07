@@ -218,3 +218,5 @@ personalized:prompt> PS1=$PS1 svet shell
 
 (myProject)personalized:prompt> _
 ```
+
+To avoid doing this each time, `export` your `PS1` to make it available for subprocesses.
