@@ -131,11 +131,11 @@ $ svet run pip3 install requests              # installs packages into virtualen
 
 ```bash 		
 $ cd /path/to/myProject
+
 $ source /path/to/the/venv/bin/activate
 $ python3 use_requests.py arg1 arg2
 $ /path/to/the/venv/bin/deactivate
 
-$ cd /path/to/myProject
 $ source /path/to/the/venv/bin/activate
 $ pip3 install requests
 $ /path/to/the/venv/bin/deactivate
