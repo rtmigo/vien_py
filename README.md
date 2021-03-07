@@ -90,7 +90,7 @@ $ svet create python3.8
 $ svet create /path/to/bin/python3
 ```
 
-## Get into interactive bash
+## Dive into interactive bash
 ```bash	
 $ cd /path/to/myProject
 $ svet shell
@@ -116,10 +116,15 @@ $ _
 
 Now you're back.
 
-## Run a script inside the virtualenv 
+## Run a script inside the virtualenv
+
+If you don't like interactive bash...
+
 ```bash 		
 $ cd /path/to/myProject
-$ svet run python3 ./my_program.py arg1 arg2 ...
+$ svet run pip3 install requests   # installs packages into virtualenv
+$ svet run python3 use_requests.py # runs in virtualenv    
+$ svet run python3 use_requests.py arg1 arg2 ... # that's ok
 ```
 
 <details>
