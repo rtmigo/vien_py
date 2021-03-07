@@ -122,9 +122,9 @@ If you don't like interactive bash...
 
 ```bash 		
 $ cd /path/to/myProject
-$ svet run pip3 install requests   # installs packages into virtualenv
-$ svet run python3 use_requests.py # runs in virtualenv    
-$ svet run python3 use_requests.py arg1 arg2 ... # that's ok
+$ svet run pip3 install requests                  # installs packages into virtualenv
+$ svet run python3 use_requests.py                # runs in virtualenv    
+$ svet run python3 use_requests.py arg1 arg2 ...  # that's ok
 ```
 
 <details>
