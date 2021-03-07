@@ -6,7 +6,7 @@ from .bash_runner import *
 
 from timeit import default_timer as timer
 
-from .sigtimeout import TimeLimited
+from .time_limited import TimeLimited
 
 
 class TestRunAsBash(unittest.TestCase):

@@ -16,7 +16,7 @@ from svet.main import VenvExistsError, VenvDoesNotExistError
 
 
 
-from svet.sigtimeout import TimeLimited
+from svet.time_limited import TimeLimited
 
 
 ########
