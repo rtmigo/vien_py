@@ -72,7 +72,7 @@ $ pip3 install svet
 Make sure it installed:
 
 ```bash
-$ svet  # shows help
+$ svet      # shows help
 ```
 
 Upgrade it later:
