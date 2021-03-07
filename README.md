@@ -11,7 +11,7 @@ It provides command-line shortcuts for managing Python [virtualenvs](https://doc
 
 -----
 
-Switching between environments in Python should be simple. A short command 
+Switching between virtual environments in Python should be simple. A short command 
 that I would type even half asleep.
 
 Something like
