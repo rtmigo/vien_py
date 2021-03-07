@@ -33,7 +33,7 @@ $ /omg/forget/it/i/will/not/.venv/bin/deactivate
 
 
 - [pipenv](https://pipenv.pypa.io/) kind of solved the problem, but brought new challenges unrelated to virtualenvs
-- [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) is a package whose name is easier to copy and paste than to type. Well, it's not just the name
+- [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) is a package whose name is easier to copy-paste than to type
 
 </details>
 
