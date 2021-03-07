@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
-import sys
 import os
+import sys
 import unittest
 
 if __name__ == "__main__":
+
+    # we also have some tests in files without "_test" in filename
 
     parent_dir = os.path.dirname(__file__)
 

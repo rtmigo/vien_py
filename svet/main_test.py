@@ -3,23 +3,17 @@
 
 from __future__ import annotations
 
-from timeit import default_timer as timer
 import os
 import sys
 import unittest
 from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from timeit import default_timer as timer
 
 from svet import main_entry_point
 from svet.main import VenvExistsError, VenvDoesNotExistError
-
-
-
 from svet.time_limited import TimeLimited
-
-
-########
 
 
 class CapturedOutput:
@@ -201,7 +195,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertTrue("project_venv" in interpreter_path.parts)
 
     def test_shell_ok(self):
-
         main_entry_point(["create"])
 
         with TemporaryDirectory() as td:
@@ -225,8 +218,8 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                 main_entry_point(["shell", "--input", bash_input, "--delay", "1"])
             end = timer()
 
-            self.assertGreater(end-start, 0.5)
-            self.assertLess(end-start, 3)
+            self.assertGreater(end - start, 0.5)
+            self.assertLess(end - start, 3)
             self.assertTrue(dir_to_create.exists())
 
     def test_shell_but_no_venv(self):

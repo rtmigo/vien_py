@@ -304,12 +304,12 @@ def main_entry_point(args: Optional[List[str]] = None):
                                           help="delete existing virtualenv and create new")
     parser_reinit.add_argument('python', type=str, default="python3", nargs='?')
 
-    shell_parser = subparsers.add_parser('shell', help="dive into Bash subshell using the virtualenv")
+    shell_parser = subparsers.add_parser('shell', help="dive into Bash sub-shell using the virtualenv")
     shell_parser.add_argument("--input", type=str, default=None)
     shell_parser.add_argument("--delay", type=float, default=None, help=argparse.SUPPRESS)
 
     parser_run = subparsers.add_parser('run', help="run a command inside the virtualenv")
-    parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)  # nargs='*'
+    parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)
 
     subparsers.add_parser('path',
                           help="show the supposed path of the virtualenv for the current directory")
@@ -319,13 +319,12 @@ def main_entry_point(args: Optional[List[str]] = None):
         parser.print_help()
         exit(2)
 
-    args = parser.parse_args(args)
+    parsed = parser.parse_args(args)
 
     ###########
 
     project_dir = Path(".").absolute()
-    venv_dir = get_svet_dir() / (
-            project_dir.name + "_venv")  # venvsParentDir / (projectDir.name + "_venv")
+    venv_dir = get_svet_dir() / (project_dir.name + "_venv")
 
     if verbose:
         print(f"Proj dir: {project_dir}")
@@ -333,18 +332,17 @@ def main_entry_point(args: Optional[List[str]] = None):
 
     ##########
 
-    if args.command == "create":
-        init(venv_dir, args.python)
-    elif args.command == "recreate":
-        reinit(venv_dir, args.python)
-    elif args.command == "delete":
+    if parsed.command == "create":
+        init(venv_dir, parsed.python)
+    elif parsed.command == "recreate":
+        reinit(venv_dir, parsed.python)
+    elif parsed.command == "delete":
         remove(venv_dir)
-    elif args.command == "path":
+    elif parsed.command == "path":
         print(venv_dir)
-    elif args.command == "run":
-        command_run(venv_dir, args.otherargs)
-    elif args.command == "shell":
-        # print(args.input)
-        shell(venv_dir, project_dir.name, args.input, args.delay)
+    elif parsed.command == "run":
+        command_run(venv_dir, parsed.otherargs)
+    elif parsed.command == "shell":
+        shell(venv_dir, project_dir.name, parsed.input, parsed.delay)
     else:
         raise ValueError
