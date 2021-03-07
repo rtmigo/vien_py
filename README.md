@@ -36,7 +36,7 @@ $ source /i/lost/that/.venv/bin/activate
   <summary>Ready-made solutions did not help.</summary><br/>
 
 
-- [pipenv](https://pipenv.pypa.io/) kind of solved the problem, but brought new challenges unrelated to virtualenvs
+- [pipenv](https://pipenv.pypa.io/) kind of solved the problem, but brought new challenges unrelated to virtual environments
 - [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) is a package whose name is easier to copy-paste than to type
 
 </details>
@@ -142,7 +142,7 @@ Now you are inside the virtual environment.
 (myProject)$ echo $PATH                # everything is slightly different
 ```
 
-Get out of the virtualenv:
+Get out of the virtual environment:
 
 ```bash
 (myProject)$ exit
@@ -183,13 +183,13 @@ $ /path/to/the/venv/bin/deactivate
 
 `vien` offers a simple rule of where to place the virtualenv.
 
-|project dir|virtualenv dir|
+|project dir|environment dir|
 |-----|----|
 |`/abc/thisProject`|`$HOME/.vien/thisProject_venv`|
 |`/abc/otherProject`|`$HOME/.vien/otherProject_venv`|
 |`/moved/to/otherProject`|`$HOME/.vien/otherProject_venv`|
 
-So only the local name of the project directory matters. And all the virtualenvs 
+So only the local name of the project directory matters. And all the virtual environments 
 are in `$HOME/.vien`. 
 
 You can set the directory where `vien` places the virtual environments. By default, it's `$HOME/.vien`. If you're not happy with this, you can define the environment variable `VIENDIR`:
