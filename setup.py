@@ -43,7 +43,7 @@ setup(
             'vien = vien:main_entry_point',
         ]},
 
-    keywords="virtual-environment venv virtualenv python".split(),
+    keywords="virtual-environment venv virtualenv python command-line shell terminal bash run create delete execute".split(),
 
     # https://pypi.org/classifiers/
     classifiers=[
