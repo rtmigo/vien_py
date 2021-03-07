@@ -49,7 +49,7 @@ So I made `svet`. A tool for a half asleep developer.
 $ sudo apt-get install -y python3 python3-pip python3-venv
 ```
 
-@ MasOS
+@ MacOS
 ```bash
 $ brew install python3
 $ pip3 install virtualenv
