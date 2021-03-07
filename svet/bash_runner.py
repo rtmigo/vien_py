@@ -1,5 +1,4 @@
 # SPDX-FileCopyrightText: (c) 2021 Art Galkin <ortemeo@gmail.com>
-# SPDX-FileCopyrightText: (c) 2003-2005 Peter Astrand <astrand@lysator.liu.se>
 # SPDX-License-Identifier: BSD-3-Clause
 
 import subprocess
@@ -22,7 +21,9 @@ def _run_with_input_delay(*popenargs, input_delay: float = None,
                           **kwargs):
     """Basically the same as subprocess.run, but accepts input_delay parameter."""
 
+
     # This is almost an exact copy of subprocess.run (as of 2021-03-06).
+    # SPDX-FileCopyrightText: (c) 2003-2005 Peter Astrand <astrand@lysator.liu.se>
     # Latest version here: https://github.com/python/cpython/blob/master/Lib/subprocess.py
 
     # START of insert from another portion of subprocess.py
