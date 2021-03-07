@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-echo "== SET UP VIRTUAL ENV =="
+echo "== SETTING UP VIRTUAL ENV =="
 
 scriptParentDir="$(dirname "$(perl -MCwd -e 'print Cwd::abs_path shift' "$0")")"
 cd "$scriptParentDir"
 
-python3 -m venv ./temp_build_test_venv
-source ./temp_build_test_venv/bin/activate
+python3 -m venv ./temp_pkg_test_venv
+source ./temp_pkg_test_venv/bin/activate
 
 echo "== BUILDING & CHECKING =="
 
@@ -31,6 +31,6 @@ vien --help
 echo "== TEARING DOWN =="
 
 deactivate
-python3 -m venv ./temp_build_test_venv --clear
-rm -rf ./temp_build_test_venv
+python3 -m venv ./temp_pkg_test_venv --clear
+rm -rf ./temp_pkg_test_venv
 rm -rf ./build ./dist ./*.egg-info
