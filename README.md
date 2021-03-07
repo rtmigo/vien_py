@@ -199,7 +199,7 @@ user@host$ svet shell
 
 (myProject)user@host$ _
 ```
-So can can see, which virtualenv you're using.
+So you can see, which virtualenv you're using.
 
 If you customized your `PS1`, it may not work as expected.  
 
