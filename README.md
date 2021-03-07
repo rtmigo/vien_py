@@ -44,12 +44,12 @@ So I made `svet`. A tool for a half asleep developer.
 <details>
   <summary>Get a working Python ≥3.7, pip3 and venv.</summary><br/>
 
-Ubuntu
+@ Ubuntu
 ```bash
 $ sudo apt-get install -y python3 python3-pip python3-venv
 ```
 
-MasOS
+@ MasOS
 ```bash
 $ brew install python3
 $ pip3 install virtualenv
