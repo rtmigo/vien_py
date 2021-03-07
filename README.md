@@ -51,9 +51,15 @@ $ sudo apt-get install -y python3 python3-pip python3-venv
 
 MasOS
 ```bash
-brew install python3
-pip3 install virtualenv
+$ brew install python3
+$pip3 install virtualenv
 ```
+Check it works
+```bash
+$ python3 --version
+$ virtualenv --version
+```
+
 
 ----
 </details>
