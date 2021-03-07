@@ -189,7 +189,7 @@ $ cd /path/to/myProject
 $ svet recreate /path/to/bin/python3
 ```
 
-# The PS1
+# Shell prompt
 
 By default the `svet shell` adds a prefix to the [`$PS1`](https://wiki.archlinux.org/index.php/Bash/Prompt_customization) 
 bash prompt.
