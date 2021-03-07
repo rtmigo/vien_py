@@ -127,7 +127,7 @@ $ vien shell
 (myProject)$ _
 ```
 
-Now you are inside the virtualenv.
+Now you are inside the virtual environment.
 
 ```bash	
 (myProject)$ pip3 install requests     # installs packages into virtualenv 
@@ -149,7 +149,7 @@ $ _
 
 Now you're back.
 
-## Run a script inside the virtualenv
+## Run a script inside the virtual environment
 
 It is `vien run <any bash command>`
 
@@ -176,7 +176,7 @@ $ /path/to/the/venv/bin/deactivate
 </details>
 
 
-# Where are the virtualenvs
+# Where are the virtual environments
 
 `vien` offers a simple rule of where to place the virtualenv.
 
@@ -199,14 +199,14 @@ The `_venv` suffix tells the utility that this directory can be safely removed.
 
 # Other commands
 
-### Delete virtualenv
+### Delete virtual environment
 
 ```bash
 $ cd /path/to/myProject
 $ vien delete 
 ```
 
-### Delete old and create new virtualenv
+### Delete old and create new virtual environment
 
 Useful, when you want to start from scratch.
 ```bash
