@@ -20,7 +20,7 @@ $ svet create
 $ svet shell
 ```
 
-And definitely not like
+And not like
 ```base
 $ python3 -m venv ./where/to/put/this/.venv
 $ source /i/lost/that/.venv/bin/activate
