@@ -40,7 +40,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'vien = vien:main_entry_point',
+            'vien = vien:main_entry_point1',
         ]},
 
     keywords="virtual-environment venv virtualenv python command-line shell terminal bash run create delete execute".split(),
