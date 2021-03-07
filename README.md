@@ -80,8 +80,8 @@ $ cd /path/to/myProject
 $ svet create 
 ```
 
-By default `svet` will try to use `python3` as the interpreter will be used for virtualenv. If you have 
-more than one Python version, just point to the proper binary the way you execute it:
+By default `svet` will try to use `python3` as the interpreter for the virtualenv. If you have 
+more than one Python version, point to the proper interpreter the way you execute it:
 
 ```bash
 $ svet create python3.8
