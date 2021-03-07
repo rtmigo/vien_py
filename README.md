@@ -54,16 +54,17 @@ are in `$HOME/.svet`. Until you decide to [change this dir](#vepdir).
 
 # Install
 
-Get a working [Python](https://www.python.org/) ≥3.7 and [pip](https://pip.pypa.io/en/stable/installing/). You may also need a computer. Then:
+Get a working [Python](https://www.python.org/) ≥3.7, 
+[pip](https://pip.pypa.io/en/stable/installing/) and [venv](https://docs.python.org/3/library/venv.html). Then:
 
 ```bash
 $ pip3 install svet
 ```
 
-create sure that it is installed:
+Make sure it installed:
 
 ```bash
-$ svet --help
+$ svet
 ```
 
 Upgrade it later:
