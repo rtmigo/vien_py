@@ -3,7 +3,7 @@ from pathlib import Path
 
 from setuptools import setup, find_packages
 
-constants = SourceFileLoader('constants', 'svet/constants.py').load_module()
+constants = SourceFileLoader('constants', 'vien/constants.py').load_module()
 
 
 def readDocText():
@@ -21,12 +21,12 @@ def readDocText():
 
 
 setup(
-    name="svet",
+    name="vien",
     version=constants.__version__,
 
     author="Art Galkin",
     author_email="ortemeo@gmail.com",
-    url='https://github.com/rtmigo/svet',
+    url='https://github.com/rtmigo/vien',
 
     packages=find_packages(),
     install_requires=[],
@@ -40,7 +40,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'svet = svet:main_entry_point',
+            'vien = vien:main_entry_point',
         ]},
 
     keywords="virtual-environment venv virtualenv python".split(),

@@ -12,8 +12,8 @@ import unittest
 from pathlib import Path
 from typing import *
 
-import svet
-from svet.bash_runner import run_as_bash_script
+import vien
+from vien.bash_runner import run_as_bash_script
 
 verbose = False
 
@@ -53,49 +53,50 @@ def version() -> str:
     mod_timestamp = (Path(__file__).parent / "constants.py").stat().st_mtime
     mod_year = dt.datetime.fromtimestamp(mod_timestamp).year
     return "\n".join([
-        f"SVET: Simple Virtual Environments Tool {svet.__version__}",
-        svet.__copyright__.replace("2020", f"2020-{mod_year}"),
-        f"See https://github.com/rtmigo/svet#readme"
+        f"VIEN: Python VIrtual ENvironments Tool {vien.__version__}",
+        vien.__copyright__.replace("2020", f"2020-{mod_year}"),
     ])
 
 
 def usage_doc():
     text = f"""{version()}
 
-SVETDIR
+See a more detailed intro at
+https://github.com/rtmigo/vien#readme
+
+VIENDIR
 -------
 
-SVET maps project directory names to virtualenv paths.
+VIEN maps project directory names to virtualenv paths.
 
-  /here/myProject       -> $SVETDIR/myProject_venv
-  /there/myProject      -> $SVETDIR/myProject_venv
-  /there/otherProject   -> $SVETDIR/otherProject_venv
+  /here/myProject       -> $VIENDIR/myProject_venv
+  /there/myProject      -> $VIENDIR/myProject_venv
+  /there/otherProject   -> $VIENDIR/otherProject_venv
 
-By default $SVETDIR is "~/.svet". You can redefine in with
+By default $VIENDIR is "~/.vien". You can redefine in with
 
-  export SVETDIR="/other/location"
+  export VIENDIR="/other/location"
 
-RUNNING
--------
+The current $VIENDIR is
+  {get_svet_dir()}
 
-CREATE new virtualenv with python3 in $SVETDIR/myProject_venv:
+QUICK START
+-----------
 
-  cd /abc/myProject
-  svet create python3
+CREATE new virtualenv with python3 in $VIENDIR/my_project_venv:
 
-RUN an interactive BASH SUBSHELL inside "myProject_venv":	
+  cd /abc/my_project
+  vien create python3
 
-  cd /abc/myProject
-  svet shell
+RUN an interactive BASH SUB-SHELL inside "my_project_venv":	
+
+  cd /abc/my_project
+  vien shell
         
-RUN a PYTHON SCRIPT inside "myProject_venv":	
+RUN a PYTHON SCRIPT inside "my_project_venv":	
 
   cd /abc/myProject
-  svet run python ./myProgram.py arg1 arg2 ...
-
-See HELP with other options:	
-
-  svet -h
+  vien run python3 ./myProgram.py arg1 arg2 ...
 
 --------
 
@@ -107,37 +108,37 @@ See HELP with other options:
 
 
 def get_svet_dir() -> Path:
-    s = os.environ.get("SVETDIR")
+    s = os.environ.get("VENVDIR")
     if s:
         return Path(os.path.expanduser(os.path.expandvars(s)))
     else:
-        return Path(os.path.expandvars("$HOME")) / ".svet"
+        return Path(os.path.expandvars("$HOME")) / ".vien"
 
 
 class TestVenvsDir(unittest.TestCase):
 
     def test_if_set_plain(self):
-        os.environ["SVETDIR"] = "/path/to/veps"
+        os.environ["VENVDIR"] = "/path/to/veps"
         self.assertEqual(get_svet_dir(), Path('/path/to/veps'))
 
     def test_if_set_with_vars(self):
-        os.environ["SVETDIR"] = "$HOME/subfolder"
+        os.environ["VENVDIR"] = "$HOME/subfolder"
         s = str(get_svet_dir())
         self.assertTrue("$" not in s)
         self.assertGreater(len(s), len("/home/"))
 
     def test_if_set_with_user(self):
-        os.environ["SVETDIR"] = "~/subfolder"
+        os.environ["VENVDIR"] = "~/subfolder"
         s = str(get_svet_dir())
         self.assertTrue("~" not in s)
         self.assertGreater(len(s), len("/home/"))
 
     def test_if_not_n(self):
-        if "SVETDIR" in os.environ:
-            del os.environ["SVETDIR"]
+        if "VENVDIR" in os.environ:
+            del os.environ["VENVDIR"]
         p = str(get_svet_dir())
-        self.assertTrue(p.endswith("svet"))
-        self.assertGreater(len(p), len("/.svet"))
+        self.assertTrue(p.endswith("vien"))
+        self.assertGreater(len(p), len("/.vien"))
 
 
 def run(args: List[str]):

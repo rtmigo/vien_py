@@ -1,11 +1,11 @@
-# [svet](https://github.com/rtmigo/svet#readme)
+# [vien](https://github.com/rtmigo/vien#readme)
 [![Generic badge](https://img.shields.io/badge/ready_for_use-no-red.svg)](#)
-[![PyPI version shields.io](https://img.shields.io/pypi/v/svet.svg)](https://pypi.python.org/pypi/svet/)
-[![Actions Status](https://github.com/rtmigo/svet/workflows/CI/badge.svg?branch=master)](https://github.com/rtmigo/svet/actions)
+[![PyPI version shields.io](https://img.shields.io/pypi/v/vien.svg)](https://pypi.python.org/pypi/vien/)
+[![Actions Status](https://github.com/rtmigo/vien/workflows/CI/badge.svg?branch=master)](https://github.com/rtmigo/vien/actions)
 [![Generic badge](https://img.shields.io/badge/CI_OS-MacOS,_Ubuntu-blue.svg)](#)
 [![Generic badge](https://img.shields.io/badge/CI_Python-3.7--3.9-blue.svg)](#)
 
-SVET is an acronym for Simple Virtual Environments Tool.
+vien is an acronym for Simple Virtual Environments Tool.
 
 It provides command-line shortcuts for managing Python [virtualenvs](https://docs.python.org/3/library/venv.html).
 
@@ -16,8 +16,8 @@ that I would type even half asleep.
 
 Something like
 ```base
-$ svet create 
-$ svet shell
+$ vien create 
+$ vien shell
 ```
 
 And not like
@@ -36,7 +36,7 @@ $ source /i/lost/that/.venv/bin/activate
 
 </details>
 
-So I made `svet`. A tool for a half asleep developer.
+So I made `vien`. A tool for a half asleep developer.
 
 
 # Install
@@ -66,18 +66,18 @@ $ python3 -m venv --help        # venv shows help message
 Then:
 
 ```bash
-$ pip3 install svet
+$ pip3 install vien
 ```
 
 Make sure it installed:
 
 ```bash
-$ svet      # shows help
+$ vien      # shows help
 ```
 
 Upgrade it later:
 ```bash
-$ pip3 install svet --upgrade
+$ pip3 install vien --upgrade
 ```
 
 
@@ -87,44 +87,43 @@ $ pip3 install svet --upgrade
 
 ```bash
 $ cd /path/to/myProject
-$ svet create 
+$ vien create 
 ```
 
-By default `svet` will try to use `python3` as the interpreter for the virtualenv. If you have 
+By default `vien` will try to use `python3` as the interpreter for the virtualenv. If you have 
 more than one Python version, point to the proper interpreter the way you execute it:
 
 ```bash
-$ svet create python3.8
+$ vien create python3.8
 ```
 ```bash
-$ svet create /path/to/bin/python3
+$ vien create /path/to/bin/python3
 ```
 
 ## Dive into interactive bash
 ```bash	
 $ cd /path/to/myProject
-$ svet shell
+$ vien shell
 
-(pyProject)$ _
+(myProject)$ _
 ```
 
 Now you are inside the virtualenv.
 
 ```bash	
-(pyProject)$ pip3 install requests     # installs packages into virtualenv 
+(myProject)$ pip3 install requests     # installs packages into virtualenv 
 
-(pyProject)$ python3 use_requests.py   # runs in virtualenv
+(myProject)$ python3 use_requests.py   # runs in virtualenv
 
-(pyProject)$ which python3             # we are using separate copy of Python
+(myProject)$ which python3             # we are using separate copy of Python
 
-(pyProject)$ echo $PATH                # everything is slightly different
-
+(myProject)$ echo $PATH                # everything is slightly different
 ```
 
 Get out of the virtualenv:
 
 ```bash
-(pyProject)$ exit
+(myProject)$ exit
 
 $ _
 ```
@@ -133,12 +132,12 @@ Now you're back.
 
 ## Run a script inside the virtualenv
 
-It is `svet run <any bash command>`
+It is `vien run <any bash command>`
 
 ```bash 		
 $ cd /path/to/myProject
-$ svet run python3 use_requests.py arg1 arg2  # runs in virtualenv
-$ svet run pip3 install requests              # installs packages into virtualenv
+$ vien run python3 use_requests.py arg1 arg2  # runs in virtualenv
+$ vien run pip3 install requests              # installs packages into virtualenv
 ```
 
 <details>
@@ -160,20 +159,20 @@ $ /path/to/the/venv/bin/deactivate
 
 # Where are the virtualenvs
 
-`svet` offers a simple rule of where to place the virtualenv.
+`vien` offers a simple rule of where to place the virtualenv.
 
 |project dir|virtualenv dir|
 |-----|----|
-|`/abc/thisProject`|`$HOME/.svet/thisProject_venv`|
-|`/abc/otherProject`|`$HOME/.svet/otherProject_venv`|
-|`/moved/to/otherProject`|`$HOME/.svet/otherProject_venv`|
+|`/abc/thisProject`|`$HOME/.vien/thisProject_venv`|
+|`/abc/otherProject`|`$HOME/.vien/otherProject_venv`|
+|`/moved/to/otherProject`|`$HOME/.vien/otherProject_venv`|
 
 So only the local name of the project directory matters. And all the virtualenvs 
-are in `$HOME/.svet`. 
+are in `$HOME/.vien`. 
 
-You can set the directory where `svet` places the virtualenvs. By default, it's `$HOME/.svet`. If you're not happy with this, you can define the environment variable `SVETDIR`:
+You can set the directory where `vien` places the virtualenvs. By default, it's `$HOME/.vien`. If you're not happy with this, you can define the environment variable `VIENDIR`:
 ```bash
-$ export SVETDIR="/x/y/z"
+$ export VIENDIR="/x/y/z"
 ```
 So for the project `aaa` the virtualenv will be located in `/x/y/z/aaa_venv`.
 
@@ -185,7 +184,7 @@ The `_venv` suffix tells the utility that this directory can be safely removed.
 
 ```bash
 $ cd /path/to/myProject
-$ svet delete 
+$ vien delete 
 ```
 
 ### Delete old and create new virtualenv
@@ -193,21 +192,21 @@ $ svet delete
 Useful, when you want to start from scratch.
 ```bash
 $ cd /path/to/myProject
-$ svet recreate 
+$ vien recreate 
 ```
 Optionally point to the interpreter:
 ```bash
 $ cd /path/to/myProject
-$ svet recreate /path/to/bin/python3
+$ vien recreate /path/to/bin/python3
 ```
 
 # Shell prompt
 
-By default the `svet shell` adds a prefix to the [`$PS1`](https://wiki.archlinux.org/index.php/Bash/Prompt_customization) 
+By default the `vien shell` adds a prefix to the [`$PS1`](https://wiki.archlinux.org/index.php/Bash/Prompt_customization) 
 bash prompt.
 ```bash
 user@host$ cd /abc/myProject
-user@host$ svet shell
+user@host$ vien shell
 
 (myProject)user@host$ _
 ```
@@ -217,16 +216,16 @@ If you customized your `PS1`, it may not work as expected.
 
 ```bash
 personalized:prompt> cd /abc/myProject
-personalized:prompt> svet shell
+personalized:prompt> vien shell
 
 (myProject)user@host$ _
 ```
 
-It can be fixed by providing `PS1` variable to `svet` like that: 
+It can be fixed by providing `PS1` variable to `vien` like that: 
 
 ```bash
 personalized:prompt> cd /abc/myProject
-personalized:prompt> PS1=$PS1 svet shell
+personalized:prompt> PS1=$PS1 vien shell
 
 (myProject)personalized:prompt> _
 ```

@@ -11,9 +11,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 
-from svet import main_entry_point
-from svet.main import VenvExistsError, VenvDoesNotExistError
-from svet.time_limited import TimeLimited
+from vien import main_entry_point
+from vien.main import VenvExistsError, VenvDoesNotExistError
+from vien.time_limited import TimeLimited
 
 
 class CapturedOutput:
@@ -73,11 +73,11 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.expectedVenvDir = self.svetDir / "project_venv"
         self.expectedVenvBin = self.expectedVenvDir / "bin" / "python"
 
-        os.environ["SVETDIR"] = str(self.svetDir.absolute())
+        os.environ["VENVDIR"] = str(self.svetDir.absolute())
 
     def tearDown(self):
         self._td.cleanup()
-        del os.environ["SVETDIR"]
+        del os.environ["VENVDIR"]
 
     def assertVenvDoesNotExist(self):
         self.assertFalse(self.expectedVenvDir.exists())
