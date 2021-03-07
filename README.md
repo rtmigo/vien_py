@@ -190,7 +190,7 @@ $ /path/to/the/venv/bin/deactivate
 So only the local name of the project directory matters. And all the virtual environments 
 are in `$HOME/.vien`. 
 
-If you're not happy with the default, you can define the environment variable `VIENDIR`:
+If you're not happy with the default, you can set the environment variable `VIENDIR`:
 ```bash
 $ export VIENDIR="/x/y/z"
 ```
