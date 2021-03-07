@@ -15,8 +15,9 @@ It provides one-line shortcuts for:
 
 -----
 
-Switching between projects with virtualenvs should be simple. A short command 
-that I would type even half asleep.
+Switching between projects should be simple. Creating environments for the projects should be simple too.
+
+Ideally it's a short command that I would type even half asleep.
 
 Something like
 ```base
