@@ -118,13 +118,12 @@ Now you're back.
 
 ## Run a script inside the virtualenv
 
-If you don't like interactive bash...
+It is `svet run <any bash command>`
 
 ```bash 		
 $ cd /path/to/myProject
 $ svet run python3 use_requests.py arg1 arg2  # runs in virtualenv
 $ svet run pip3 install requests              # installs packages into virtualenv
-
 ```
 
 <details>
