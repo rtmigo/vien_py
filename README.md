@@ -44,7 +44,7 @@ So I made `svet`. A stupidly simple tool for a half asleep developer.
 <details>
   <summary>Get a working Python ≥3.7, pip3 and venv.</summary><br/>
 
-Ubuntu:
+Ubuntu
 ```bash
 $ sudo apt-get install -y python3 python3-pip python3-venv
 ```
