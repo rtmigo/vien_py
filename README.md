@@ -183,7 +183,7 @@ $ /path/to/the/venv/bin/deactivate
 
 `vien` offers a simple rule of where to place the virtualenv.
 
-|project dir|environment dir|
+|project dir|virtual environment dir|
 |-----|----|
 |`/abc/thisProject`|`$HOME/.vien/thisProject_venv`|
 |`/abc/otherProject`|`$HOME/.vien/otherProject_venv`|
