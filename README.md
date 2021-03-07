@@ -101,7 +101,7 @@ $ svet shell
 Now you are inside the virtualenv.
 
 ```bash	
-(pyProject)$ pip3 install requests     # installed into virtualenv 
+(pyProject)$ pip3 install requests     # installs packages into virtualenv 
 (pyProject)$ python use_requests.py    # runs in virtualenv
 
 ```
