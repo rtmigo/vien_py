@@ -197,8 +197,6 @@ def main_create(venv_dir: Path, version: str):
         print(str(venv_dir_to_exe(venv_dir)))
     else:
         raise FailedToCreateVenvError(venv_dir)
-        # print("svet failed to create the virtualenv")
-        # exit(1)
 
 
 def main_delete(venv_dir: Path):
@@ -322,7 +320,6 @@ def main_entry_point(args: Optional[List[str]] = None):
     if args is None:
         args = sys.argv[1:]
 
-    # noinspection PyTypeChecker
     parser = argparse.ArgumentParser()
 
     subparsers = parser.add_subparsers(dest='command', required=True)
@@ -364,8 +361,6 @@ def main_entry_point(args: Optional[List[str]] = None):
 
     ##########
 
-    # try:
-
     if parsed.command == "create":
         main_create(venv_dir, parsed.python)
     elif parsed.command == "recreate":
@@ -381,7 +376,3 @@ def main_entry_point(args: Optional[List[str]] = None):
     else:
         raise ValueError
 
-    # except SvetError as se:
-    #
-    #     print(f"ERROR: {se}")
-    #     raise
