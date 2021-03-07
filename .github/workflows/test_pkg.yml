@@ -1,4 +1,4 @@
-name: build pkg test
+name: pkg test
 
 on:
   push:
@@ -30,4 +30,4 @@ jobs:
 
       - name: Build and check
         run: |
-          ./test_build.sh
+          ./test_pkg.sh
