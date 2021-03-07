@@ -116,10 +116,10 @@ $ _
 
 Now you're back.
 
-## Run a python script inside the virtualenv 
+## Run a script inside the virtualenv 
 ```bash 		
 $ cd /path/to/myProject
-$ svet run python ./my_program.py arg1 arg2 ...
+$ svet run python3 ./my_program.py arg1 arg2 ...
 ```
 
 <details>
