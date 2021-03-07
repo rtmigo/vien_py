@@ -10,7 +10,7 @@
 It provides one-line shortcuts for:
 - creating and deleting environments
 - running commands inside environments
-- switching between working environments in bash shell
+- switching between environments in bash shell
     
 
 -----
