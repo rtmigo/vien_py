@@ -192,11 +192,11 @@ $ /path/to/the/venv/bin/deactivate
 So only the local name of the project directory matters. And all the virtualenvs 
 are in `$HOME/.vien`. 
 
-You can set the directory where `vien` places the virtualenvs. By default, it's `$HOME/.vien`. If you're not happy with this, you can define the environment variable `VIENDIR`:
+You can set the directory where `vien` places the virtual environments. By default, it's `$HOME/.vien`. If you're not happy with this, you can define the environment variable `VIENDIR`:
 ```bash
 $ export VIENDIR="/x/y/z"
 ```
-So for the project `aaa` the virtualenv will be located in `/x/y/z/aaa_venv`.
+So for the project `aaa` the virtual environment will be located in `/x/y/z/aaa_venv`.
 
 The `_venv` suffix tells the utility that this directory can be safely removed.
 
@@ -232,7 +232,7 @@ user@host$ vien shell
 
 (myProject)user@host$ _
 ```
-So you can see, which virtualenv you're using.
+So you can see, which virtual environment you're using.
 
 If you customized your `PS1`, it may not work as expected.  
 
