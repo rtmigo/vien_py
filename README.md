@@ -73,7 +73,7 @@ $ pip3 install svet --upgrade
 
 # Use
 
-### Create a new virtualenv
+## Create a new virtualenv
 
 ```bash
 $ cd /path/to/myProject
@@ -90,7 +90,13 @@ $ svet create python3.8
 $ svet create /path/to/bin/python3
 ```
 
-### Run a python script inside the virtualenv 
+## Get into interactive bash inside the virtualenv 
+```bash	
+$ cd /path/to/myProject
+$ svet shell
+```
+
+## Run a python script inside the virtualenv 
 ```bash 		
 $ cd /path/to/myProject
 $ svet run python ./my_program.py arg1 arg2 ...
@@ -107,11 +113,6 @@ $ /path/to/the/venv/bin/deactivate
 ```
 </details>
 
-### Get into interactive bash inside the virtualenv 
-```bash	
-$ cd /path/to/myProject
-$ svet shell
-```
 
 # Where are the virtualenvs
 
