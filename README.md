@@ -32,11 +32,8 @@ $ /omg/forget/it/i/will/not/.venv/bin/deactivate
   <summary>Ready-made solutions did not help.</summary><br/>
 
 
-I tried [pipenv](https://pipenv.pypa.io/). It kind of solved the problem, but also brought new 
-challenges that dwarfed the old ones. I did not sign up to this. I just wanted to manage virtualenvs.
-
-I also tried [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/). 
-A package whose name is easier to copy-paste than to type. I hoped it was only a name. Alas, this is the philosophy of the whole package.
+- [pipenv](https://pipenv.pypa.io/) kind of solved the problem, but brought new challenges unrelated to virtualenvs
+- [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) is a package whose name is easier to copy and paste than to type. Well, it's not just the name
 
 </details>
 
