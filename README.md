@@ -1,7 +1,8 @@
 # [vien](https://github.com/rtmigo/vien#readme)
 [![Generic badge](https://img.shields.io/badge/ready_for_use-no-red.svg)](#)
 [![PyPI version shields.io](https://img.shields.io/pypi/v/vien.svg)](https://pypi.python.org/pypi/vien/)
-[![Actions Status](https://github.com/rtmigo/vien/workflows/CI/badge.svg?branch=master)](https://github.com/rtmigo/vien/actions)
+[![Actions Status](https://github.com/rtmigo/vien/workflows/unit%20test/badge.svg?branch=master)](https://github.com/rtmigo/vien/actions)
+[![Actions Status](https://github.com/rtmigo/vien/workflows/build%20pkg%20test/badge.svg?branch=master)](https://github.com/rtmigo/vien/actions)
 [![Generic badge](https://img.shields.io/badge/CI_OS-MacOS,_Ubuntu-blue.svg)](#)
 [![Generic badge](https://img.shields.io/badge/CI_Python-3.7--3.9-blue.svg)](#)
 
