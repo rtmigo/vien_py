@@ -28,7 +28,7 @@ pip3 install "$latest_whl_file" --force-reinstall
 
 vien --help
 
-echo "== TEAR DOWN =="
+echo "== TEARING DOWN =="
 
 deactivate
 python3 -m venv ./temp_build_test_venv --clear
