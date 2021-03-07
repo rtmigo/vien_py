@@ -37,11 +37,11 @@ class CannotFindExecutableError(SvetError):
 
 
 def version() -> str:
-    modTimestamp = (Path(__file__).parent / "constants.py").stat().st_mtime
-    modYear = dt.datetime.fromtimestamp(modTimestamp).year
+    mod_timestamp = (Path(__file__).parent / "constants.py").stat().st_mtime
+    mod_year = dt.datetime.fromtimestamp(mod_timestamp).year
     return "\n".join([
         f"SVET: Simple Virtual Environments Tool {__version__}",
-        f"(c) 2020-{modYear} Art Galkin <ortemeo@gmail.com>",
+        f"(c) 2020-{mod_year} Art Galkin <ortemeo@gmail.com>",
         f"See https://github.com/rtmigo/svet#readme"
     ])
 
@@ -87,8 +87,8 @@ See HELP with other options:
 """
 
     doc = text.strip()
-    aboveFirstLine = ("-" * len(doc.splitlines()[0]))
-    return f"{aboveFirstLine}\n{doc}\n"
+    above_first_line = ("-" * len(doc.splitlines()[0]))
+    return f"{above_first_line}\n{doc}\n"
 
 
 def get_svet_dir() -> Path:
@@ -132,25 +132,25 @@ def run(args: List[str]):
 
 
 def runseq(commands: List[str]):
-    bashLines = [
+    bash_lines = [
         "#!/bin/bash"
         "set -e",  # fail on first error
     ]
 
-    bashLines.extend(commands)
+    bash_lines.extend(commands)
 
     # Ubuntu really needs executable='/bin/bash'.
     # Otherwise the command is executed in /bin/sh, ignoring the hashbang,
     # but SH fails to execute commands like 'source'
 
-    subprocess.call("\n".join(bashLines), shell=True, executable='/bin/bash')
+    subprocess.call("\n".join(bash_lines), shell=True, executable='/bin/bash')
 
 
 def quote(arg: str) -> str:
     return json.dumps(arg)
 
 
-def venvDirToExe(venvDir: Path) -> Path:
+def venv_dir_to_exe(venvDir: Path) -> Path:
     return venvDir / "bin" / "python"
 
 
@@ -168,7 +168,7 @@ def init(venvDir: Path, version: str):
     if result.returncode == 0:
         print()
         print("The Python executable:")
-        print(str(venvDirToExe(venvDir)))
+        print(str(venv_dir_to_exe(venvDir)))
     else:
         print("svet failed to create the virtualenv")
         exit(1)
@@ -183,10 +183,10 @@ def remove(venvDir: Path):
     shutil.rmtree(str(venvDir))
 
 
-def reinit(venvDir: Path, version: str):
-    if venvDir.exists():
-        remove(venvDir)
-    init(venvDir=venvDir, version=version)
+def reinit(venv_dir: Path, version: str):
+    if venv_dir.exists():
+        remove(venv_dir)
+    init(venvDir=venv_dir, version=version)
 
 
 def get_bash_ps1():
@@ -236,20 +236,20 @@ class Colors:
     NOCOLOR = r"\e[0m\]"
 
 
-def shell(venvDir: Path, venvName: str, input: str, input_delay: float):
-    if not venvDir.exists():
+def shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
+    if not venv_dir.exists():
         raise VenvDoesNotExistError
 
-    activatePathQuoted = quote(str(venvDir / "bin" / "activate"))
+    activate_path_quoted = quote(str(venv_dir / "bin" / "activate"))
 
     old_ps1 = os.environ.get("PS1") or get_bash_ps1()
 
     if not old_ps1:
         old_ps1 = r"\h:\W \u\$"  # default from MacOS
 
-    new_ps1 = f"\\[{Colors.YELLOW}({venvName}){Colors.NOCOLOR}:{old_ps1} \\]"
+    new_ps1 = f"\\[{Colors.YELLOW}({venv_name}){Colors.NOCOLOR}:{old_ps1} \\]"
 
-    commands = [f'source {activatePathQuoted}']
+    commands = [f'source {activate_path_quoted}']
 
     bashrc_file = Path(os.path.expanduser("~/.bashrc"))
 
@@ -274,8 +274,8 @@ def shell(venvDir: Path, venvName: str, input: str, input_delay: float):
                        input_delay=input_delay)
 
 
-def command_run(venvDir: Path, otherargs):
-    vd = str(venvDir.absolute())
+def command_run(venv_dir: Path, otherargs):
+    vd = str(venv_dir.absolute())
     commands = [
         f'source "{vd}/bin/activate"',
         " ".join(quote(a) for a in otherargs)
