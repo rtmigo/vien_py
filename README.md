@@ -41,7 +41,7 @@ $ source /i/lost/that/.venv/bin/activate
 
 </details>
 
-So I made `vien`. A tool for a half asleep developer.
+So there is the `vien`. A tool for a half asleep developer.
 
 
 # Install
