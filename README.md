@@ -214,10 +214,10 @@ Useful, when you want to start from scratch.
 $ cd /path/to/myProject
 $ vien recreate 
 ```
-Optionally point to the interpreter:
+Or upgrade it from an old Python to a new one:
 ```bash
 $ cd /path/to/myProject
-$ vien recreate /path/to/bin/python3
+$ vien recreate /usr/local/opt/python@3.10/bin/python3
 ```
 
 # Shell prompt
