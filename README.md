@@ -22,9 +22,9 @@ $ svet shell
 
 And definitely not like
 ```base
-$ python3 -m venv ./i/have/no/idea/where/to/put/this/.venv
-$ source /where/is/that/damn/directory/.venv/bin/activate
-$ /omg/forget/it/i/will/not/.venv/bin/deactivate
+$ python3 -m venv ./oh/where/to/put/this/.venv
+$ source /i/lost/that/dir/.venv/bin/activate
+$ /omg/i/will/not/.venv/bin/deactivate
 ```
 
 
