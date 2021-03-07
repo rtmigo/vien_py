@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import argparse
-import datetime as dt
 import json
 import os
 import shutil
@@ -50,19 +49,20 @@ class CannotFindExecutableError(SvetError):
 
 
 def version() -> str:
-    mod_timestamp = (Path(__file__).parent / "constants.py").stat().st_mtime
-    mod_year = dt.datetime.fromtimestamp(mod_timestamp).year
+    # mod_timestamp = (Path(__file__).parent / "constants.py").stat().st_mtime
+    # mod_year = dt.datetime.fromtimestamp(mod_timestamp).year
     return "\n".join([
-        f"VIEN: Python VIrtual ENvironments Tool {vien.__version__}",
-        vien.__copyright__.replace("2020", f"2020-{mod_year}"),
+        f"VIEN: Python Virtual Environments Tool {vien.__version__}",
+        vien.__copyright__  # .replace("2020", f"2020-{mod_year}"),
     ])
 
 
 def usage_doc():
     text = f"""{version()}
 
-See a more detailed intro at
+See a detailed intro at
 https://github.com/rtmigo/vien#readme
+
 
 VIENDIR
 -------
@@ -79,6 +79,7 @@ By default $VIENDIR is "~/.vien". You can redefine in with
 
 The current $VIENDIR is
   {get_svet_dir()}
+
 
 QUICK START
 -----------
@@ -98,9 +99,9 @@ RUN a PYTHON SCRIPT inside "my_project_venv":
   cd /abc/myProject
   vien run python3 ./myProgram.py arg1 arg2 ...
 
---------
 
-"""
+HELP
+----"""
 
     doc = text.strip()
     above_first_line = ("-" * len(doc.splitlines()[0]))
