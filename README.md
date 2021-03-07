@@ -89,7 +89,7 @@ $ pip3 install vien --upgrade
 
 # Use
 
-## Create a virtualenv
+## Create a virtual environment
 
 ```bash
 $ cd /path/to/myProject
