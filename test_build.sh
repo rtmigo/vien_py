@@ -1,16 +1,16 @@
 #!/bin/bash
 set -e
 
-## SET UP ####
+## SET UP ##
 
 scriptParentDir="$(dirname "$(perl -MCwd -e 'print Cwd::abs_path shift' "$0")")"
 cd "$scriptParentDir"
 
-## TEST ####
+## TEST ##
 
 python3 setup.py sdist bdist_wheel
 twine check ./dist/* --strict
 
-## TEAR DOWN ####
+## TEAR DOWN ##
 
 rm -rf ./build ./dist ./*.egg-info
