@@ -101,6 +101,12 @@ $ svet shell
 Now you are inside the virtualenv.
 
 ```bash	
+(pyProject)$ pip3            # installs packages into virtualenv 
+(pyProject)$ python file.py  # runs in virtualenv
+
+```
+
+```bash	
 (pyProject)$ exit
 
 $ _
