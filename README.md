@@ -61,8 +61,8 @@ $ brew install python3
 Check it works
 ```bash
 $ python3 --version             # python shows its version
-$ pip3 install --upgrade pip    # pip upgrades itself
 $ python3 -m venv --help        # venv shows help message
+$ pip3 install --upgrade pip    # pip upgrades itself
 ```
 
 
