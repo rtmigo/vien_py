@@ -96,14 +96,25 @@ $ cd /path/to/myProject
 $ vien create 
 ```
 
-By default `vien` will try to use `python3` as the interpreter for the virtualenv. If you have 
-more than one Python version, point to the proper interpreter the way you execute it:
+By default `vien` will try to use `python3` as the interpreter for the virtualenv. **If you have 
+more than one Python version**, point to the proper interpreter the way you execute it.
+
+If you execute scripts like that
+
+```bash
+$ python3.8 /path/to/script.py
+```
+
+Create virtual environment like that
 
 ```bash
 $ vien create python3.8
 ```
+
+Or provide full path to the interpreter:
+
 ```bash
-$ vien create /path/to/bin/python3
+$ vien create /usr/local/opt/python@3.8/bin/python3
 ```
 
 ## Dive into interactive bash
