@@ -49,11 +49,9 @@ class CannotFindExecutableError(SvetError):
 
 
 def version() -> str:
-    # mod_timestamp = (Path(__file__).parent / "constants.py").stat().st_mtime
-    # mod_year = dt.datetime.fromtimestamp(mod_timestamp).year
     return "\n".join([
         f"VIEN: Python Virtual Environments Tool {vien.__version__}",
-        vien.__copyright__  # .replace("2020", f"2020-{mod_year}"),
+        vien.__copyright__
     ])
 
 
