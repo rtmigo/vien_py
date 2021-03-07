@@ -204,8 +204,8 @@ So can can see, which virtualenv you're using.
 If you customized your `PS1`, it may not work as expected.  
 
 ```bash
-custom:prompt> cd /abc/myProject
-custom:prompt> svet shell
+personalized:prompt> cd /abc/myProject
+personalized:prompt> svet shell
 
 (myProject)user@host$ _
 ```
@@ -213,8 +213,8 @@ custom:prompt> svet shell
 It can be fixed by providing `PS1` variable to `svet` like that: 
 
 ```bash
-custom:prompt> cd /abc/myProject
-custom:prompt> PS1=$PS1 svet shell
+personalized:prompt> cd /abc/myProject
+personalized:prompt> PS1=$PS1 svet shell
 
 (myProject)custom:prompt> _
 ```
