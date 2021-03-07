@@ -1,11 +1,13 @@
+# SPDX-FileCopyrightText: (c) 2021 Art Galkin <ortemeo@gmail.com>
+# SPDX-License-Identifier: BSD-3-Clause
+
+
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-
-from .bash_runner import *
-
 from timeit import default_timer as timer
 
+from .bash_runner import *
 from .time_limited import TimeLimited
 
 
@@ -43,13 +45,10 @@ class TestRunAsBash(unittest.TestCase):
             self.assertEqual(file_to_create.read_text().strip(), "that is the answer")
 
     def test_input_delay(self):
-
         start = timer()
         # run interactive shell end type "exit" after small delay
         with TimeLimited(seconds=10):  # safety net
             run_as_bash_script("exec bash", input="exit\n".encode(), input_delay=1, timeout=10)
         end = timer()
-        self.assertGreater(end-start, 0.9)
-        self.assertLess(end-start, 5)
-
-
+        self.assertGreater(end - start, 0.9)
+        self.assertLess(end - start, 5)
