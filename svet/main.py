@@ -169,7 +169,7 @@ def venv_dir_to_exe(venv_dir: Path) -> Path:
     raise Exception(f"Cannot find the interpreter in {venv_dir}.")
 
 
-def init(venv_dir: Path, version: str):
+def main_create(venv_dir: Path, version: str):
     if venv_dir.exists():
         raise VenvExistsError("Virtualenv already exists.")
 
@@ -190,25 +190,25 @@ def init(venv_dir: Path, version: str):
         # exit(1)
 
 
-def remove(venv_dir: Path):
+def main_delete(venv_dir: Path):
     if not "_venv" in venv_dir.name:
         raise ValueError(venv_dir)
     if not venv_dir.exists():
         raise VenvDoesNotExistError(venv_dir)
-    print(f"Removing {venv_dir}")
+    print(f"Deleting {venv_dir}")
     shutil.rmtree(str(venv_dir))
 
 
-def reinit(venv_dir: Path, version: str):
+def main_recreate(venv_dir: Path, version: str):
     if venv_dir.exists():
-        remove(venv_dir)
-    init(venv_dir=venv_dir, version=version)
+        main_delete(venv_dir)
+    main_create(venv_dir=venv_dir, version=version)
 
 
-def get_bash_ps1():
+def guess_bash_ps1():
     """Returns the default BASH prompt."""
 
-    # TL;DR Normal PS1 is actually inaccessible for the child shell of BASH.
+    # TL;DR PS1 is often inaccessible for child processes of BASH. It means, for scripts too.
     #
     # AG 2021: PS1 is not an environment variable, but a local variable of
     # the shell [2019](https://stackoverflow.com/a/54999265). It seems to be
@@ -221,11 +221,12 @@ def get_bash_ps1():
     # 3) `bash -i -c "echo $PS1"` from command line    | seems to be OK in Ubuntu
     # 4) `zsh -i -c "echo $PS1"` from command line     | looks like a normal prompt in OSX
     #
-    # In Ubuntu (3) seems to be the same as used by terminal by default.
-    # Although there are no guarantees it is the same that user sees.
+    # In Ubuntu (3) returns the same prompt that in used by terminal by default.
+    # Although if the user customized their PS1, no guarantees, that (3) will return
+    # the updated value.
     #
-    # For MacOS, the prompt printed by (3) in not the same as seen in terminal app,
-    # and boring: "bash-3.2" instead of "host:dir user$".
+    # For MacOS, the prompt printed by (3) in not the same as seen in terminal app.
+    # It returns boring "bash-3.2" instead of expected "host:dir user$".
     #
     # (4) on MacOS seems to return the correct "host:dir user$", but it is in ZSH format.
 
@@ -234,7 +235,7 @@ def get_bash_ps1():
     if env_var is not None:
         return env_var
 
-    # return None for MacOS
+    # for MacOS return predefined constant PS1
     import platform
     if platform.system() == "Darwin":
         return r"\h:\W \u\$"  # default for MacOS up to Catalina
@@ -252,13 +253,13 @@ class Colors:
     NOCOLOR = r"\e[0m\]"
 
 
-def shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
+def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
     if not venv_dir.exists():
         raise VenvDoesNotExistError(venv_dir)
 
     activate_path_quoted = quote(str(venv_dir / "bin" / "activate"))
 
-    old_ps1 = os.environ.get("PS1") or get_bash_ps1()
+    old_ps1 = os.environ.get("PS1") or guess_bash_ps1()
 
     if not old_ps1:
         old_ps1 = r"\h:\W \u\$"  # default from MacOS
@@ -290,7 +291,7 @@ def shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
                        input_delay=input_delay)
 
 
-def command_run(venv_dir: Path, otherargs):
+def main_run(venv_dir: Path, otherargs):
     vd = str(venv_dir.absolute())
     commands = [
         f'source "{vd}/bin/activate"',
@@ -349,17 +350,17 @@ def main_entry_point(args: Optional[List[str]] = None):
     try:
 
         if parsed.command == "create":
-            init(venv_dir, parsed.python)
+            main_create(venv_dir, parsed.python)
         elif parsed.command == "recreate":
-            reinit(venv_dir, parsed.python)
+            main_recreate(venv_dir, parsed.python)
         elif parsed.command == "delete":
-            remove(venv_dir)
+            main_delete(venv_dir)
         elif parsed.command == "path":
             print(venv_dir)
         elif parsed.command == "run":
-            command_run(venv_dir, parsed.otherargs)
+            main_run(venv_dir, parsed.otherargs)
         elif parsed.command == "shell":
-            shell(venv_dir, project_dir.name, parsed.input, parsed.delay)
+            main_shell(venv_dir, project_dir.name, parsed.input, parsed.delay)
         else:
             raise ValueError
 
