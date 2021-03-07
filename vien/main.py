@@ -88,7 +88,7 @@ CREATE new virtualenv with python3 in $VIENDIR/my_project_venv:
   cd /abc/my_project
   vien create python3
 
-RUN an interactive BASH SUB-SHELL inside "my_project_venv":	
+RUN an interactive BASH SUBSHELL inside "my_project_venv":	
 
   cd /abc/my_project
   vien shell
