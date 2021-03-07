@@ -9,7 +9,7 @@ SVET is an acronym for Simple Virtual Environments Tool.
 
 It provides command-line shortcuts for managing Python [virtualenvs](https://docs.python.org/3/library/venv.html).
 
-# Why
+-----
 
 Switching between different projects in Python should be simple. A short command 
 that I would type even half asleep.
@@ -72,7 +72,7 @@ $ pip3 install svet --upgrade
 ```
 
 
-# Usage
+# Use
 
 ### Create a new virtualenv
 
