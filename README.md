@@ -216,5 +216,5 @@ It can be fixed by providing `PS1` variable to `svet` like that:
 personalized:prompt> cd /abc/myProject
 personalized:prompt> PS1=$PS1 svet shell
 
-(myProject)custom:prompt> _
+(myProject)personalized:prompt> _
 ```
