@@ -39,18 +39,6 @@ $ /omg/forget/it/i/will/not/.venv/bin/deactivate
 
 So I made `svet`. A stupidly simple tool for a half asleep developer.
 
-# What is does
-
-`svet` offers a simple rule of where to place the virtualenv.
-
-|project dir|virtualenv dir|
-|-----|----|
-|`/abc/thisProject`|`$HOME/.svet/thisProject_venv`|
-|`/abc/otherProject`|`$HOME/.svet/otherProject_venv`|
-|`/moved/to/otherProject`|`$HOME/.svet/otherProject_venv`|
-
-So only the local name of the project directory matters. And all the virtualenvs 
-are in `$HOME/.svet`. Until you decide to [change this dir](#vepdir).
 
 # Install
 
@@ -125,7 +113,21 @@ $ cd /path/to/myProject
 $ svet shell
 ```
 
-# The `$SVETDIR`
+# Where are the virtualenvs
+
+`svet` offers a simple rule of where to place the virtualenv.
+
+|project dir|virtualenv dir|
+|-----|----|
+|`/abc/thisProject`|`$HOME/.svet/thisProject_venv`|
+|`/abc/otherProject`|`$HOME/.svet/otherProject_venv`|
+|`/moved/to/otherProject`|`$HOME/.svet/otherProject_venv`|
+
+So only the local name of the project directory matters. And all the virtualenvs 
+are in `$HOME/.svet`. Until you decide to
+
+
+### Change the `$SVETDIR`
 
 You can set the directory where `svet` places the virtualenvs. By default, it's `$HOME/.svet`. If you're not happy with this, you can define the environment variable `SVETDIR`:
 ```bash
