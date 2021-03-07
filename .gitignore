@@ -1,6 +1,7 @@
 *_nogit/
 __about__.txt
 labuda/
+temp_build_test_venv/
 
 # Editors
 .vscode/
