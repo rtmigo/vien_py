@@ -177,7 +177,7 @@ $ /path/to/the/venv/bin/deactivate
 </details>
 
 
-# Where are the virtual environments
+# Where are those virtual environments
 
 `vien` offers a simple rule of where to keep the environments.
 
