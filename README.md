@@ -102,7 +102,10 @@ Now you are inside the virtualenv.
 
 ```bash	
 (pyProject)$ pip3 install requests     # installs packages into virtualenv 
+
 (pyProject)$ python3 use_requests.py   # runs in virtualenv
+
+(pyProject)$ which python3             # see, it's a python copy
 
 ```
 
