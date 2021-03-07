@@ -156,8 +156,8 @@ It is `vien run <any bash command>`
 
 ```bash 		
 $ cd /path/to/myProject
-$ vien run python3 use_requests.py arg1 arg2  # runs in virtualenv
-$ vien run pip3 install requests              # installs packages into virtualenv
+$ vien run python3 use_requests.py arg1 arg2  # runs in virtual environment
+$ vien run pip3 install requests              # installs packages into virtual environment
 ```
 
 <details>
