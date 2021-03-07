@@ -179,7 +179,7 @@ $ /path/to/the/venv/bin/deactivate
 
 # Where are the virtual environments
 
-`vien` offers a simple rule of where to place the virtualenv.
+`vien` offers a simple rule of where to store the environments.
 
 |project dir|virtual environment dir|
 |-----|----|
