@@ -18,7 +18,7 @@ from svet.bash_runner import run_as_bash_script
 verbose = False
 
 
-class SvetError(Exception):
+class SvetError(SystemExit):
     def __init__(self, message: str):
         super().__init__(message)
 
@@ -27,8 +27,8 @@ class VenvExistsError(SvetError): pass
 
 
 class VenvDoesNotExistError(SvetError):
-    def __init__(self):
-        super().__init__("Virtualenv does not exist")
+    def __init__(self, path: Path):
+        super().__init__(f"Virtualenv {path} does not exist.")
 
 
 class CannotFindExecutableError(SvetError):
@@ -152,7 +152,13 @@ def quote(arg: str) -> str:
 
 
 def venv_dir_to_exe(venv_dir: Path) -> Path:
-    return venv_dir / "bin" / "python"
+    c = venv_dir / "bin" / "python"
+    if c.exists():
+        return c
+    c = venv_dir / "bin" / "python3"
+    if c.exists():
+        return c
+    raise Exception(f"Cannot find the interpreter in {venv_dir}.")
 
 
 def init(venv_dir: Path, version: str):
@@ -179,7 +185,7 @@ def remove(venv_dir: Path):
     if not "_venv" in venv_dir.name:
         raise ValueError(venv_dir)
     if not venv_dir.exists():
-        raise VenvDoesNotExistError
+        raise VenvDoesNotExistError(venv_dir)
     print(f"Removing {venv_dir}")
     shutil.rmtree(str(venv_dir))
 
@@ -239,7 +245,7 @@ class Colors:
 
 def shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
     if not venv_dir.exists():
-        raise VenvDoesNotExistError
+        raise VenvDoesNotExistError(venv_dir)
 
     activate_path_quoted = quote(str(venv_dir / "bin" / "activate"))
 
@@ -331,17 +337,24 @@ def main_entry_point(args: Optional[List[str]] = None):
 
     ##########
 
-    if parsed.command == "create":
-        init(venv_dir, parsed.python)
-    elif parsed.command == "recreate":
-        reinit(venv_dir, parsed.python)
-    elif parsed.command == "delete":
-        remove(venv_dir)
-    elif parsed.command == "path":
-        print(venv_dir)
-    elif parsed.command == "run":
-        command_run(venv_dir, parsed.otherargs)
-    elif parsed.command == "shell":
-        shell(venv_dir, project_dir.name, parsed.input, parsed.delay)
-    else:
-        raise ValueError
+    try:
+
+        if parsed.command == "create":
+            init(venv_dir, parsed.python)
+        elif parsed.command == "recreate":
+            reinit(venv_dir, parsed.python)
+        elif parsed.command == "delete":
+            remove(venv_dir)
+        elif parsed.command == "path":
+            print(venv_dir)
+        elif parsed.command == "run":
+            command_run(venv_dir, parsed.otherargs)
+        elif parsed.command == "shell":
+            shell(venv_dir, project_dir.name, parsed.input, parsed.delay)
+        else:
+            raise ValueError
+
+    except SvetError as se:
+
+        print(f"ERROR: {se}")
+        raise
