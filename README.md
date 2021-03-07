@@ -6,7 +6,7 @@
 [![Generic badge](https://img.shields.io/badge/OS-MacOS,_Ubuntu-blue.svg)](#)
 [![Generic badge](https://img.shields.io/badge/Python-3.7--3.9-blue.svg)](#)
 
-**VIEN** is a command-line tool for managing [Python Virtual Environments](https://docs.python.org/3/library/venv.html) in shell.
+**VIEN** is a command-line tool for managing [Python Virtual Environments](https://docs.python.org/3/library/venv.html).
 
 It provides one-line shortcuts for:
 - creating and deleting environments
