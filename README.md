@@ -96,7 +96,9 @@ $ cd /path/to/myProject
 $ vien create 
 ```
 
-By default `vien` will try to use `python3` as the interpreter for the virtualenv. **If you have 
+By default `vien` will try to use `python3` as the interpreter for the virtualenv.
+
+**If you have 
 more than one Python version**, point to the proper interpreter the way you execute it.
 
 If you execute scripts like that
