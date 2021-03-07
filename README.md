@@ -54,8 +54,19 @@ are in `$HOME/.svet`. Until you decide to [change this dir](#vepdir).
 
 # Install
 
+<details>
+  <summary>Get a working [Python](https://www.python.org/) ≥3.7</summary><br/>
+
+Ubuntu:
+```bash
+sudo apt-get install -y python3 python3-pip python3-venv
+```
+ 
+
 Get a working [Python](https://www.python.org/) ≥3.7, 
-[pip](https://pip.pypa.io/en/stable/installing/) and [venv](https://docs.python.org/3/library/venv.html). Then:
+[pip](https://pip.pypa.io/en/stable/installing/) and [venv](https://docs.python.org/3/library/venv.html).
+</details> 
+ Then:
 
 ```bash
 $ pip3 install svet
