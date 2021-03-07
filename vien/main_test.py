@@ -147,13 +147,14 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     def test_delete_fails_if_not_exist(self):
         self.assertVenvDoesNotExist()
-        with self.assertRaises(VenvDoesNotExistError):
+        with self.assertRaises(VenvDoesNotExistError) as cm:
             main_entry_point(["delete"])
 
     def test_shell_fails_if_not_exist(self):
         self.assertVenvDoesNotExist()
-        with self.assertRaises(VenvDoesNotExistError):
+        with self.assertRaises(VenvDoesNotExistError) as cm:
             main_entry_point(["shell"])
+
 
     def test_run(self):
         main_entry_point(["create"])
@@ -226,5 +227,5 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         # python3 -m unittest svet.main_test.TestsInsideTempProjectDir.test_shell
 
         with TimeLimited(10):  # safety net
-            with self.assertRaises(VenvDoesNotExistError):
+            with self.assertRaises(VenvDoesNotExistError) as cm:
                 main_entry_point(["shell"])
