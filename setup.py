@@ -62,7 +62,5 @@ setup(
         "Operating System :: POSIX",
     ],
 
-    # test_suite='nose.collector',
-    # tests_require=['nose'],
-    # zip_safe=False
+    test_suite="test_unit.suite"
 )
