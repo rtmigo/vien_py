@@ -4,18 +4,22 @@ import unittest
 from pathlib import Path
 
 
+def suite():
+    """Can be imported into `setup.py` as `test_suite="test_unit.suite"`."""
+
+    parent_dir = Path(__file__).parent
+    init_py, = parent_dir.glob("*/__init__.py")
+
+    return unittest.TestLoader().discover(
+        top_level_dir=str(parent_dir),
+        start_dir=str(init_py.parent),
+        pattern="*.py")
+
+
 def run_tests():
     """Discovers and runs unit tests for the module."""
 
-    parent_dir = Path(__file__).parent
-    the_init_file, = parent_dir.glob("*/__init__.py")
-
-    tests = unittest.TestLoader().discover(
-        top_level_dir=str(parent_dir),
-        start_dir=str(the_init_file.parent),
-        pattern="*.py")
-
-    result = unittest.TextTestRunner(buffer=True).run(tests)
+    result = unittest.TextTestRunner(buffer=True).run(suite())
 
     if result.failures or result.errors:
         exit(1)
