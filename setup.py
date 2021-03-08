@@ -14,8 +14,8 @@ def readDocText():
 
     # skipping until first empty line
     lines = [l.strip() for l in doctext.splitlines()]
-    firstEmptyLineIndex = lines.index("")
-    lines = lines[firstEmptyLineIndex + 1:]
+    first_empty_line_index = lines.index("")
+    lines = lines[first_empty_line_index + 1:]
 
     return "\n".join(lines)
 

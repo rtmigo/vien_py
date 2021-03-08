@@ -13,6 +13,7 @@ from typing import *
 
 import vien
 from vien.bash_runner import run_as_bash_script
+from vien.colors import Colors
 
 verbose = False
 
@@ -259,13 +260,11 @@ def guess_bash_ps1():
     return subprocess.check_output(['/bin/bash', '-i', '-c', 'echo $PS1']).decode().rstrip()
 
 
-class Colors:
-    GREEN = r"\e[32m\]"
-    MAGENTA = r"\e[35m\]"
-    YELLOW = r"\e[33m\]"
-    CYAN = r"\e[36m\]"
-    BLUE = r"\e[34m\]"
-    NOCOLOR = r"\e[0m\]"
+# ESC_OPEN = r"\e["
+# ESC_CLOSE = r"\]"
+
+
+# Thanks. In my case I just replaced \e[39m with \[\e[;39m\]
 
 
 def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
@@ -279,7 +278,14 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
     if not old_ps1:
         old_ps1 = r"\h:\W \u\$"  # default from MacOS
 
-    new_ps1 = f"\\[{Colors.YELLOW}({venv_name}){Colors.NOCOLOR}:{old_ps1} \\]"
+    color_start = Colors.YELLOW
+    color_end = Colors.NOCOLOR
+
+    # color_start=""
+    # color_end=""
+
+    # new_ps1 = f"\\[{color_start}({venv_name}){color_end}:{old_ps1} \\]"
+    new_ps1 = f"{color_start}({venv_name}){color_end}:{old_ps1} "
 
     commands = [f'source {activate_path_quoted}']
 
