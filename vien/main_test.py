@@ -229,3 +229,4 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with TimeLimited(10):  # safety net
             with self.assertRaises(VenvDoesNotExistError) as cm:
                 main_entry_point(["shell"])
+

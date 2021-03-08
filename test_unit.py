@@ -1,21 +1,25 @@
 #!/usr/bin/env python3
 
-import os
-import sys
 import unittest
+from pathlib import Path
 
-if __name__ == "__main__":
 
-    # we also have some tests in files without "_test" in filename
+def run_tests():
+    """Discovers and runs unit tests for the module."""
 
-    parent_dir = os.path.dirname(__file__)
+    parent_dir = Path(__file__).parent
+    the_init_file, = parent_dir.glob("*/__init__.py")
 
     tests = unittest.TestLoader().discover(
-        top_level_dir=parent_dir,
-        start_dir=os.path.join(parent_dir, "vien"),
-        pattern=sys.argv[1] if len(sys.argv) > 1 else "*.py")
+        top_level_dir=str(parent_dir),
+        start_dir=str(the_init_file.parent),
+        pattern="*.py")
 
-    result = unittest.runner.TextTestRunner(buffer=True).run(tests)
+    result = unittest.TextTestRunner(buffer=True).run(tests)
 
     if result.failures or result.errors:
         exit(1)
+
+
+if __name__ == "__main__":
+    run_tests()
