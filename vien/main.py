@@ -260,13 +260,6 @@ def guess_bash_ps1():
     return subprocess.check_output(['/bin/bash', '-i', '-c', 'echo $PS1']).decode().rstrip()
 
 
-# ESC_OPEN = r"\e["
-# ESC_CLOSE = r"\]"
-
-
-# Thanks. In my case I just replaced \e[39m with \[\e[;39m\]
-
-
 def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
     if not venv_dir.exists():
         raise VenvDoesNotExistError(venv_dir)
@@ -281,10 +274,6 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
     color_start = Colors.YELLOW
     color_end = Colors.NOCOLOR
 
-    # color_start=""
-    # color_end=""
-
-    # new_ps1 = f"\\[{color_start}({venv_name}){color_end}:{old_ps1} \\]"
     new_ps1 = f"{color_start}({venv_name}){color_end}:{old_ps1} "
 
     commands = [f'source {activate_path_quoted}']
