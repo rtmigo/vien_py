@@ -12,15 +12,16 @@ def run_as_bash_script(script: str, timeout: float = None, input_delay: float = 
 
     # we need executable='/bin/bash' for Ubuntu 18.04, it will run '/bin/sh' otherwise.
     # For MacOS 10.13 it seems to be optional
-    return _run_with_input_delay(script, shell=True, executable='/bin/bash', timeout=timeout, input=input,
+    return _run_with_input_delay(script, shell=True, executable='/bin/bash', timeout=timeout,
+                                 input=input,
                                  input_delay=input_delay)
 
 
 def _run_with_input_delay(*popenargs, input_delay: float = None,
-                          input=None, timeout: float = None, check: bool = False, capture_output: bool = False,
+                          input=None, timeout: float = None, check: bool = False,
+                          capture_output: bool = False,
                           **kwargs):
     """Basically the same as subprocess.run, but accepts input_delay parameter."""
-
 
     # This is almost an exact copy of subprocess.run (as of 2021-03-06).
     # SPDX-FileCopyrightText: (c) 2003-2005 Peter Astrand <astrand@lysator.liu.se>

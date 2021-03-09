@@ -50,7 +50,7 @@ class CannotFindExecutableError(SvetError):
         super().__init__(f"Cannot resolve '{version}' to an executable file.")
 
 
-def version() -> str:
+def version_message() -> str:
     return "\n".join([
         f"VIEN: Python Virtual Environments Tool {vien.__version__}",
         vien.__copyright__
@@ -58,7 +58,7 @@ def version() -> str:
 
 
 def usage_doc():
-    text = f"""{version()}
+    text = f"""{version_message()}
 
 See a detailed intro at
 https://github.com/rtmigo/vien#readme
@@ -142,11 +142,11 @@ class TestVenvsDir(unittest.TestCase):
         self.assertGreater(len(p), len("/.vien"))
 
 
-def run(args: List[str]):
-    if verbose:
-        print(f"Running {args}")
-    subprocess.run(args, shell=True)
-
+# def run(args: List[str]):
+#     if verbose:
+#         print(f"Running {args}")
+#     subprocess.run(args, shell=True)
+#
 
 def runseq(commands: List[str]):
     bash_lines = [
@@ -283,7 +283,8 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
 
     if bashrc_file.exists():
         # Ubuntu
-        commands.append(f"exec bash --rcfile <(cat {json.dumps(str(bashrc_file))} && echo 'PS1={json.dumps(new_ps1)}')")
+        commands.append(f"exec bash --rcfile <(cat {json.dumps(str(bashrc_file))} "
+                        f"&& echo 'PS1={json.dumps(new_ps1)}')")
     else:
         # MacOS
         commands.append(f"PS1={json.dumps(new_ps1)} exec bash")
@@ -329,7 +330,8 @@ def main_entry_point(args: Optional[List[str]] = None):
                                           help="delete existing virtualenv and create new")
     parser_reinit.add_argument('python', type=str, default="python3", nargs='?')
 
-    shell_parser = subparsers.add_parser('shell', help="dive into Bash sub-shell using the virtualenv")
+    shell_parser = subparsers.add_parser('shell',
+                                         help="dive into Bash sub-shell using the virtualenv")
     shell_parser.add_argument("--input", type=str, default=None)
     shell_parser.add_argument("--delay", type=float, default=None, help=argparse.SUPPRESS)
 
