@@ -21,23 +21,24 @@ Switching between projects should be simple. Creating environments for the proje
 Ideally it's a short command that I would type even half asleep.
 
 Something like
-```base
+
+```bash
 $ vien create 
 $ vien shell
 ```
 
-And not like
-```base
+Not like
+
+```bash
 $ python3 -m venv ./where/to/put/this/.venv
 $ source /i/lost/that/.venv/bin/activate
 ```
 
-
 <details>
   <summary>Ready-made solutions did not help.</summary><br/>
 
-
-- [pipenv](https://pipenv.pypa.io/) kind of solved the problem, but brought new challenges unrelated to virtual environments
+- [pipenv](https://pipenv.pypa.io/) kind of solved the problem, but brought new challenges unrelated to virtual
+  environments
 - [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/) name is easier to copy-paste than to type. And its commands are too 
 
 </details>

@@ -26,7 +26,8 @@ class SvetError(SystemExit):
         super().__init__(f"ERROR: {message}")
 
 
-class VenvExistsError(SvetError): pass
+class VenvExistsError(SvetError):
+    pass
 
 
 class VenvDoesNotExistError(SvetError):
@@ -201,7 +202,7 @@ def main_create(venv_dir: Path, version: str):
 
 
 def main_delete(venv_dir: Path):
-    if not "_venv" in venv_dir.name:
+    if "_venv" not in venv_dir.name:
         raise ValueError(venv_dir)
     if not venv_dir.exists():
         raise VenvDoesNotExistError(venv_dir)
