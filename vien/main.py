@@ -371,4 +371,3 @@ def main_entry_point(args: Optional[List[str]] = None):
         main_shell(venv_dir, project_dir.name, parsed.input, parsed.delay)
     else:
         raise ValueError
-
