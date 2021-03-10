@@ -34,7 +34,7 @@ setup(
 
     description="Command-line shortcuts for Python virtual environments",
 
-    long_description=readDocText(),
+    long_description=readme,
     long_description_content_type='text/markdown',
 
     license=constants.__license__,
