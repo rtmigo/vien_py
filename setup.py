@@ -5,20 +5,21 @@ from setuptools import setup, find_packages
 
 constants = SourceFileLoader('constants', 'vien/constants.py').load_module()
 
+# def readDocText():
+#     """Reads README.md and returns the text after first empty line.
+#     It helps to skip the header with badges intended only for GitHub.
+#     """
+#     doctext = (Path(__file__).parent / 'README.md').read_text()
+#
+#     # skipping until first empty line
+#     lines = [l.strip() for l in doctext.splitlines()]
+#     first_empty_line_index = lines.index("")
+#     lines = lines[first_empty_line_index + 1:]
+#
+#     return "\n".join(lines)
 
-def readDocText():
-    """Reads README.md and returns the text after first empty line.
-    It helps to skip the header with badges intended only for GitHub.
-    """
-    doctext = (Path(__file__).parent / 'README.md').read_text()
-
-    # skipping until first empty line
-    lines = [l.strip() for l in doctext.splitlines()]
-    first_empty_line_index = lines.index("")
-    lines = lines[first_empty_line_index + 1:]
-
-    return "\n".join(lines)
-
+readme = (Path(__file__).parent / 'README.md').read_text()
+readme = "# " + readme.partition("\n#")[-1]
 
 setup(
     name="vien",
