@@ -25,9 +25,9 @@ setup(
     name="vien",
     version=constants.__version__,
 
-    author="Art Galkin",
+    author="Artëm IG",
     author_email="ortemeo@gmail.com",
-    url='https://github.com/rtmigo/vien',
+    url='https://github.com/rtmigo/vien_py',
 
     packages=find_packages(),
     install_requires=[],
