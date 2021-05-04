@@ -268,4 +268,35 @@ personalized:prompt> PS1=$PS1 vien shell
 (myProject)personalized:prompt> _
 ```
 
-To avoid doing this each time, `export` your `PS1` to make it available for subprocesses.
+To avoid doing this each time, `export` your `PS1` to make it available for
+subprocesses.
+
+# Shebang
+
+Add the following line to the top of `main.py`
+
+```
+#!/usr/bin/env vien run python
+```
+
+Make the main.py executable
+
+``` bash
+$ chmod +x main.py  
+```
+
+Now you can run the `main.py` directly from command line. In will use the `vien`
+virtual environment associated with the parent directory of `main.py`.
+
+``` bash
+$ /path/to/myProject/main.py
+```
+
+Of course, the virtual environment must be initialized if it is not already done
+
+``` bash
+$ cd /abc/myProject
+$ vien create
+$ vien shell
+$ pip install ...
+```

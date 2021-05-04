@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: (c) 2021 Art Galkin <ortemeo@gmail.com>
+# SPDX-FileCopyrightText: (c) 2021 Artëm IG <github.com/rtmigo>
 # SPDX-License-Identifier: BSD-3-Clause
 
 
@@ -7,6 +7,7 @@ import unittest
 
 def color_escape(s: str):
     esc_open = r"\[\e[;"  # r"\e[" is not enough! https://superuser.com/a/367280
+    # esc_open = r"\[\e[;"  # r"\e[" is not enough! https://superuser.com/a/367280
     esc_close = r"\]"
 
     return f"{esc_open}{s}{esc_close}"

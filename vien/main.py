@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: (c) 2020 Art Galkin <ortemeo@gmail.com>
+# SPDX-FileCopyrightText: (c) 2020 Artëm IG <github.com/rtmigo>
 # SPDX-License-Identifier: BSD-3-Clause
 
 import argparse
