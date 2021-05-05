@@ -18,7 +18,7 @@ from vien.colors import Colors
 verbose = False
 
 
-class SvetError(SystemExit):
+class VienError(SystemExit):
     """Base class for all the expected exceptions,
     that show the error message and stop the program."""
 
@@ -26,26 +26,26 @@ class SvetError(SystemExit):
         super().__init__(f"ERROR: {message}")
 
 
-class VenvExistsError(SvetError):
+class VenvExistsError(VienError):
     pass
 
 
-class VenvDoesNotExistError(SvetError):
+class VenvDoesNotExistError(VienError):
     def __init__(self, path: Path):
         super().__init__(f"Virtualenv {path} does not exist.")
 
 
-class FailedToCreateVenvError(SvetError):
+class FailedToCreateVenvError(VienError):
     def __init__(self, path: Path):
         super().__init__(f"Failed to create virtualenv {path}.")
 
 
-class FailedToClearVenvError(SvetError):
+class FailedToClearVenvError(VienError):
     def __init__(self, path: Path):
         super().__init__(f"Failed to clear virtualenv {path}.")
 
 
-class CannotFindExecutableError(SvetError):
+class CannotFindExecutableError(VienError):
     def __init__(self, version: str):
         super().__init__(f"Cannot resolve '{version}' to an executable file.")
 
