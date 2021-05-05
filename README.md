@@ -1,11 +1,8 @@
-[![Generic badge](https://img.shields.io/badge/ready_for_use-maybe-orange.svg)](#)
 [![PyPI version shields.io](https://img.shields.io/pypi/v/vien.svg)](https://pypi.python.org/pypi/vien/)
-[![Actions Status](https://github.com/rtmigo/vien/workflows/unit%20test/badge.svg?branch=master)](https://github.com/rtmigo/vien/actions)
-[![Actions Status](https://github.com/rtmigo/vien/workflows/pkg%20test/badge.svg?branch=master)](https://github.com/rtmigo/vien/actions)
 [![Generic badge](https://img.shields.io/badge/OS-MacOS%20|%20Ubuntu-blue.svg)](#)
 [![Generic badge](https://img.shields.io/badge/Python-3.7--3.9-blue.svg)](#)
 
-# [vien](https://github.com/rtmigo/vien#readme)
+# [vien](https://github.com/rtmigo/vien_py#readme)
 
 **VIEN** is a command-line tool for
 managing [Python Virtual Environments](https://docs.python.org/3/library/venv.html).

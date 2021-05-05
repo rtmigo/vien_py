@@ -25,14 +25,14 @@ setup(
     name="vien",
     version=constants.__version__,
 
-    author="Art Galkin",
+    author="Artëm IG",
     author_email="ortemeo@gmail.com",
-    url='https://github.com/rtmigo/vien',
+    url='https://github.com/rtmigo/vien_py',
 
     packages=find_packages(),
     install_requires=[],
 
-    description="Command-line shortcuts for Python virtual environments",
+    description="Command-line tool for managing Python virtual environments",
 
     long_description=readme,
     long_description_content_type='text/markdown',
