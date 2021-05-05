@@ -32,7 +32,7 @@ setup(
     packages=find_packages(),
     install_requires=[],
 
-    description="Command-line shortcuts for Python virtual environments",
+    description="Command-line tool for managing Python virtual environments",
 
     long_description=readme,
     long_description_content_type='text/markdown',
