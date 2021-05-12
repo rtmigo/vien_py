@@ -29,7 +29,7 @@ setup(
     author_email="ortemeo@gmail.com",
     url='https://github.com/rtmigo/vien_py',
 
-    packages=find_packages(),
+    packages=['vien'],
     install_requires=[],
 
     description="Command-line tool for managing Python virtual environments",
