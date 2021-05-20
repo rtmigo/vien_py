@@ -155,6 +155,30 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with self.assertRaises(VenvDoesNotExistError) as cm:
             main_entry_point(["shell"])
 
+    # TODO test 'shell' exit codes too?
+
+    def test_run_exit_code_0(self):
+        """Test that main_entry_point returns the same exit code,
+        as the called command"""
+        with self.assertRaises(SystemExit) as ce:
+            main_entry_point(["run", "python3", "-c", "exit(0)"])
+        self.assertEqual(ce.exception.code, 0)
+
+    def test_run_exit_code_1(self):
+        """Test that main_entry_point returns the same exit code,
+        as the called command"""
+        with self.assertRaises(SystemExit) as ce:
+            main_entry_point(["run", "python3", "-c", "exit(1)"])
+        self.assertEqual(ce.exception.code, 1)
+
+    def test_run_exit_code_2(self):
+        """Test that main_entry_point returns the same exit code,
+        as the called command"""
+        with self.assertRaises(SystemExit) as ce:
+            main_entry_point(["run", "python3", "-c", "exit(2)"])
+        self.assertEqual(ce.exception.code, 2)
+
+
 
     def test_run(self):
         main_entry_point(["create"])
