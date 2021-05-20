@@ -247,6 +247,14 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             self.assertLess(end - start, 3)
             self.assertTrue(dir_to_create.exists())
 
+    def test_shell_exit_codes(self):
+        main_entry_point(["create"])
+        with TimeLimited(10):  # safety net
+            with self.assertRaises(SystemExit) as ce:
+                main_entry_point(
+                    ["shell", "--input", "exit 42", "--delay", "1"])
+            self.assertEqual(ce.exception.code, 42)
+
     def test_shell_but_no_venv(self):
         # python3 -m unittest svet.main_test.TestsInsideTempProjectDir.test_shell
 
