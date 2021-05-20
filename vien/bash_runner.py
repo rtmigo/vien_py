@@ -81,8 +81,16 @@ def _run_with_input_delay(*popenargs, input_delay: float = None,
             process.kill()
             # We don't call process.wait() as .__exit__ does that for us.
             raise
-        retcode = process.poll()
-        if check and retcode:
-            raise CalledProcessError(retcode, process.args,
+
+        exit_code = process.poll()
+
+        # START of modified code
+        if exit_code is None:
+            raise RuntimeError("The process was not terminated.")
+        # END of modified code
+
+        if check and exit_code:
+            raise CalledProcessError(exit_code, process.args,
                                      output=stdout, stderr=stderr)
-    return CompletedProcess(process.args, retcode, stdout, stderr)
+
+    return CompletedProcess(process.args, exit_code, stdout, stderr)
