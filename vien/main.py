@@ -325,22 +325,27 @@ def main_entry_point(args: Optional[List[str]] = None):
 
     subparsers.add_parser('delete', help="delete existing virtualenv")
 
-    parser_reinit = subparsers.add_parser('recreate',
-                                          help="delete existing virtualenv and create new")
+    parser_reinit = subparsers.add_parser(
+        'recreate',
+        help="delete existing virtualenv and create new")
     parser_reinit.add_argument('python', type=str, default="python3", nargs='?')
 
-    shell_parser = subparsers.add_parser('shell',
-                                         help="dive into Bash sub-shell using the virtualenv")
+    shell_parser = subparsers.add_parser(
+        'shell',
+        help="dive into Bash sub-shell using the virtualenv")
     shell_parser.add_argument("--input", type=str, default=None)
     shell_parser.add_argument("--delay", type=float, default=None,
                               help=argparse.SUPPRESS)
 
-    parser_run = subparsers.add_parser('run',
-                                       help="run a command inside the virtualenv")
+    parser_run = subparsers.add_parser(
+        'run',
+        help="run a command inside the virtualenv")
     parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)
 
-    subparsers.add_parser('path',
-                          help="show the supposed path of the virtualenv for the current directory")
+    subparsers.add_parser(
+        'path',
+        help="show the supposed path of the virtualenv "
+             "for the current directory")
 
     if not args:
         print(usage_doc())
