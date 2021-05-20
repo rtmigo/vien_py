@@ -27,11 +27,12 @@ def _run_with_input_delay(*popenargs, input_delay: float = None,
                           check: bool = False,
                           capture_output: bool = False,
                           **kwargs):
-    """Basically the same as subprocess.run, but accepts input_delay parameter."""
+    """Basically the same as subprocess.run, but accepts input_delay
+    parameter."""
 
     # This is almost an exact copy of subprocess.run (as of 2021-03-06).
-    # SPDX-FileCopyrightText: (c) 2003-2005 Peter Astrand <astrand@lysator.liu.se>
-    # Latest version here: https://github.com/python/cpython/blob/master/Lib/subprocess.py
+    # SPDX-FileCopyrightText: 2003-2005 Peter Astrand <astrand@lysator.liu.se>
+    # https://github.com/python/cpython/blob/master/Lib/subprocess.py
 
     # START of insert from another portion of subprocess.py
     try:
@@ -80,8 +81,16 @@ def _run_with_input_delay(*popenargs, input_delay: float = None,
             process.kill()
             # We don't call process.wait() as .__exit__ does that for us.
             raise
-        retcode = process.poll()
-        if check and retcode:
-            raise CalledProcessError(retcode, process.args,
+
+        exit_code = process.poll()
+
+        # START of modified code
+        if exit_code is None:
+            raise RuntimeError("The process was not terminated.")
+        # END of modified code
+
+        if check and exit_code:
+            raise CalledProcessError(exit_code, process.args,
                                      output=stdout, stderr=stderr)
-    return CompletedProcess(process.args, retcode, stdout, stderr)
+
+    return CompletedProcess(process.args, exit_code, stdout, stderr)
