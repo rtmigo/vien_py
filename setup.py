@@ -27,6 +27,7 @@ setup(
     url='https://github.com/rtmigo/vien_py',
 
     packages=['vien'],
+    python_requires='>=3.7',
     install_requires=[],
 
     description="Command-line tool for managing Python virtual environments",

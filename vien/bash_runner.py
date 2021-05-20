@@ -3,22 +3,28 @@
 
 import subprocess
 import time
-from subprocess import Popen, TimeoutExpired, CalledProcessError, CompletedProcess, PIPE
+from subprocess import Popen, TimeoutExpired, CalledProcessError, \
+    CompletedProcess, PIPE
 
 
-def run_as_bash_script(script: str, timeout: float = None, input_delay: float = None,
+def run_as_bash_script(script: str, timeout: float = None,
+                       input_delay: float = None,
+                       capture_output: bool = False,
                        input: bytes = None) -> subprocess.CompletedProcess:
     """Runs the provided string as a .sh script."""
 
-    # we need executable='/bin/bash' for Ubuntu 18.04, it will run '/bin/sh' otherwise.
-    # For MacOS 10.13 it seems to be optional
-    return _run_with_input_delay(script, shell=True, executable='/bin/bash', timeout=timeout,
+    # we need executable='/bin/bash' for Ubuntu 18.04, it will run '/bin/sh'
+    # otherwise. For MacOS 10.13 it seems to be optional
+    return _run_with_input_delay(script, shell=True, executable='/bin/bash',
+                                 timeout=timeout,
                                  input=input,
+                                 capture_output=capture_output,
                                  input_delay=input_delay)
 
 
 def _run_with_input_delay(*popenargs, input_delay: float = None,
-                          input=None, timeout: float = None, check: bool = False,
+                          input=None, timeout: float = None,
+                          check: bool = False,
                           capture_output: bool = False,
                           **kwargs):
     """Basically the same as subprocess.run, but accepts input_delay parameter."""
