@@ -1,1 +1,2 @@
 neatest
+mypy

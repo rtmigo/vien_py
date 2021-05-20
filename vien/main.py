@@ -288,18 +288,25 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
         commands.append(f"PS1={json.dumps(new_ps1)} exec bash")
 
     # we will use [input] for testing: we will send a command to the stdin of
-    # the interactive sub-shell and later check whether the command was executed.
+    # the interactive sub-shell and later check whether the command was
+    # executed.
     #
-    # We will also provide [input_delay] parameter. This allows the check whether
+    # We will also provide [input_delay] parameter. This allows the check
+    # whether
     # the sub-shell was really interactive: did it wait for the input
     #
-    # Surprisingly, the sub-shell will immediately close after executing the command.
-    # It seems it closes immediately after the subprocess.Popen closes the stdin.
-    # So it will not wait for "exit". But it serves the task well
+    # Surprisingly, the sub-shell will immediately close after executing the
+    # command.  It seems it closes immediately after the subprocess.Popen
+    # closes the stdin. So it will not wait for "exit". But it serves the
+    # task well
 
-    run_as_bash_script("\n".join(commands),
-                       input=input.encode() if input else None,
-                       input_delay=input_delay)
+    cp = run_as_bash_script("\n".join(commands),
+                            input=input.encode() if input else None,
+                            input_delay=input_delay)
+
+    # the vien will return the same exit code as the shell returned
+    if cp.returncode != 0:
+        exit(cp.returncode)
 
 
 def main_run(venv_dir: Path, otherargs):
@@ -325,22 +332,27 @@ def main_entry_point(args: Optional[List[str]] = None):
 
     subparsers.add_parser('delete', help="delete existing virtualenv")
 
-    parser_reinit = subparsers.add_parser('recreate',
-                                          help="delete existing virtualenv and create new")
+    parser_reinit = subparsers.add_parser(
+        'recreate',
+        help="delete existing virtualenv and create new")
     parser_reinit.add_argument('python', type=str, default="python3", nargs='?')
 
-    shell_parser = subparsers.add_parser('shell',
-                                         help="dive into Bash sub-shell using the virtualenv")
+    shell_parser = subparsers.add_parser(
+        'shell',
+        help="dive into Bash sub-shell using the virtualenv")
     shell_parser.add_argument("--input", type=str, default=None)
     shell_parser.add_argument("--delay", type=float, default=None,
                               help=argparse.SUPPRESS)
 
-    parser_run = subparsers.add_parser('run',
-                                       help="run a command inside the virtualenv")
+    parser_run = subparsers.add_parser(
+        'run',
+        help="run a command inside the virtualenv")
     parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)
 
-    subparsers.add_parser('path',
-                          help="show the supposed path of the virtualenv for the current directory")
+    subparsers.add_parser(
+        'path',
+        help="show the supposed path of the virtualenv "
+             "for the current directory")
 
     if not args:
         print(usage_doc())

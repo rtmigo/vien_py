@@ -178,8 +178,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python3", "-c", "exit(2)"])
         self.assertEqual(ce.exception.code, 2)
 
-
-
     def test_run(self):
         main_entry_point(["create"])
 
@@ -212,8 +210,8 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         # check the file created (it means, the command was executed)
         self.assertTrue(file_to_be_created.exists())
 
-        # the file should contain the path or the python interpreter that executed
-        # it in virtualenv
+        # the file should contain the path or the python interpreter that
+        # executed it in virtualenv
         interpreter_path = Path(file_to_be_created.read_text())
 
         self.assertTrue("svetdir" in interpreter_path.parts)
@@ -228,24 +226,39 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             dir_to_create_quoted = repr(str(dir_to_create))
             bash_input = f'mkdir {dir_to_create_quoted}\n'
 
-            # we did not find an easy way to run an interactive sub-shell during testing
-            # and then to kill it. Solutions that were based on signal.SIGALRM or the
-            # subprocess.run(timeout), were harming the MacOS terminal that started the test
+            # I did not find an easy way to run an interactive sub-shell during
+            # testing and then to kill it. Solutions that were based on
+            # signal.SIGALRM or the subprocess.run(timeout), were harming the
+            # MacOS terminal that started the test
             #
-            # So we provide input and delay arguments to the sub-shell. It makes the
-            # sub-shell peacefully close itself.
+            # So we provide input and delay arguments to the sub-shell. It
+            # makes the sub-shell peacefully close itself.
             #
-            # It is not a clean test for "shell" though. The "shell" meant to be run
-            # without parameters.
+            # It is not a clean test for "shell" though. The "shell" meant to
+            # be run without parameters.
 
             start = timer()
             with TimeLimited(10):  # safety net
-                main_entry_point(["shell", "--input", bash_input, "--delay", "1"])
+                main_entry_point(
+                    ["shell", "--input", bash_input, "--delay", "1"])
             end = timer()
 
             self.assertGreater(end - start, 0.5)
             self.assertLess(end - start, 3)
             self.assertTrue(dir_to_create.exists())
+
+    def test_shell_exit_code_non_zero(self):
+        main_entry_point(["create"])
+        with TimeLimited(10):  # safety net
+            with self.assertRaises(SystemExit) as ce:
+                main_entry_point(["shell", "--input", "exit 42"])
+            self.assertEqual(ce.exception.code, 42)
+
+    def test_shell_exit_code_zero(self):
+        main_entry_point(["create"])
+        with TimeLimited(10):  # safety net
+            main_entry_point(["shell", "--input", "exit"])
+            # no exceptions is OK
 
     def test_shell_but_no_venv(self):
         # python3 -m unittest svet.main_test.TestsInsideTempProjectDir.test_shell
@@ -253,4 +266,3 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with TimeLimited(10):  # safety net
             with self.assertRaises(VenvDoesNotExistError) as cm:
                 main_entry_point(["shell"])
-
