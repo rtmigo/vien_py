@@ -32,7 +32,7 @@ class VenvExistsError(VienError):
 
 class VenvDoesNotExistError(VienError):
     def __init__(self, path: Path):
-        super().__init__(f"Virtualenv {path} does not exist.")
+        super().__init__(f"Virtual environment {path} does not exist.")
 
 
 class FailedToCreateVenvError(VienError):
@@ -142,13 +142,7 @@ class TestVenvsDir(unittest.TestCase):
         self.assertGreater(len(p), len("/.vien"))
 
 
-# def run(args: List[str]):
-#     if verbose:
-#         print(f"Running {args}")
-#     subprocess.run(args, shell=True)
-#
-
-def runseq(commands: List[str]):
+def run_bash_sequence(commands: List[str]) -> int:
     bash_lines = [
         "#!/bin/bash"
         "set -e",  # fail on first error
@@ -160,7 +154,9 @@ def runseq(commands: List[str]):
     # Otherwise the command is executed in /bin/sh, ignoring the hashbang,
     # but SH fails to execute commands like 'source'
 
-    subprocess.call("\n".join(bash_lines), shell=True, executable='/bin/bash')
+    return subprocess.call("\n".join(bash_lines),
+                           shell=True,
+                           executable='/bin/bash')
 
 
 def quote(arg: str) -> str:
@@ -258,7 +254,8 @@ def guess_bash_ps1():
         return r"\h:\W \u\$"  # default for MacOS up to Catalina
 
     # hope for the best in other systems
-    return subprocess.check_output(['/bin/bash', '-i', '-c', 'echo $PS1']).decode().rstrip()
+    return subprocess.check_output(
+        ['/bin/bash', '-i', '-c', 'echo $PS1']).decode().rstrip()
 
 
 def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
@@ -283,8 +280,9 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
 
     if bashrc_file.exists():
         # Ubuntu
-        commands.append(f"exec bash --rcfile <(cat {json.dumps(str(bashrc_file))} "
-                        f"&& echo 'PS1={json.dumps(new_ps1)}')")
+        commands.append(
+            f"exec bash --rcfile <(cat {json.dumps(str(bashrc_file))} "
+            f"&& echo 'PS1={json.dumps(new_ps1)}')")
     else:
         # MacOS
         commands.append(f"PS1={json.dumps(new_ps1)} exec bash")
@@ -299,7 +297,8 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
     # It seems it closes immediately after the subprocess.Popen closes the stdin.
     # So it will not wait for "exit". But it serves the task well
 
-    run_as_bash_script("\n".join(commands), input=input.encode() if input else None,
+    run_as_bash_script("\n".join(commands),
+                       input=input.encode() if input else None,
                        input_delay=input_delay)
 
 
@@ -310,7 +309,7 @@ def main_run(venv_dir: Path, otherargs):
         " ".join(quote(a) for a in otherargs)
     ]
 
-    exit(runseq(commands))
+    exit(run_bash_sequence(commands))
 
 
 def main_entry_point(args: Optional[List[str]] = None):
@@ -333,9 +332,11 @@ def main_entry_point(args: Optional[List[str]] = None):
     shell_parser = subparsers.add_parser('shell',
                                          help="dive into Bash sub-shell using the virtualenv")
     shell_parser.add_argument("--input", type=str, default=None)
-    shell_parser.add_argument("--delay", type=float, default=None, help=argparse.SUPPRESS)
+    shell_parser.add_argument("--delay", type=float, default=None,
+                              help=argparse.SUPPRESS)
 
-    parser_run = subparsers.add_parser('run', help="run a command inside the virtualenv")
+    parser_run = subparsers.add_parser('run',
+                                       help="run a command inside the virtualenv")
     parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)
 
     subparsers.add_parser('path',
