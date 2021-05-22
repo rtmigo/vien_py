@@ -73,11 +73,11 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.expectedVenvDir = self.svetDir / "project_venv"
         self.expectedVenvBin = self.expectedVenvDir / "bin" / "python"
 
-        os.environ["VENVDIR"] = str(self.svetDir.absolute())
+        os.environ["VIENDIR"] = str(self.svetDir.absolute())
 
     def tearDown(self):
         self._td.cleanup()
-        del os.environ["VENVDIR"]
+        del os.environ["VIENDIR"]
 
     def assertVenvDoesNotExist(self):
         self.assertFalse(self.expectedVenvDir.exists())
