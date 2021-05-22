@@ -95,7 +95,30 @@ $ pip3 install vien --upgrade
 
 # Use
 
-## Create a virtual environment
+### Example: interactive shell
+
+``` bash
+$ cd /path/to/myProject
+$ vien create
+$ vien shell
+```
+
+### Example: running commands
+
+``` bash
+$ cd /path/to/myProject
+$ vien create
+$ vien run pip install --upgrade pip
+$ vien run pip install requests lxml
+$ vien call main.py
+```
+
+# Commands
+
+## create
+
+`vien shell` creates a virtual environment corresponding to the working 
+directory. 
 
 ``` bash
 $ cd /path/to/myProject
@@ -105,12 +128,10 @@ $ vien create
 By default `vien` will try to use `python3` as the interpreter for the virtual
 environment.
 
-<details>
-  <summary>If you have 
-more than one Python version, provide one more argument.</summary><br/>
-Point to the proper interpreter the way you execute it.
+If you have more than one Python version, provide one more argument,
+point to the proper interpreter the way you execute it.
 
-If you execute scripts like that
+E.g. if you execute scripts like that
 
 ``` bash
 $ python3.8 /path/to/script.py
@@ -128,9 +149,11 @@ Or provide full path to the interpreter:
 $ vien create /usr/local/opt/python@3.8/bin/python3
 ```
 
-</details>
 
-## Dive into interactive bash
+
+## shell 
+
+`vien shell` starts interactive bash session in the virtual environment.
 
 ```bash	
 $ cd /path/to/myProject
@@ -159,9 +182,9 @@ $ _
 
 Now you're back.
 
-## Run a script inside the virtual environment
+## run
 
-It is `vien run <any bash command>`
+`vien run COMMAND` runs any shell command in the virtual environment.
 
 ```bash 		
 $ cd /path/to/myProject
@@ -186,9 +209,55 @@ $ /path/to/the/venv/bin/deactivate
 
 </details>
 
-# Where are those virtual environments
+## call
 
-`vien` offers a simple rule of where to keep the environments.
+`vien call PYFILE` executes a `.py` script in the virtual environment.
+
+```bash 		
+$ cd /path/to/myProject
+$ vien call main.py
+```
+
+The optional `-p` parameter allows you to specify the project directory relative 
+to the parent directory of the file being run.
+
+```bash 		
+$ cd any/where
+$ vien call -p /path/to/myProject main.py
+$ vien call -p . main.py
+```
+
+## delete
+
+`vien delete` deletes the virtual environment.
+
+``` bash
+$ cd /path/to/myProject
+$ vien delete 
+```
+
+## recreate
+
+`vien recreate` old and creates new virtual environment. 
+
+If you decided to start from scratch:
+
+``` bash
+$ cd /path/to/myProject
+$ vien recreate 
+```
+
+If you decided to change the Python version:
+
+``` bash
+$ cd /path/to/myProject
+$ vien recreate /usr/local/opt/python@3.10/bin/python3
+```
+
+
+# Virtual environments location
+
+By default, `vien` places virtual environments in the `$HOME/.vien` directory.
 
 |project dir|virtual environment dir|
 |-----|----|
@@ -196,8 +265,7 @@ $ /path/to/the/venv/bin/deactivate
 |`/abc/otherProject`|`$HOME/.vien/otherProject_venv`|
 |`/moved/to/otherProject`|`$HOME/.vien/otherProject_venv`|
 
-So only the local name of the project directory matters. And all the virtual
-environments are in `$HOME/.vien`.
+Only the local name of the project directory matters.
 
 If you're not happy with the default, you can set the environment
 variable `VIENDIR`:
@@ -210,31 +278,6 @@ So for the project `aaa` the virtual environment will be located
 in `/x/y/z/aaa_venv`.
 
 The `_venv` suffix tells the utility that this directory can be safely removed.
-
-# Other commands
-
-### Delete virtual environment
-
-``` bash
-$ cd /path/to/myProject
-$ vien delete 
-```
-
-### Delete old and create new virtual environment
-
-Useful, when you want to start from scratch.
-
-``` bash
-$ cd /path/to/myProject
-$ vien recreate 
-```
-
-Or upgrade it from an old Python to a new one:
-
-``` bash
-$ cd /path/to/myProject
-$ vien recreate /usr/local/opt/python@3.10/bin/python3
-```
 
 # Shell prompt
 
@@ -301,13 +344,4 @@ be anything.
 
 $ cd anywhere/somewhere
 $ /abc/myProject/pkg/main.py   
-```
-
-Of course, the virtual environment must be initialized if it is not already done
-
-``` bash
-$ cd /abc/myProject
-$ vien create
-$ vien shell
-$ pip install ...
 ```

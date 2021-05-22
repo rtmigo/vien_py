@@ -12,7 +12,8 @@ from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 
 from vien import main_entry_point
-from vien.main import VenvExistsError, VenvDoesNotExistError, VienChildExit
+from vien.main import VenvExistsExit, VenvDoesNotExistExit, ChildExit, \
+    PyFileNotFoundExit
 from tests.time_limited import TimeLimited
 
 
@@ -87,6 +88,14 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertTrue(self.expectedVenvDir.exists())
         self.assertTrue(self.expectedVenvBin.exists())
 
+    def assertIsErrorExit(self, exc: SystemExit):
+        self.assertIsInstance(exc, SystemExit)
+        self.assertTrue(exc.code is not None and exc.code != 0)
+
+    def assertIsSuccessExit(self, exc: SystemExit):
+        self.assertIsInstance(exc, SystemExit)
+        self.assertTrue(exc.code is None or exc.code == 0)
+
     def test_create_with_argument(self):
         self.assertFalse(self.expectedVenvDir.exists())
         self.assertFalse(self.expectedVenvBin.exists())
@@ -98,8 +107,9 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     def test_create_fails_if_twice(self):
         main_entry_point(["create"])
-        with self.assertRaises(VenvExistsError):
+        with self.assertRaises(VenvExistsExit) as ce:
             main_entry_point(["create"])
+        self.assertIsErrorExit(ce.exception)
 
     def test_recreate_with_argument(self):
         self.assertFalse(self.expectedVenvDir.exists())
@@ -147,23 +157,25 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     def test_delete_fails_if_not_exist(self):
         self.assertVenvDoesNotExist()
-        with self.assertRaises(VenvDoesNotExistError) as cm:
+        with self.assertRaises(VenvDoesNotExistExit) as cm:
             main_entry_point(["delete"])
+        self.assertIsErrorExit(cm.exception)
 
     def test_shell_fails_if_not_exist(self):
         self.assertVenvDoesNotExist()
-        with self.assertRaises(VenvDoesNotExistError) as cm:
+        with self.assertRaises(VenvDoesNotExistExit) as cm:
             main_entry_point(["shell"])
+        self.assertIsErrorExit(cm.exception)
 
     def test_run_needs_venv(self):
-        with self.assertRaises(VenvDoesNotExistError):
+        with self.assertRaises(VenvDoesNotExistExit):
             main_entry_point(["run", "python", "--version"])
 
     def test_run_exit_code_0(self):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
         main_entry_point(["create"])  # need venv to run
-        with self.assertRaises(VienChildExit) as ce:
+        with self.assertRaises(ChildExit) as ce:
             main_entry_point(["run", "python3", "-c", "exit(0)"])
         self.assertEqual(ce.exception.code, 0)
 
@@ -171,7 +183,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
         main_entry_point(["create"])  # need venv to run
-        with self.assertRaises(VienChildExit) as ce:
+        with self.assertRaises(ChildExit) as ce:
             main_entry_point(["run", "python3", "-c", "exit(1)"])
         self.assertEqual(ce.exception.code, 1)
 
@@ -179,14 +191,14 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
         main_entry_point(["create"])  # need venv to run
-        with self.assertRaises(VienChildExit) as ce:
+        with self.assertRaises(ChildExit) as ce:
             main_entry_point(["run", "python3", "-c", "exit(2)"])
         self.assertEqual(ce.exception.code, 2)
 
     def test_run(self):
         main_entry_point(["create"])
 
-        with self.assertRaises(VienChildExit):
+        with self.assertRaises(ChildExit):
             # just check the argparser handles --version properly
             # (was failing with nargs='*', ok with nargs=argparse.REMAINDER)
             main_entry_point(["run", "python3", "--version"])
@@ -210,8 +222,9 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         lines = [line.strip() for line in python_program.splitlines()]
         python_program = "; ".join(line for line in lines if line)
 
-        with self.assertRaises(SystemExit):
+        with self.assertRaises(SystemExit) as ce:
             main_entry_point(["run", "python3", "-c", python_program])
+        self.assertIsSuccessExit(ce.exception)
 
         # check the file created (it means, the command was executed)
         self.assertTrue(file_to_be_created.exists())
@@ -227,8 +240,15 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         """File exists, but venv does not exist"""
         runme_py = self.projectDir / "runme.py"
         runme_py.touch()
-        with self.assertRaises(VenvDoesNotExistError):
+        with self.assertRaises(VenvDoesNotExistExit) as ce:
             main_entry_point(["call", str(runme_py)])
+        self.assertIsErrorExit(ce.exception)
+
+    def test_call_nonexistent_file(self):
+        main_entry_point(["create"])
+        with self.assertRaises(PyFileNotFoundExit) as ce:
+            main_entry_point(["call", "nonexistent.py"])
+        self.assertIsErrorExit(ce.exception)
 
     def _call_for_exit_code(self, exit_code: int):
         (self.projectDir / "main.py").write_text(f"exit({exit_code})")
@@ -254,11 +274,11 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         (self.projectDir / "main.py").write_text(
             f"import sys; exit(len(sys.argv))")
 
-        with self.assertRaises(VienChildExit) as ce:
+        with self.assertRaises(ChildExit) as ce:
             main_entry_point(["call", "main.py"])
         self.assertEqual(ce.exception.code, 1)  # received len(argv)
 
-        with self.assertRaises(VienChildExit) as ce:
+        with self.assertRaises(ChildExit) as ce:
             main_entry_point(["call", "main.py", "aaa", "bbb", "ccc"])
         self.assertEqual(ce.exception.code, 4)  # received len(argv)
 
@@ -279,23 +299,23 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
             # without -p we assume that the current dir is the project dir,
             # but the current is temp. So we must get an exception
-            with self.assertRaises(VenvDoesNotExistError):
+            with self.assertRaises(VenvDoesNotExistExit):
                 main_entry_point(["call", run_py_str])
 
             # this call specifies project dir relative to run.py.
             # It runs the file successfully
-            with self.assertRaises(VienChildExit) as ce:
+            with self.assertRaises(ChildExit) as ce:
                 main_entry_point(["call", "-p", "..", run_py_str])
             self.assertEqual(ce.exception.code, 5)
 
             # this call specifies project dir relative to run.py.
             # It runs the file successfully
-            with self.assertRaises(VienChildExit) as ce:
+            with self.assertRaises(ChildExit) as ce:
                 main_entry_point(["call", "--project-dir", "..", run_py_str])
             self.assertEqual(ce.exception.code, 5)
 
             # this call specifies *incorrect* project dir relative to run.py.
-            with self.assertRaises(VenvDoesNotExistError):
+            with self.assertRaises(VenvDoesNotExistExit):
                 main_entry_point(["call", "--project-dir", "../..", run_py_str])
 
     def test_call_project_dir_relative_imports(self):
@@ -315,7 +335,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         run_py_str = str(run_py.absolute())
         with TemporaryDirectory() as td:
             os.chdir(td)
-            with self.assertRaises(VienChildExit) as ce:
+            with self.assertRaises(ChildExit) as ce:
                 main_entry_point(["call", "-p", "..", run_py_str])
             self.assertEqual(ce.exception.code, 55)
 
@@ -341,7 +361,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
             start = timer()
             with TimeLimited(10):  # safety net
-                with self.assertRaises(VienChildExit) as ce:
+                with self.assertRaises(ChildExit) as ce:
                     main_entry_point(
                         ["shell", "--input", bash_input, "--delay", "1"])
                 self.assertFalse(ce.exception.code, 0)
@@ -354,14 +374,14 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def test_shell_exit_code_non_zero(self):
         main_entry_point(["create"])
         with TimeLimited(10):  # safety net
-            with self.assertRaises(VienChildExit) as ce:
+            with self.assertRaises(ChildExit) as ce:
                 main_entry_point(["shell", "--input", "exit 42"])
             self.assertEqual(ce.exception.code, 42)
 
     def test_shell_exit_code_zero(self):
         main_entry_point(["create"])
         with TimeLimited(10):  # safety net
-            with self.assertRaises(VienChildExit) as ce:
+            with self.assertRaises(ChildExit) as ce:
                 main_entry_point(["shell", "--input", "exit"])
             self.assertFalse(ce.exception.code, 0)
 
@@ -369,5 +389,5 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         # python3 -m unittest svet.main_test.TestsInsideTempProjectDir.test_shell
 
         with TimeLimited(10):  # safety net
-            with self.assertRaises(VenvDoesNotExistError) as cm:
+            with self.assertRaises(VenvDoesNotExistExit) as cm:
                 main_entry_point(["shell"])
