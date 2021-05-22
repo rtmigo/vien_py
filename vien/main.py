@@ -87,7 +87,7 @@ By default $VIENDIR is "~/.vien". You can redefine in with
   export VIENDIR="/other/location"
 
 The current $VIENDIR is
-  {get_svet_dir()}
+  {get_vien_dir()}
 
 
 QUICK START
@@ -117,38 +117,15 @@ HELP
     return f"{above_first_line}\n{doc}\n"
 
 
-def get_svet_dir() -> Path:
-    s = os.environ.get("VENVDIR")
+def get_vien_dir() -> Path:
+    s = os.environ.get("VIENDIR")
     if s:
         return Path(os.path.expanduser(os.path.expandvars(s)))
     else:
         return Path(os.path.expandvars("$HOME")) / ".vien"
 
 
-class TestVenvsDir(unittest.TestCase):
 
-    def test_if_set_plain(self):
-        os.environ["VENVDIR"] = "/path/to/veps"
-        self.assertEqual(get_svet_dir(), Path('/path/to/veps'))
-
-    def test_if_set_with_vars(self):
-        os.environ["VENVDIR"] = "$HOME/subfolder"
-        s = str(get_svet_dir())
-        self.assertTrue("$" not in s)
-        self.assertGreater(len(s), len("/home/"))
-
-    def test_if_set_with_user(self):
-        os.environ["VENVDIR"] = "~/subfolder"
-        s = str(get_svet_dir())
-        self.assertTrue("~" not in s)
-        self.assertGreater(len(s), len("/home/"))
-
-    def test_if_not_n(self):
-        if "VENVDIR" in os.environ:
-            del os.environ["VENVDIR"]
-        p = str(get_svet_dir())
-        self.assertTrue(p.endswith("vien"))
-        self.assertGreater(len(p), len("/.vien"))
 
 
 def run_bash_sequence(commands: List[str]) -> int:
@@ -346,7 +323,7 @@ def main_run(venv_dir: Path, other_args: List[str]):
 class Dirs:
     def __init__(self, project_dir: Union[str, Path] = '.'):
         self.project_dir = Path(project_dir).absolute()
-        self.venv_dir = get_svet_dir() / (self.project_dir.name + "_venv")
+        self.venv_dir = get_vien_dir() / (self.project_dir.name + "_venv")
         if verbose:
             print(f"Proj dir: {self.project_dir}")
             print(f"Venv dir: {self.venv_dir}")
