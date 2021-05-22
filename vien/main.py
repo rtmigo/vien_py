@@ -39,7 +39,7 @@ class ChildExit(VienExit):
         super().__init__(exit_code)
 
 
-class VenvExistsExit(VienExit):
+class VenvExistsExit(VienExit):  # todo does it return error code?
     pass
 
 
@@ -80,43 +80,9 @@ def usage_doc():
     text = f"""{version_message()}
 
 See a detailed intro at
-https://github.com/rtmigo/vien#readme
+https://github.com/rtmigo/vien_py#readme
 
-
-VIENDIR
--------
-
-VIEN maps project directory names to virtualenv paths.
-
-  /here/myProject       -> $VIENDIR/myProject_venv
-  /there/myProject      -> $VIENDIR/myProject_venv
-  /there/otherProject   -> $VIENDIR/otherProject_venv
-
-By default $VIENDIR is "~/.vien". You can redefine in with
-
-  export VIENDIR="/other/location"
-
-The current $VIENDIR is
-  {get_vien_dir()}
-
-
-QUICK START
------------
-
-CREATE new virtualenv with python3 in $VIENDIR/myProject_venv:
-  cd /abc/myProject
-  vien create python3
-
-RUN an interactive BASH SUBSHELL inside "myProject_venv":	
-  cd /abc/myProject
-  vien shell
-        
-RUN a PYTHON SCRIPT inside "myProject_venv":	
-  cd /abc/myProject
-  vien run python3 ./myProgram.py arg1 arg2 ...
-
-HELP
-----"""
+"""
 
     doc = text.strip()
     above_first_line = ("-" * len(doc.splitlines()[0]))
