@@ -314,23 +314,33 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
                             input_delay=input_delay)
 
     # the vien will return the same exit code as the shell returned
-    #if cp.returncode != 0:
+    # if cp.returncode != 0:
     #    exit(cp.returncode)
     raise VienChildExit(cp.returncode)
 
 
-def main_run(venv_dir: Path, other_args: List[str]):
+def _run(venv_dir: Path, other_args: List[str], prepend_py_path:str = None):
     activate_file = (venv_dir / 'bin' / 'activate').absolute()
     if not activate_file.exists():
         raise FileNotFoundError(activate_file)
 
-    commands = [
-        f'source "{activate_file}"',
-        " ".join(quote(a) for a in other_args)
-    ]
+    commands: List[str] = []
+    commands.append(f'source "{activate_file}"')
+    if prepend_py_path:
+        commands.append(f'export PYTHONPATH="{prepend_py_path}:$PYTHONPATH"')
+    commands.append(" ".join(quote(a) for a in other_args))
+
+    # commands = [
+    #     f'source "{activate_file}"',
+    #
+    # ]
 
     exit_code = run_bash_sequence(commands)
     raise VienChildExit(exit_code)
+
+
+def main_run(venv_dir: Path, other_args: List[str]):
+    _run(venv_dir=venv_dir, other_args=other_args)
 
 
 class Dirs:
@@ -361,13 +371,15 @@ def main_call(py_file: str, proj_rel_path: Optional[str],
 
     print(f"PROJ PATH: {proj_path}")
 
-
     dirs = Dirs(proj_path).existing()
 
     # print(parsed.p)
     # exit()
     # if not os.path.exists()
-    main_run(dirs.venv_dir, ['python', str(file)] + other_args)
+    _run(venv_dir=dirs.venv_dir, other_args=['python', str(file)] + other_args,
+         prepend_py_path=str(proj_path) if proj_rel_path else None
+         )
+    # main_run(dirs.venv_dir, )
 
 
 def main_entry_point(args: Optional[List[str]] = None):

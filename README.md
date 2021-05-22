@@ -274,27 +274,32 @@ subprocesses.
 
 # Shebang
 
-Add the following line to the top of `main.py`
+Insert the shebang line to the top of the file you want to run. The value of the
+shebang depends on the location of the file relative to the project directory.
 
-```
-#!/usr/bin/env vien call -p .
-```
+File                            | Shebang line
+--------------------------------|--------------------------------
+`myProject/runme.py`            | `#!/usr/bin/env vien call -p .`
+`myProject/pkg/runme.py`        | `#!/usr/bin/env vien call -p ..`
+`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien call -p ../..`
 
-Make the main.py executable
+After inserting the shebang, make the file executable:
 
 ``` bash
-$ chmod +x main.py  
+$ chmod +x runme.py  
 ```
 
-Now you can run the `main.py` directly from command line.
+Now you can run the `runme.py` directly from command line.
 
 With this shebang, the file can be run from any working directory. Thanks to
-the `-p` parameter the project directory is not the working directory, but the
-parent directory of the `main.py` file.
+the `-p` parameter the project directory is not the working directory, but a
+directory relative to `runme.py`.
 
 ``` bash
+# runs the runme.py in virtual environment for myProject
+
 $ cd anywhere/somewhere
-$ /path/to/myProject/main.py   # runs the file in virtual environment
+$ /abc/myProject/pkg/main.py   
 ```
 
 Of course, the virtual environment must be initialized if it is not already done

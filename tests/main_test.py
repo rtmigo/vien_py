@@ -263,7 +263,10 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["call", "main.py", "aaa", "bbb", "ccc"])
         self.assertEqual(ce.exception.code, 4)  # received len(argv)
 
-    def test_call_project_dir(self):
+    def test_call_project_dir_venv(self):
+        """Tests that the -p parameter actually changes the project directory,
+        so the correct virtual environment is found."""
+
         main_entry_point(["create"])
         pkg_dir = self.projectDir / "subpkg"
         pkg_dir.mkdir()
@@ -295,6 +298,27 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             # this call specifies *incorrect* project dir relative to run.py.
             with self.assertRaises(VenvDoesNotExistError):
                 main_entry_point(["call", "--project-dir", "../..", run_py_str])
+
+    def test_call_project_dir_relative_imports(self):
+        """ Tests that modules are importable from the project dir
+        set by -p parameter"""
+
+        main_entry_point(["create"])
+        pkg_dir = self.projectDir / "subpkg"
+        pkg_dir.mkdir()
+        (pkg_dir / "__init__.py").touch()
+        (pkg_dir / "constant.py").write_text("FIFTY_FIVE=55")
+        run_py = (pkg_dir / "run.py")
+        # thanks to modified PYTHONPATH, the following must work
+        run_py.write_text("import subpkg.constant\n"
+                          "exit(subpkg.constant.FIFTY_FIVE)")
+
+        run_py_str = str(run_py.absolute())
+        with TemporaryDirectory() as td:
+            os.chdir(td)
+            with self.assertRaises(VienChildExit) as ce:
+                main_entry_point(["call", "-p", "..", run_py_str])
+            self.assertEqual(ce.exception.code, 55)
 
     def test_shell_ok(self):
         main_entry_point(["create"])
