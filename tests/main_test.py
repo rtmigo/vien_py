@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import os
 import sys
-import textwrap
 import unittest
 from io import StringIO
 from pathlib import Path
@@ -14,7 +13,7 @@ from timeit import default_timer as timer
 
 from vien import main_entry_point
 from vien.main import VenvExistsError, VenvDoesNotExistError, VienChildExit
-from vien.time_limited import TimeLimited
+from tests.time_limited import TimeLimited
 
 
 class CapturedOutput:

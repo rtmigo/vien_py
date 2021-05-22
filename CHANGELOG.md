@@ -2,7 +2,9 @@
 
 - "call" command added
 - new versioning scheme
+- tests removed from the `vien` package, so installable code is now smaller  
 - fixed: the 'run' command could be run when the virtual environment does not exist
+
 
 # 0.3.7
 

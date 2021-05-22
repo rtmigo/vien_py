@@ -7,8 +7,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 
-from .bash_runner import *
-from .time_limited import TimeLimited
+from vien.bash_runner import *
+from tests.time_limited import TimeLimited
 
 
 class TestRunAsBash(unittest.TestCase):
