@@ -153,11 +153,11 @@ def quote(arg: str) -> str:
 
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
-    for p in (venv_dir / "bin" / "python",
-              venv_dir / "bin" / "python3"):
+    for sub in ("bin/python", "bin/python3"):
+        p = venv_dir/sub
         if p.exists():
             return p
-    raise Exception(f"Cannot find the interpreter in {venv_dir}.")
+    raise Exception(f"Cannot find the Python interpreter in {venv_dir}.")
 
 
 def get_python_interpreter(argument: str) -> str:
