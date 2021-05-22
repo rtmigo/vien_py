@@ -5,7 +5,8 @@
 # [vien](https://github.com/rtmigo/vien_py#readme)
 
 **VIEN** is a command-line tool for
-managing [Python Virtual Environments](https://docs.python.org/3/library/venv.html).
+managing [Python Virtual Environments](https://docs.python.org/3/library/venv.html)
+.
 
 It provides one-line shortcuts for:
 
@@ -15,8 +16,8 @@ It provides one-line shortcuts for:
 
 -----
 
-Switching between projects should be simple. Creating environments for the projects should be simple
-too.
+Switching between projects should be simple. Creating environments for the
+projects should be simple too.
 
 Ideally it's a short command that I would type even half asleep.
 
@@ -37,10 +38,10 @@ $ source /i/lost/that/.venv/bin/activate
 <details>
   <summary>Ready-made solutions did not help.</summary><br/>
 
-- [pipenv](https://pipenv.pypa.io/) kind of solved the problem, but brought new challenges unrelated
-  to virtual environments
-- [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/) name is easier to copy-paste than
-  to type. And its commands are too
+- [pipenv](https://pipenv.pypa.io/) kind of solved the problem, but brought new
+  challenges unrelated to virtual environments
+- [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/) name is easier
+  to copy-paste than to type. And its commands are too
 
 </details>
 
@@ -101,7 +102,8 @@ $ cd /path/to/myProject
 $ vien create 
 ```
 
-By default `vien` will try to use `python3` as the interpreter for the virtual environment.
+By default `vien` will try to use `python3` as the interpreter for the virtual
+environment.
 
 <details>
   <summary>If you have 
@@ -194,16 +196,18 @@ $ /path/to/the/venv/bin/deactivate
 |`/abc/otherProject`|`$HOME/.vien/otherProject_venv`|
 |`/moved/to/otherProject`|`$HOME/.vien/otherProject_venv`|
 
-So only the local name of the project directory matters. And all the virtual environments are
-in `$HOME/.vien`.
+So only the local name of the project directory matters. And all the virtual
+environments are in `$HOME/.vien`.
 
-If you're not happy with the default, you can set the environment variable `VIENDIR`:
+If you're not happy with the default, you can set the environment
+variable `VIENDIR`:
 
 ``` bash
 $ export VIENDIR="/x/y/z"
 ```
 
-So for the project `aaa` the virtual environment will be located in `/x/y/z/aaa_venv`.
+So for the project `aaa` the virtual environment will be located
+in `/x/y/z/aaa_venv`.
 
 The `_venv` suffix tells the utility that this directory can be safely removed.
 
@@ -273,7 +277,7 @@ subprocesses.
 Add the following line to the top of `main.py`
 
 ```
-#!/usr/bin/env vien run python
+#!/usr/bin/env vien call -p .
 ```
 
 Make the main.py executable
@@ -282,11 +286,15 @@ Make the main.py executable
 $ chmod +x main.py  
 ```
 
-Now you can run the `main.py` directly from command line. In will use the `vien`
-virtual environment associated with the parent directory of `main.py`.
+Now you can run the `main.py` directly from command line.
+
+With this shebang, the file can be run from any working directory. Thanks to
+the `-p` parameter the project directory is not the working directory, but the
+parent directory of the `main.py` file.
 
 ``` bash
-$ /path/to/myProject/main.py
+$ cd anywhere/somewhere
+$ /path/to/myProject/main.py   # runs the file in virtual environment
 ```
 
 Of course, the virtual environment must be initialized if it is not already done

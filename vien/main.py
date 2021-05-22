@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (c) 2020 Artëm IG <github.com/rtmigo>
 # SPDX-License-Identifier: BSD-3-Clause
 
+from __future__ import annotations
 import argparse
 import json
 import os
@@ -18,34 +19,42 @@ from vien.colors import Colors
 verbose = False
 
 
-class VienError(SystemExit):
+class VienExit(SystemExit):
     """Base class for all the expected exceptions,
     that show the error message and stop the program."""
 
-    def __init__(self, message: str):
-        super().__init__(f"ERROR: {message}")
+    def __init__(self, arg):
+        super().__init__(arg)
 
 
-class VenvExistsError(VienError):
+class VienChildExit(VienExit):
+    """When a child process finished, and vien must exit too with
+    the same code"""
+
+    def __init__(self, exit_code: int):
+        super().__init__(exit_code)
+
+
+class VenvExistsError(VienExit):
     pass
 
 
-class VenvDoesNotExistError(VienError):
+class VenvDoesNotExistError(VienExit):
     def __init__(self, path: Path):
         super().__init__(f"Virtual environment {path} does not exist.")
 
 
-class FailedToCreateVenvError(VienError):
+class FailedToCreateVenvError(VienExit):
     def __init__(self, path: Path):
         super().__init__(f"Failed to create virtualenv {path}.")
 
 
-class FailedToClearVenvError(VienError):
+class FailedToClearVenvError(VienExit):
     def __init__(self, path: Path):
         super().__init__(f"Failed to clear virtualenv {path}.")
 
 
-class CannotFindExecutableError(VienError):
+class CannotFindExecutableError(VienExit):
     def __init__(self, version: str):
         super().__init__(f"Cannot resolve '{version}' to an executable file.")
 
@@ -305,18 +314,60 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
                             input_delay=input_delay)
 
     # the vien will return the same exit code as the shell returned
-    if cp.returncode != 0:
-        exit(cp.returncode)
+    #if cp.returncode != 0:
+    #    exit(cp.returncode)
+    raise VienChildExit(cp.returncode)
 
 
-def main_run(venv_dir: Path, otherargs):
-    vd = str(venv_dir.absolute())
+def main_run(venv_dir: Path, other_args: List[str]):
+    activate_file = (venv_dir / 'bin' / 'activate').absolute()
+    if not activate_file.exists():
+        raise FileNotFoundError(activate_file)
+
     commands = [
-        f'source "{vd}/bin/activate"',
-        " ".join(quote(a) for a in otherargs)
+        f'source "{activate_file}"',
+        " ".join(quote(a) for a in other_args)
     ]
 
-    exit(run_bash_sequence(commands))
+    exit_code = run_bash_sequence(commands)
+    raise VienChildExit(exit_code)
+
+
+class Dirs:
+    def __init__(self, project_dir: Union[str, Path] = '.'):
+        self.project_dir = Path(project_dir).absolute()
+        self.venv_dir = get_svet_dir() / (self.project_dir.name + "_venv")
+        if verbose:
+            print(f"Proj dir: {self.project_dir}")
+            print(f"Venv dir: {self.venv_dir}")
+
+    def existing(self) -> Dirs:
+        if not self.venv_dir.exists():
+            raise VenvDoesNotExistError(self.venv_dir)
+        return self
+
+
+def main_call(py_file: str, proj_rel_path: Optional[str],
+              other_args: List[str]):
+    file = Path(py_file)
+    if not file.exists():
+        raise FileNotFoundError(file)  # todo better error
+    assert isinstance(other_args, list)
+
+    if proj_rel_path is not None:
+        proj_path = Path(os.path.normpath(file.parent / proj_rel_path))
+    else:
+        proj_path = Path('.')
+
+    print(f"PROJ PATH: {proj_path}")
+
+
+    dirs = Dirs(proj_path).existing()
+
+    # print(parsed.p)
+    # exit()
+    # if not os.path.exists()
+    main_run(dirs.venv_dir, ['python', str(file)] + other_args)
 
 
 def main_entry_point(args: Optional[List[str]] = None):
@@ -349,6 +400,13 @@ def main_entry_point(args: Optional[List[str]] = None):
         help="run a command inside the virtualenv")
     parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)
 
+    parser_run = subparsers.add_parser(
+        'call',
+        help="run a script inside the virtualenv")
+    parser_run.add_argument("--project-dir", "-p", default=None, type=str)
+    parser_run.add_argument('file_py', type=str)
+    parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)
+
     subparsers.add_parser(
         'path',
         help="show the supposed path of the virtualenv "
@@ -363,26 +421,37 @@ def main_entry_point(args: Optional[List[str]] = None):
 
     ###########
 
-    project_dir = Path(".").absolute()
-    venv_dir = get_svet_dir() / (project_dir.name + "_venv")
-
-    if verbose:
-        print(f"Proj dir: {project_dir}")
-        print(f"Venv dir: {venv_dir}")
+    # def vdir() -> Path:
+    #     project_dir = Path(".").absolute()
+    #     venv_dir = get_svet_dir() / (project_dir.name + "_venv")
+    #     if verbose:
+    #         print(f"Proj dir: {project_dir}")
+    #         print(f"Venv dir: {venv_dir}")
+    #     return venv_dir
 
     ##########
 
     if parsed.command == "create":
-        main_create(venv_dir, parsed.python)
+        main_create(Dirs().venv_dir, parsed.python)
     elif parsed.command == "recreate":
-        main_recreate(venv_dir, parsed.python)
+        main_recreate(Dirs().venv_dir, parsed.python)  # todo .existing()?
     elif parsed.command == "delete":
-        main_delete(venv_dir)
+        main_delete(Dirs().venv_dir)  # todo .existing()?
     elif parsed.command == "path":
-        print(venv_dir)
+        print(Dirs().venv_dir)  # todo .existing()?
     elif parsed.command == "run":
-        main_run(venv_dir, parsed.otherargs)
+        main_run(Dirs().existing().venv_dir, parsed.otherargs)
+    elif parsed.command == "call":
+        main_call(py_file=parsed.file_py,
+                  proj_rel_path=parsed.project_dir,
+                  other_args=parsed.otherargs)
+
+
     elif parsed.command == "shell":
-        main_shell(venv_dir, project_dir.name, parsed.input, parsed.delay)
+        dirs = Dirs()
+        main_shell(dirs.venv_dir,
+                   dirs.project_dir.name,
+                   parsed.input,
+                   parsed.delay)
     else:
         raise ValueError
