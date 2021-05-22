@@ -274,6 +274,9 @@ subprocesses.
 
 # Shebang
 
+On POSIX systems, you can make a `.py` file executable, with `vien` executing 
+it inside a virtual environment.
+
 Insert the shebang line to the top of the file you want to run. The value of the
 shebang depends on the location of the file relative to the project directory.
 
@@ -289,11 +292,9 @@ After inserting the shebang, make the file executable:
 $ chmod +x runme.py  
 ```
 
-Now you can run the `runme.py` directly from command line.
-
-With this shebang, the file can be run from any working directory. Thanks to
-the `-p` parameter the project directory is not the working directory, but a
-directory relative to `runme.py`.
+Now you can run the `runme.py` directly from command line. This will use the 
+virtual environment associated with the `myProject`. The working directory can 
+be anything.
 
 ``` bash
 # runs the runme.py in virtual environment for myProject
