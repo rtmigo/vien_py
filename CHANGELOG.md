@@ -1,3 +1,8 @@
+# 4.3
+
+- A much shorter help message now appears when running `vien` without parameters
+- Fixed: `call` printed debug message to stdout
+
 # 4.2
 
 - Trying to `call` a non-existent file now prints a short error message 
