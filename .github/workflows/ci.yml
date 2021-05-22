@@ -52,7 +52,7 @@ jobs:
 
       - name: Run pkg tests
         run: |
-          ./test_pkg.sh
+          python ./test_pkg.py
 
   to-staging:
     needs: test
