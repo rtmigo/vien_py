@@ -1,5 +1,5 @@
 [![PyPI version shields.io](https://img.shields.io/pypi/v/vien.svg)](https://pypi.python.org/pypi/vien/)
-[![Generic badge](https://img.shields.io/badge/OS-MacOS%20|%20Ubuntu-blue.svg)](#)
+[![Generic badge](https://img.shields.io/badge/OS-Linux%20|%20macOS-blue.svg)](#)
 [![Generic badge](https://img.shields.io/badge/Python-3.7--3.9-blue.svg)](#)
 
 # [vien](https://github.com/rtmigo/vien_py#readme)
