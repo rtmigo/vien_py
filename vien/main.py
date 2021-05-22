@@ -39,7 +39,7 @@ class ChildExit(VienExit):
         super().__init__(exit_code)
 
 
-class VenvExistsExit(VienExit):
+class VenvExistsExit(VienExit):  # todo does it return error code?
     pass
 
 
@@ -80,43 +80,9 @@ def usage_doc():
     text = f"""{version_message()}
 
 See a detailed intro at
-https://github.com/rtmigo/vien#readme
+https://github.com/rtmigo/vien_py#readme
 
-
-VIENDIR
--------
-
-VIEN maps project directory names to virtualenv paths.
-
-  /here/myProject       -> $VIENDIR/myProject_venv
-  /there/myProject      -> $VIENDIR/myProject_venv
-  /there/otherProject   -> $VIENDIR/otherProject_venv
-
-By default $VIENDIR is "~/.vien". You can redefine in with
-
-  export VIENDIR="/other/location"
-
-The current $VIENDIR is
-  {get_vien_dir()}
-
-
-QUICK START
------------
-
-CREATE new virtualenv with python3 in $VIENDIR/myProject_venv:
-  cd /abc/myProject
-  vien create python3
-
-RUN an interactive BASH SUBSHELL inside "myProject_venv":	
-  cd /abc/myProject
-  vien shell
-        
-RUN a PYTHON SCRIPT inside "myProject_venv":	
-  cd /abc/myProject
-  vien run python3 ./myProgram.py arg1 arg2 ...
-
-HELP
-----"""
+"""
 
     doc = text.strip()
     above_first_line = ("-" * len(doc.splitlines()[0]))
@@ -152,14 +118,12 @@ def quote(arg: str) -> str:
     return json.dumps(arg)
 
 
-def venv_dir_to_exe(venv_dir: Path) -> Path:
-    c = venv_dir / "bin" / "python"
-    if c.exists():
-        return c
-    c = venv_dir / "bin" / "python3"
-    if c.exists():
-        return c
-    raise Exception(f"Cannot find the interpreter in {venv_dir}.")
+def venv_dir_to_python_exe(venv_dir: Path) -> Path:
+    for sub in ("bin/python", "bin/python3"):
+        p = venv_dir/sub
+        if p.exists():
+            return p
+    raise Exception(f"Cannot find the Python interpreter in {venv_dir}.")
 
 
 def get_python_interpreter(argument: str) -> str:
@@ -181,7 +145,7 @@ def main_create(venv_dir: Path, version: str):
     if result.returncode == 0:
         print()
         print("The Python executable:")
-        print(str(venv_dir_to_exe(venv_dir)))
+        print(str(venv_dir_to_python_exe(venv_dir)))
     else:
         raise FailedToCreateVenvExit(venv_dir)
 
@@ -191,7 +155,7 @@ def main_delete(venv_dir: Path):
         raise ValueError(venv_dir)
     if not venv_dir.exists():
         raise VenvDoesNotExistExit(venv_dir)
-    python_exe = venv_dir_to_exe(venv_dir)
+    python_exe = venv_dir_to_python_exe(venv_dir)
     print(f"Clearing {venv_dir}")
 
     result = subprocess.run([python_exe, "-m", "venv", str(venv_dir)])
@@ -353,17 +317,10 @@ def main_call(py_file: str, proj_rel_path: Optional[str],
     else:
         proj_path = Path('.')
 
-    print(f"PROJ PATH: {proj_path}")
-
     dirs = Dirs(proj_path).existing()
 
-    # print(parsed.p)
-    # exit()
-    # if not os.path.exists()
     _run(venv_dir=dirs.venv_dir, other_args=['python', str(file)] + other_args,
-         prepend_py_path=str(proj_path) if proj_rel_path else None
-         )
-    # main_run(dirs.venv_dir, )
+         prepend_py_path=str(proj_path) if proj_rel_path else None)
 
 
 def main_entry_point(args: Optional[List[str]] = None):
