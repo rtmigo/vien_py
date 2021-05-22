@@ -152,7 +152,7 @@ $ vien create /usr/local/opt/python@3.8/bin/python3
 
 `vien shell` starts interactive bash session in the virtual environment.
 
-```bash	
+``` bash	
 $ cd /path/to/myProject
 $ vien shell
 
@@ -161,7 +161,7 @@ $ vien shell
 
 Now you are inside the virtual environment.
 
-```bash	
+``` bash	
 (myProject)$ which python3             # now we are using separate copy of Python
 (myProject)$ echo $PATH                # everything is slightly different
 
@@ -171,7 +171,7 @@ Now you are inside the virtual environment.
 
 Get out of the virtual environment:
 
-```bash
+``` bash
 (myProject)$ exit
 
 $ _
@@ -183,7 +183,7 @@ Now you're back.
 
 `vien run COMMAND` runs any shell command in the virtual environment.
 
-```bash 		
+``` bash 		
 $ cd /path/to/myProject
 $ vien run python3 use_requests.py arg1 arg2  # runs in virtual environment
 $ vien run pip3 install requests              # installs packages into virtual environment
@@ -192,7 +192,7 @@ $ vien run pip3 install requests              # installs packages into virtual e
 <details>
   <summary>is an equivalent to</summary><br/>
 
-```bash 		
+``` bash 		
 $ cd /path/to/myProject
 
 $ source /path/to/the/venv/bin/activate
@@ -210,7 +210,7 @@ $ /path/to/the/venv/bin/deactivate
 
 `vien call PYFILE` executes a `.py` script in the virtual environment.
 
-```bash 		
+``` bash 		
 $ cd /path/to/myProject
 $ vien call main.py
 ```
@@ -218,7 +218,7 @@ $ vien call main.py
 The optional `-p` parameter allows you to specify the project directory relative
 to the parent directory of the file being run.
 
-```bash 		
+``` bash 		
 $ cd any/where
 $ vien call -p /path/to/myProject main.py
 $ vien call -p . main.py
