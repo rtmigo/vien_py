@@ -4,9 +4,8 @@
 
 # [vien](https://github.com/rtmigo/vien_py#readme)
 
-**VIEN** is a command-line tool for
-managing [Python Virtual Environments](https://docs.python.org/3/library/venv.html)
-.
+**VIEN** is a command-line tool for managing
+[Python Virtual Environments](https://docs.python.org/3/library/venv.html).
 
 It provides one-line shortcuts for:
 
@@ -117,8 +116,8 @@ $ vien call main.py
 
 ## create
 
-`vien shell` creates a virtual environment corresponding to the working 
-directory. 
+`vien shell` creates a virtual environment corresponding to the working
+directory.
 
 ``` bash
 $ cd /path/to/myProject
@@ -128,8 +127,8 @@ $ vien create
 By default `vien` will try to use `python3` as the interpreter for the virtual
 environment.
 
-If you have more than one Python version, provide one more argument,
-point to the proper interpreter the way you execute it.
+If you have more than one Python version, provide one more argument, point to
+the proper interpreter the way you execute it.
 
 E.g. if you execute scripts like that
 
@@ -149,9 +148,7 @@ Or provide full path to the interpreter:
 $ vien create /usr/local/opt/python@3.8/bin/python3
 ```
 
-
-
-## shell 
+## shell
 
 `vien shell` starts interactive bash session in the virtual environment.
 
@@ -218,7 +215,7 @@ $ cd /path/to/myProject
 $ vien call main.py
 ```
 
-The optional `-p` parameter allows you to specify the project directory relative 
+The optional `-p` parameter allows you to specify the project directory relative
 to the parent directory of the file being run.
 
 ```bash 		
@@ -238,7 +235,7 @@ $ vien delete
 
 ## recreate
 
-`vien recreate` old and creates new virtual environment. 
+`vien recreate` old and creates new virtual environment.
 
 If you decided to start from scratch:
 
@@ -253,7 +250,6 @@ If you decided to change the Python version:
 $ cd /path/to/myProject
 $ vien recreate /usr/local/opt/python@3.10/bin/python3
 ```
-
 
 # Virtual environments location
 
@@ -317,8 +313,8 @@ subprocesses.
 
 # Shebang
 
-On POSIX systems, you can make a `.py` file executable, with `vien` executing 
-it inside a virtual environment.
+On POSIX systems, you can make a `.py` file executable, with `vien` executing it
+inside a virtual environment.
 
 Insert the shebang line to the top of the file you want to run. The value of the
 shebang depends on the location of the file relative to the project directory.
@@ -335,8 +331,8 @@ After inserting the shebang, make the file executable:
 $ chmod +x runme.py  
 ```
 
-Now you can run the `runme.py` directly from command line. This will use the 
-virtual environment associated with the `myProject`. The working directory can 
+Now you can run the `runme.py` directly from command line. This will use the
+virtual environment associated with the `myProject`. The working directory can
 be anything.
 
 ``` bash

@@ -152,13 +152,11 @@ def quote(arg: str) -> str:
     return json.dumps(arg)
 
 
-def venv_dir_to_exe(venv_dir: Path) -> Path:
-    c = venv_dir / "bin" / "python"
-    if c.exists():
-        return c
-    c = venv_dir / "bin" / "python3"
-    if c.exists():
-        return c
+def venv_dir_to_python_exe(venv_dir: Path) -> Path:
+    for p in (venv_dir / "bin" / "python",
+              venv_dir / "bin" / "python3"):
+        if p.exists():
+            return p
     raise Exception(f"Cannot find the interpreter in {venv_dir}.")
 
 
@@ -181,7 +179,7 @@ def main_create(venv_dir: Path, version: str):
     if result.returncode == 0:
         print()
         print("The Python executable:")
-        print(str(venv_dir_to_exe(venv_dir)))
+        print(str(venv_dir_to_python_exe(venv_dir)))
     else:
         raise FailedToCreateVenvExit(venv_dir)
 
@@ -191,7 +189,7 @@ def main_delete(venv_dir: Path):
         raise ValueError(venv_dir)
     if not venv_dir.exists():
         raise VenvDoesNotExistExit(venv_dir)
-    python_exe = venv_dir_to_exe(venv_dir)
+    python_exe = venv_dir_to_python_exe(venv_dir)
     print(f"Clearing {venv_dir}")
 
     result = subprocess.run([python_exe, "-m", "venv", str(venv_dir)])
@@ -353,17 +351,10 @@ def main_call(py_file: str, proj_rel_path: Optional[str],
     else:
         proj_path = Path('.')
 
-    print(f"PROJ PATH: {proj_path}")
-
     dirs = Dirs(proj_path).existing()
 
-    # print(parsed.p)
-    # exit()
-    # if not os.path.exists()
     _run(venv_dir=dirs.venv_dir, other_args=['python', str(file)] + other_args,
-         prepend_py_path=str(proj_path) if proj_rel_path else None
-         )
-    # main_run(dirs.venv_dir, )
+         prepend_py_path=str(proj_path) if proj_rel_path else None)
 
 
 def main_entry_point(args: Optional[List[str]] = None):
