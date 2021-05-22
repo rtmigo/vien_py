@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 from __future__ import annotations
+
 import argparse
 import json
 import os
 import shutil
 import subprocess
 import sys
-import unittest
 from pathlib import Path
 from typing import *
 
@@ -19,6 +19,10 @@ from vien.colors import Colors
 verbose = False
 
 
+def exe_name() -> str:
+    return os.path.basename(sys.argv[0])
+
+
 class VienExit(SystemExit):
     """Base class for all the expected exceptions,
     that show the error message and stop the program."""
@@ -27,7 +31,7 @@ class VienExit(SystemExit):
         super().__init__(arg)
 
 
-class VienChildExit(VienExit):
+class ChildExit(VienExit):
     """When a child process finished, and vien must exit too with
     the same code"""
 
@@ -35,26 +39,32 @@ class VienChildExit(VienExit):
         super().__init__(exit_code)
 
 
-class VenvExistsError(VienExit):
+class VenvExistsExit(VienExit):
     pass
 
 
-class VenvDoesNotExistError(VienExit):
+class VenvDoesNotExistExit(VienExit):
     def __init__(self, path: Path):
-        super().__init__(f"Virtual environment {path} does not exist.")
+        super().__init__(f'Virtual environment "{path}" does not exist.\n'
+                         f'You can create it with "{exe_name()} create".')
 
 
-class FailedToCreateVenvError(VienExit):
+class PyFileNotFoundExit(VienExit):
+    def __init__(self, path: Path):
+        super().__init__(f"File {path} not found.")
+
+
+class FailedToCreateVenvExit(VienExit):
     def __init__(self, path: Path):
         super().__init__(f"Failed to create virtualenv {path}.")
 
 
-class FailedToClearVenvError(VienExit):
+class FailedToClearVenvExit(VienExit):
     def __init__(self, path: Path):
         super().__init__(f"Failed to clear virtualenv {path}.")
 
 
-class CannotFindExecutableError(VienExit):
+class CannotFindExecutableExit(VienExit):
     def __init__(self, version: str):
         super().__init__(f"Cannot resolve '{version}' to an executable file.")
 
@@ -93,21 +103,17 @@ The current $VIENDIR is
 QUICK START
 -----------
 
-CREATE new virtualenv with python3 in $VIENDIR/my_project_venv:
-
-  cd /abc/my_project
+CREATE new virtualenv with python3 in $VIENDIR/myProject_venv:
+  cd /abc/myProject
   vien create python3
 
-RUN an interactive BASH SUBSHELL inside "my_project_venv":	
-
-  cd /abc/my_project
+RUN an interactive BASH SUBSHELL inside "myProject_venv":	
+  cd /abc/myProject
   vien shell
         
-RUN a PYTHON SCRIPT inside "my_project_venv":	
-
+RUN a PYTHON SCRIPT inside "myProject_venv":	
   cd /abc/myProject
   vien run python3 ./myProgram.py arg1 arg2 ...
-
 
 HELP
 ----"""
@@ -123,9 +129,6 @@ def get_vien_dir() -> Path:
         return Path(os.path.expanduser(os.path.expandvars(s)))
     else:
         return Path(os.path.expandvars("$HOME")) / ".vien"
-
-
-
 
 
 def run_bash_sequence(commands: List[str]) -> int:
@@ -162,13 +165,13 @@ def venv_dir_to_exe(venv_dir: Path) -> Path:
 def get_python_interpreter(argument: str) -> str:
     exe = shutil.which(argument)
     if not exe:
-        raise CannotFindExecutableError(argument)
+        raise CannotFindExecutableExit(argument)
     return exe
 
 
 def main_create(venv_dir: Path, version: str):
     if venv_dir.exists():
-        raise VenvExistsError("Virtualenv already exists.")
+        raise VenvExistsExit("Virtualenv already exists.")
 
     exe = get_python_interpreter(version)
 
@@ -180,20 +183,20 @@ def main_create(venv_dir: Path, version: str):
         print("The Python executable:")
         print(str(venv_dir_to_exe(venv_dir)))
     else:
-        raise FailedToCreateVenvError(venv_dir)
+        raise FailedToCreateVenvExit(venv_dir)
 
 
 def main_delete(venv_dir: Path):
     if "_venv" not in venv_dir.name:
         raise ValueError(venv_dir)
     if not venv_dir.exists():
-        raise VenvDoesNotExistError(venv_dir)
+        raise VenvDoesNotExistExit(venv_dir)
     python_exe = venv_dir_to_exe(venv_dir)
     print(f"Clearing {venv_dir}")
 
     result = subprocess.run([python_exe, "-m", "venv", str(venv_dir)])
     if result.returncode != 0:
-        raise FailedToClearVenvError(venv_dir)
+        raise FailedToClearVenvExit(venv_dir)
     print(f"Deleting {venv_dir}")
     shutil.rmtree(str(venv_dir))
 
@@ -207,7 +210,8 @@ def main_recreate(venv_dir: Path, version: str):
 def guess_bash_ps1():
     """Returns the default BASH prompt."""
 
-    # TL;DR PS1 is often inaccessible for child processes of BASH. It means, for scripts too.
+    # TL;DR PS1 is often inaccessible for child processes of BASH. It means,
+    # for scripts too.
     #
     # AG 2021: PS1 is not an environment variable, but a local variable of
     # the shell [2019](https://stackoverflow.com/a/54999265). It seems to be
@@ -215,19 +219,26 @@ def guess_bash_ps1():
     #
     # We can see PS1 by typing "echo $PS1" to the prompt, but ...
     #
-    # 1) script.sh with `echo $PS1`                    | prints nothing MacOS & Ubuntu
-    # 2) module.py with `print(os.environ.get("PS1")   | prints Null MacOS & Ubuntu
-    # 3) `bash -i -c "echo $PS1"` from command line    | seems to be OK in Ubuntu
-    # 4) `zsh -i -c "echo $PS1"` from command line     | looks like a normal prompt in OSX
+    # 1) script.sh with `echo $PS1`        | prints nothing MacOS & Ubuntu
+    #
+    # 2) module.py with                    | prints Null MacOS & Ubuntu
+    #    `print(os.environ.get("PS1")      |
+    #
+    # 3) `bash -i -c "echo $PS1"`          | seems to be OK in Ubuntu
+    #     from command line                |
+    #
+    # 4) `zsh -i -c "echo $PS1"`           | looks like a normal prompt in OSX
+    #     from command line                |
     #
     # In Ubuntu (3) returns the same prompt that in used by terminal by default.
-    # Although if the user customized their PS1, no guarantees, that (3) will return
-    # the updated value.
+    # Although if the user customized their PS1, no guarantees, that (3) will
+    # return the updated value.
     #
-    # For MacOS, the prompt printed by (3) in not the same as seen in terminal app.
-    # It returns boring "bash-3.2" instead of expected "host:dir user$".
+    # For MacOS, the prompt printed by (3) in not the same as seen in terminal
+    # app. It returns boring "bash-3.2" instead of expected "host:dir user$".
     #
-    # (4) on MacOS seems to return the correct "host:dir user$", but it is in ZSH format.
+    # (4) on MacOS seems to return the correct "host:dir user$", but it is in
+    # ZSH format.
 
     # try to return $PS1 environment variable:
     env_var = os.environ.get("PS1")
@@ -246,7 +257,7 @@ def guess_bash_ps1():
 
 def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
     if not venv_dir.exists():
-        raise VenvDoesNotExistError(venv_dir)
+        raise VenvDoesNotExistExit(venv_dir)
 
     activate_path_quoted = quote(str(venv_dir / "bin" / "activate"))
 
@@ -291,29 +302,22 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
                             input_delay=input_delay)
 
     # the vien will return the same exit code as the shell returned
-    # if cp.returncode != 0:
-    #    exit(cp.returncode)
-    raise VienChildExit(cp.returncode)
+    raise ChildExit(cp.returncode)
 
 
-def _run(venv_dir: Path, other_args: List[str], prepend_py_path:str = None):
+def _run(venv_dir: Path, other_args: List[str], prepend_py_path: str = None):
     activate_file = (venv_dir / 'bin' / 'activate').absolute()
     if not activate_file.exists():
         raise FileNotFoundError(activate_file)
 
-    commands: List[str] = []
+    commands: List[str] = list()
     commands.append(f'source "{activate_file}"')
     if prepend_py_path:
         commands.append(f'export PYTHONPATH="{prepend_py_path}:$PYTHONPATH"')
     commands.append(" ".join(quote(a) for a in other_args))
 
-    # commands = [
-    #     f'source "{activate_file}"',
-    #
-    # ]
-
     exit_code = run_bash_sequence(commands)
-    raise VienChildExit(exit_code)
+    raise ChildExit(exit_code)
 
 
 def main_run(venv_dir: Path, other_args: List[str]):
@@ -330,15 +334,18 @@ class Dirs:
 
     def existing(self) -> Dirs:
         if not self.venv_dir.exists():
-            raise VenvDoesNotExistError(self.venv_dir)
+            raise VenvDoesNotExistExit(self.venv_dir)
         return self
 
 
 def main_call(py_file: str, proj_rel_path: Optional[str],
               other_args: List[str]):
+    # todo run python directly, without shell and activate
+
     file = Path(py_file)
     if not file.exists():
-        raise FileNotFoundError(file)  # todo better error
+        raise PyFileNotFoundExit(file)
+
     assert isinstance(other_args, list)
 
     if proj_rel_path is not None:
@@ -408,26 +415,14 @@ def main_entry_point(args: Optional[List[str]] = None):
 
     parsed = parser.parse_args(args)
 
-    ###########
-
-    # def vdir() -> Path:
-    #     project_dir = Path(".").absolute()
-    #     venv_dir = get_svet_dir() / (project_dir.name + "_venv")
-    #     if verbose:
-    #         print(f"Proj dir: {project_dir}")
-    #         print(f"Venv dir: {venv_dir}")
-    #     return venv_dir
-
-    ##########
-
     if parsed.command == "create":
         main_create(Dirs().venv_dir, parsed.python)
     elif parsed.command == "recreate":
         main_recreate(Dirs().venv_dir, parsed.python)  # todo .existing()?
-    elif parsed.command == "delete":
-        main_delete(Dirs().venv_dir)  # todo .existing()?
+    elif parsed.command == "delete":  # todo move 'existing' check from func?
+        main_delete(Dirs().venv_dir)
     elif parsed.command == "path":
-        print(Dirs().venv_dir)  # todo .existing()?
+        print(Dirs().venv_dir)  # does not need to be existing
     elif parsed.command == "run":
         main_run(Dirs().existing().venv_dir, parsed.otherargs)
     elif parsed.command == "call":
@@ -435,9 +430,8 @@ def main_entry_point(args: Optional[List[str]] = None):
                   proj_rel_path=parsed.project_dir,
                   other_args=parsed.otherargs)
 
-
     elif parsed.command == "shell":
-        dirs = Dirs()
+        dirs = Dirs()  # todo move 'existing' check from func?
         main_shell(dirs.venv_dir,
                    dirs.project_dir.name,
                    parsed.input,
