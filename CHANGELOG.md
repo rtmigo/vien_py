@@ -1,3 +1,8 @@
+# 4.4
+
+- `call` is now faster as it launches Python directly without spawning an extra 
+  shell process
+
 # 4.3
 
 - A much shorter help message now appears when running `vien` without parameters
