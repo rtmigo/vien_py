@@ -137,8 +137,8 @@ $ vien create python3.8
 ```
 
 Here `python3.8` is literally the name of the command you are running python
-with (file available from `$PATH` or symlink). Since not all shell commands can
-be easily resolved, sometimes you have to specify the full path.
+with (file available from `$PATH` or a symlink). Since not all shell commands
+can be easily resolved, sometimes you have to specify the full path.
 
 ``` bash
 $ vien create /usr/local/opt/python@3.8/bin/python3
