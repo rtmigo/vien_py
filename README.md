@@ -214,12 +214,19 @@ The optional `-p` parameter allows you to specify the project directory
 **relative** to the parent directory of the **file** being run.
 
 ``` bash 		
-$ cd any/where
-$ vien call -p /path/to/myProject main.py
-$ vien call -p . main.py
+$ cd any/where  # working dir is irrelevant
+
+# absolute (using venv for /abc/myProject):
+$ vien call -p /abc/myProject /abc/myProject/main.py
+
+# relative (using venv for /abc/myProject):
+$ vien call -p . /abc/myProject/main.py
+
+# error (there is no venv for any/where)
+$ vien call /abc/myProject/main.py
 ```
 
-This makes things like [shebang](#Shebang) possible.
+`-p` makes things like [shebang](#Shebang) possible.
 
 ## delete
 
