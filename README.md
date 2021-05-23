@@ -220,7 +220,7 @@ $ vien call -p . main.py
 ```
 
 The `-p` parameter makes working directory irrelevant and absolute paths
-optional. This allows you to do cool things like [shebangs](#Shebang).
+optional. This makes things like [shebang](#Shebang) possible.
 
 ## delete
 
