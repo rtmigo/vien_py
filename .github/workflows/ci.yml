@@ -86,7 +86,7 @@ jobs:
 
       # ADD GITHUB RELEASE
       - name: Get the Python package version
-        run: echo "PKGVER=$(.github/package_version.sh)" >> $GITHUB_ENV
+        run: echo "PKGVER=$(python setup.py --version)" >> $GITHUB_ENV
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v1
         with:
