@@ -226,7 +226,7 @@ $ vien call -p . /abc/myProject/main.py
 $ vien call /abc/myProject/main.py
 ```
 
-`-p` makes things like [shebang](#Shebang) possible.
+This parameter makes things like [shebang](#Shebang) possible.
 
 ## delete
 
