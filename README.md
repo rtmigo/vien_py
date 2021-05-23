@@ -130,18 +130,17 @@ By default `vien` will try to use `python3` as the interpreter for the virtual
 environment.
 
 If you have more than one Python version, you can provide an argument to point
-to the proper interpreter. For example,
-
-``` bash
-$ vien create python3.8
-```
-
-Here `python3.8` is literally the name of the command you are running python
-with (file available from `$PATH` or a symlink). Since not all shell commands
-can be easily resolved, sometimes you have to specify the full path.
+to the proper interpreter.
 
 ``` bash
 $ vien create /usr/local/opt/python@3.8/bin/python3
+```
+
+In many cases, a shorter command will also work. If the needed interpreter can
+be executed in the shell as `python3.8`, you can try
+
+``` bash
+$ vien create python3.8
 ```
 
 ## shell
@@ -181,7 +180,7 @@ Now you're back.
 
 ``` bash 		
 $ cd /path/to/myProject
-$ vien run python3 use_requests.py arg1 arg2  # runs in virtual environment
+$ vien run python3 use_requests.py arg1 arg2  # runs script in virtual environment
 $ vien run pip3 install requests              # installs packages into virtual environment
 ```
 
@@ -211,14 +210,23 @@ $ cd /path/to/myProject
 $ vien call main.py
 ```
 
-The optional `-p` parameter allows you to specify the project directory relative
-to the parent directory of the file being run.
+The optional `-p` parameter allows you to specify the project directory
+**relative** to the parent directory of the **file** being run.
 
 ``` bash 		
-$ cd any/where
-$ vien call -p /path/to/myProject main.py
-$ vien call -p . main.py
+$ cd any/where  # working dir is irrelevant
+
+# absolute (using venv for /abc/myProject):
+$ vien call -p /abc/myProject /abc/myProject/main.py
+
+# relative (using venv for /abc/myProject):
+$ vien call -p . /abc/myProject/main.py
+
+# error (there is no venv for any/where)
+$ vien call /abc/myProject/main.py
 ```
+
+This parameter makes things like [shebang](#Shebang) possible.
 
 ## delete
 
