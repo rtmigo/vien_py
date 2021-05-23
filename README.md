@@ -219,8 +219,7 @@ $ vien call -p /path/to/myProject main.py
 $ vien call -p . main.py
 ```
 
-The `-p` parameter makes working directory irrelevant and absolute paths
-optional. This makes things like [shebang](#Shebang) possible.
+This makes things like [shebang](#Shebang) possible.
 
 ## delete
 
