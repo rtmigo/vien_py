@@ -178,7 +178,7 @@ With shell pipes, you can specify what the shell should execute right in the
 command line.
 
 ``` bash
-$ echo "which python3 && echo $PATH" | vien shell
+$ echo 'which python3 && echo $PATH' | vien shell
 ```
 
 ## run
