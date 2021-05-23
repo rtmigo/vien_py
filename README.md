@@ -210,8 +210,8 @@ $ cd /path/to/myProject
 $ vien call main.py
 ```
 
-The optional `-p` parameter allows you to specify the project directory _
-relative to the parent directory of the file_ being run.
+The optional `-p` parameter allows you to specify the project directory
+_relative to the parent directory of the file_ being run.
 
 ``` bash 		
 $ cd any/where
