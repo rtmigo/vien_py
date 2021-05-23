@@ -120,7 +120,7 @@ def quote(arg: str) -> str:
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
     for sub in ("bin/python", "bin/python3"):
-        p = venv_dir/sub
+        p = venv_dir / sub
         if p.exists():
             return p
     raise Exception(f"Cannot find the Python interpreter in {venv_dir}.")
@@ -302,10 +302,16 @@ class Dirs:
         return self
 
 
+def _insert_into_pythonpath(insert_me: str) -> str:
+    # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH
+    # "The format is the same as the shell’s PATH: one or more directory
+    # pathnames separated by os.pathsep (e.g. colons on Unix or semicolons
+    # on Windows)"
+    return os.pathsep.join([insert_me] + sys.path)
+
+
 def main_call(py_file: str, proj_rel_path: Optional[str],
               other_args: List[str]):
-    # todo run python directly, without shell and activate
-
     file = Path(py_file)
     if not file.exists():
         raise PyFileNotFoundExit(file)
@@ -319,8 +325,23 @@ def main_call(py_file: str, proj_rel_path: Optional[str],
 
     dirs = Dirs(proj_path).existing()
 
-    _run(venv_dir=dirs.venv_dir, other_args=['python', str(file)] + other_args,
-         prepend_py_path=str(proj_path) if proj_rel_path else None)
+    # todo allow python options (before file name)
+
+    python_exe = venv_dir_to_python_exe(dirs.venv_dir)
+    args = [str(python_exe), str(file)] + other_args
+
+    env: Optional[Dict]
+    if proj_rel_path:
+        env = {
+            **os.environ,
+            'PYTHONPATH': _insert_into_pythonpath(str(proj_path))
+        }
+    else:
+        env = None
+
+    cp = subprocess.run(args, env=env)
+
+    raise ChildExit(cp.returncode)
 
 
 def main_entry_point(args: Optional[List[str]] = None):

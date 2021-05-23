@@ -174,9 +174,16 @@ $ _
 
 Now you're back.
 
+With shell pipes, you can specify what the shell should execute right in the 
+command line.
+
+``` bash
+$ echo "which python3 && echo $PATH" | vien shell
+```
+
 ## run
 
-`vien run COMMAND` runs any shell command in the virtual environment.
+`vien run COMMAND` runs a shell command in the virtual environment.
 
 ``` bash 		
 $ cd /path/to/myProject
