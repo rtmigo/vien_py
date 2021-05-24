@@ -158,8 +158,7 @@ def guess_bash_ps1():
 
 
 def main_shell(dirs: Dirs, input: str, input_delay: float):
-    if not dirs.venv_dir.exists():
-        raise VenvDoesNotExistExit(dirs.venv_dir)
+    dirs.venv_must_exist()
 
     activate_path_quoted = quote(str(dirs.venv_dir / "bin" / "activate"))
 
@@ -216,8 +215,8 @@ def _run(dirs: Dirs, other_args: List[str]):
 
     commands: List[str] = list()
     commands.append(f'source "{activate_file}"')
-    #if prepend_py_path:
-     #   commands.append(f'export PYTHONPATH="{prepend_py_path}:$PYTHONPATH"')
+    # if prepend_py_path:
+    #   commands.append(f'export PYTHONPATH="{prepend_py_path}:$PYTHONPATH"')
     commands.append(" ".join(quote(a) for a in other_args))
 
     exit_code = run_bash_sequence(commands, env=child_env(dirs.project_dir))
@@ -296,6 +295,7 @@ def child_env(proj_path: Path) -> Optional[Dict]:
     else:
         return None
 
+
 def main_call(venv_dir: Path,
               proj_path: Path,
               other_args: List[str]):
@@ -366,9 +366,6 @@ def main_entry_point(args: Optional[List[str]] = None):
                   other_args=parsed.args_to_python)
 
     elif parsed.command == Commands.shell:
-        # dirs = Dirs()  # todo move 'existing' check from func?
-        # todo test shell respects project_dir
-        main_shell(dirs, parsed._ns.input,
-                   parsed._ns.delay)
+        main_shell(dirs, parsed._ns.input, parsed._ns.delay)
     else:
         raise ValueError
