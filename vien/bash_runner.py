@@ -5,12 +5,16 @@ import subprocess
 import time
 from subprocess import Popen, TimeoutExpired, CalledProcessError, \
     CompletedProcess, PIPE
+from typing import Optional, Dict
 
 
 def run_as_bash_script(script: str, timeout: float = None,
                        input_delay: float = None,
                        capture_output: bool = False,
-                       input: bytes = None) -> subprocess.CompletedProcess:
+                       input: bytes = None,
+**kwargs
+                       #env: Optional[Dict],
+                       ) -> subprocess.CompletedProcess:
     """Runs the provided string as a .sh script."""
 
     # we need executable='/bin/bash' for Ubuntu 18.04, it will run '/bin/sh'
@@ -19,7 +23,8 @@ def run_as_bash_script(script: str, timeout: float = None,
                                  timeout=timeout,
                                  input=input,
                                  capture_output=capture_output,
-                                 input_delay=input_delay)
+                                 input_delay=input_delay,
+                                 **kwargs)
 
 
 def _run_with_input_delay(*popenargs, input_delay: float = None,

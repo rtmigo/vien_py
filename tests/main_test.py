@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 import unittest
@@ -12,7 +13,7 @@ from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 
 from vien import main_entry_point
-from vien.main import VenvExistsExit, VenvDoesNotExistExit, ChildExit, \
+from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit
 from tests.time_limited import TimeLimited
 
@@ -59,6 +60,12 @@ class Test(unittest.TestCase):
         main_entry_point(["path"])
 
 
+# def is_in(inner: Path, outer: Path) -> bool:
+#     inner_str = str(inner.absolute())
+#     outer_str = str(outer.absolute())
+#     return len(inner_str) > len(outer_str) and inner_str.startswith(outer_str)
+
+
 class TestsInsideTempProjectDir(unittest.TestCase):
 
     def setUp(self):
@@ -80,6 +87,20 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self._td.cleanup()
         del os.environ["VIENDIR"]
 
+    def assertInVenv(self, inner:Path):
+        inner_str = str(inner.absolute())
+        outer_str = str(self.expectedVenvDir.absolute())
+
+        # macOS weirdness
+        inner_str = inner_str.replace("/private/var", "/var")
+        outer_str = outer_str.replace("/private/var", "/var")
+
+        if (os.path.commonpath([outer_str]) != os.path.commonpath([outer_str, inner_str])):
+        #if not (len(inner_str) > len(outer_str)
+        #       and inner_str.startswith(outer_str)):
+            self.fail(f"{inner_str} is not in {outer_str}")
+
+
     def assertVenvDoesNotExist(self):
         self.assertFalse(self.expectedVenvDir.exists())
         self.assertFalse(self.expectedVenvBin.exists())
@@ -95,6 +116,18 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def assertIsSuccessExit(self, exc: SystemExit):
         self.assertIsInstance(exc, SystemExit)
         self.assertTrue(exc.code is None or exc.code == 0)
+
+    def write_program(self, py_file_path: Path) -> Path:
+        out_file_path = py_file_path.parent / 'output.json'
+        code = "import pathlib, sys, json\n" \
+               "d={'sys.path': sys.path, \n" \
+               "   'sys.executable': sys.executable}\n" \
+               "js=json.dumps(d)\n" \
+               f'(pathlib.Path("{out_file_path}")).write_text(js)'
+        py_file_path.write_text(code)
+
+        assert not out_file_path.exists()
+        return out_file_path
 
     def test_create_with_argument(self):
         self.assertFalse(self.expectedVenvDir.exists())
@@ -170,6 +203,36 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def test_run_needs_venv(self):
         with self.assertRaises(VenvDoesNotExistExit):
             main_entry_point(["run", "python", "--version"])
+
+    def test_run_respects_p(self):
+        """Checking the -p changes both venv directory and the first item
+        in PYTHONPATH"""
+        main_entry_point(["create"])
+        with TemporaryDirectory() as temp_cwd:
+            # we will run it NOT from the project dir as CWD
+            os.chdir(temp_cwd)
+            code_py = Path(temp_cwd) / "code.py"
+            output_file = self.write_program(code_py)
+            self.assertNotEqual(Path.cwd().absolute(),
+                                self.projectDir.absolute())
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(
+                    ["-p", str(self.projectDir.absolute()),
+                     "run", "python3",
+                     str(code_py)])
+            self.assertEqual(ce.exception.code, 0)
+
+            d = json.loads(output_file.read_text())
+
+            self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
+            self.assertInVenv(Path(d["sys.executable"]))
+            # Path(d["sys.executable"]).is
+
+            # self.assertEqual(
+            #    Path((Path(temp_cwd) / "out.txt").read_text()).absolute(),
+            #    self.projectDir.absolute())
+
+
 
     def test_run_exit_code_0(self):
         """Test that main_entry_point returns the same exit code,
@@ -391,3 +454,9 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with TimeLimited(10):  # safety net
             with self.assertRaises(VenvDoesNotExistExit) as cm:
                 main_entry_point(["shell"])
+
+
+if __name__ == "__main__":
+    suite = unittest.TestSuite()
+    suite.addTest(TestsInsideTempProjectDir("test_run_respects_p"))
+    unittest.TextTestRunner().run(suite)

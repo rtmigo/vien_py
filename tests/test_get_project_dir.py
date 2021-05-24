@@ -2,7 +2,9 @@ import os
 import unittest
 from pathlib import Path
 
-from vien.main import Parsed, get_project_dir, PyFileArgNotFoundExit
+from vien.main import get_project_dir
+from vien.exceptions import PyFileArgNotFoundExit
+from vien.arg_parser import Parsed
 
 
 class TestGetProjectDir(unittest.TestCase):
