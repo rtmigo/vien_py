@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import warnings
+from enum import Enum
 from pathlib import Path
 from typing import *
 
@@ -368,8 +369,6 @@ def main_call(venv_dir: Path,
     else:
         env = None
 
-    # print(f"CALLING {args}")
-
     cp = subprocess.run(args, env=env)
 
     raise ChildExit(cp.returncode)
@@ -388,12 +387,20 @@ def remove_leading_p(args: List[str]) -> List[str]:
     return args
 
 
-class Parsed:
+class Commands(Enum):
+    create = "create"
+    delete = "delete"
+    recreate = "recreate"
+    shell = "shell"
+    run = "run"
+    call = "call"
+    path = "path"
 
+
+class Parsed:
     def __init__(self, args: Optional[List[str]]):
         super().__init__()
 
-        # def parse_args(args) -> argparse.Namespace:
         parser = argparse.ArgumentParser()
 
         parser.add_argument("--project-dir", "-p", default=None, type=str,
@@ -401,35 +408,36 @@ class Parsed:
 
         subparsers = parser.add_subparsers(dest='command', required=True)
 
-        parser_init = subparsers.add_parser('create',
+        parser_init = subparsers.add_parser(Commands.create.name,
                                             help="create new virtualenv")
         parser_init.add_argument('python', type=str, default="python3",
                                  nargs='?')
 
-        subparsers.add_parser('delete', help="delete existing virtualenv")
+        subparsers.add_parser(Commands.delete.name,
+                              help="delete existing virtualenv")
 
         parser_reinit = subparsers.add_parser(
-            'recreate',
+            Commands.recreate.name,
             help="delete existing virtualenv and create new")
         parser_reinit.add_argument('python', type=str, default="python3",
                                    nargs='?')
 
         shell_parser = subparsers.add_parser(
-            'shell',
+            Commands.shell.name,
             help="dive into Bash sub-shell using the virtualenv")
         shell_parser.add_argument("--input", type=str, default=None)
         shell_parser.add_argument("--delay", type=float, default=None,
                                   help=argparse.SUPPRESS)
 
         parser_run = subparsers.add_parser(
-            'run',
+            Commands.run.name,
             help="run a command inside the virtualenv")
         parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)
 
         parser_call = subparsers.add_parser(
-            'call',
+            Commands.call.name,
             help="run a script inside the virtualenv")
-        # todo [call -p] outdated since 2021-05
+        # todo [call -p] is outdated since 2021-05
         parser_call.add_argument("--project-dir", "-p", default=None, type=str,
                                  dest="outdated_call_project_dir",
                                  help=argparse.SUPPRESS)
@@ -437,7 +445,7 @@ class Parsed:
         parser_call.add_argument('args_to_python', nargs=argparse.REMAINDER)
 
         subparsers.add_parser(
-            'path',
+            Commands.path.name,
             help="show the supposed path of the virtualenv "
                  "for the current directory")
 
@@ -454,9 +462,8 @@ class Parsed:
         # it seems, nargs.REMAINDER is buggy in 2021:
         # https://bugs.python.org/issue17050
         #
-        # For example, when the first "remainder" argument is an option
-        # such as "-d", argparse shows error instead of just remembering
-        # the arg.
+        # For example, when the first REMAINDER argument is an option
+        # such as "-d", argparse shows error instead of just remembering "-d"
         #
         # But "-d" actually can be the first REMAINDER arg after the CALL
         # command.
@@ -468,16 +475,17 @@ class Parsed:
         self._ns: argparse.Namespace
 
         self._ns, _ = parser.parse_known_args(self.args)
-        if self._ns.command == "call":
+        if self.command == Commands.call:
+            # todo check that all unknown args are after the `call` word
             self.args_to_python = list(items_after(args, 'call'))
-            # todo [call -p] outdated since 2021-05
+            # todo [call -p] is outdated since 2021-05
             self.args_to_python = remove_leading_p(self.args_to_python)
         else:
             self._ns = parser.parse_args(self.args)
 
     @property
-    def command(self) -> str:
-        return self._ns.command
+    def command(self) -> Commands:
+        return Commands(self._ns.command)
 
     @property
     def project_dir_arg(self) -> Optional[str]:
@@ -501,7 +509,7 @@ def normalize_path(reference: Path, path: Path) -> Path:
 
 def get_project_dir(parsed: Parsed) -> Path:
     if parsed.project_dir_arg is not None:
-        if parsed.command == "call":
+        if parsed.command == Commands.call:
             # for the 'call' the reference dir is the parent or .py file
             pyfile = call_pyfile(parsed.args)
             if pyfile is None:
@@ -527,17 +535,17 @@ def main_entry_point(args: Optional[List[str]] = None):
 
     dirs = Dirs(project_dir=get_project_dir(parsed))
 
-    if parsed.command == "create":
+    if parsed.command == Commands.create:
         main_create(dirs.venv_dir, parsed._ns.python)
-    elif parsed.command == "recreate":
+    elif parsed.command == Commands.recreate:
         main_recreate(dirs.venv_dir, parsed._ns.python)  # todo .existing()?
-    elif parsed.command == "delete":  # todo move 'existing' check from func?
+    elif parsed.command == Commands.delete:  # todo move 'existing' check from func?
         main_delete(dirs.venv_dir)
-    elif parsed.command == "path":
+    elif parsed.command == Commands.path:
         print(dirs.venv_dir)  # does not need to be existing
-    elif parsed.command == "run":
+    elif parsed.command == Commands.run:
         main_run(dirs.venv_must_exist().venv_dir, parsed._ns.otherargs)
-    elif parsed.command == "call":
+    elif parsed.command == Commands.call:
         # to move inside func
         dirs.venv_must_exist()
         pyfile_arg = call_pyfile(parsed.args)
@@ -548,7 +556,7 @@ def main_entry_point(args: Optional[List[str]] = None):
                   proj_path=dirs.project_dir,
                   other_args=parsed.args_to_python)
 
-    elif parsed.command == "shell":
+    elif parsed.command == Commands.shell:
         # dirs = Dirs()  # todo move 'existing' check from func?
         main_shell(dirs.venv_dir,
                    dirs.project_dir.name,
