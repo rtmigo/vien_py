@@ -1,3 +1,8 @@
+# 5.0
+
+- option `--project-dir` aka `-p` is now supported by all commands
+- the `vien call -p` format (with the `-p` option after the command) is deprecated but still works
+
 # 4.4
 
 - `call` is now faster as it launches Python directly without spawning an extra 

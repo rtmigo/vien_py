@@ -223,14 +223,11 @@ The optional `-p` parameter allows you to specify the project directory
 ``` bash 		
 $ cd any/where  # working dir is irrelevant
 
-# absolute (using venv for /abc/myProject):
-$ vien call -p /abc/myProject /abc/myProject/main.py
+# both of the following calls consider /abc/myProject
+# the project directory
 
-# relative (using venv for /abc/myProject):
-$ vien call -p . /abc/myProject/main.py
-
-# error (there is no venv for any/where)
-$ vien call /abc/myProject/main.py
+$ vien -p /abc/myProject call /abc/myProject/main.py
+$ vien -p . call /abc/myProject/main.py
 ```
 
 This parameter makes things like [shebang](#Shebang) possible.
@@ -265,6 +262,12 @@ $ vien recreate /usr/local/opt/python@3.10/bin/python3
 # Options
 
 ## --project-dir, -p
+
+This option must appear after `vien`, but before the command. For example,
+``` bash
+vien -p some/dir run ...
+vien -p other/dir shell ...
+```
 
 If `--project-dir` is specified, it is the project directory.
 
@@ -360,9 +363,9 @@ shebang depends on the location of the file relative to the project directory.
 
 File                            | Shebang line
 --------------------------------|--------------------------------
-`myProject/runme.py`            | `#!/usr/bin/env vien call -p .`
-`myProject/pkg/runme.py`        | `#!/usr/bin/env vien call -p ..`
-`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien call -p ../..`
+`myProject/runme.py`            | `#!/usr/bin/env vien -p . call`
+`myProject/pkg/runme.py`        | `#!/usr/bin/env vien -p .. call`
+`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien -p ../.. call`
 
 After inserting the shebang, make the file executable:
 
