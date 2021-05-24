@@ -87,7 +87,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self._td.cleanup()
         del os.environ["VIENDIR"]
 
-    def assertInVenv(self, inner:Path):
+    def assertInVenv(self, inner: Path):
         inner_str = str(inner.absolute())
         outer_str = str(self.expectedVenvDir.absolute())
 
@@ -95,11 +95,24 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         inner_str = inner_str.replace("/private/var", "/var")
         outer_str = outer_str.replace("/private/var", "/var")
 
-        if (os.path.commonpath([outer_str]) != os.path.commonpath([outer_str, inner_str])):
-        #if not (len(inner_str) > len(outer_str)
-        #       and inner_str.startswith(outer_str)):
+        if (os.path.commonpath([outer_str]) != os.path.commonpath(
+                [outer_str, inner_str])):
+            # if not (len(inner_str) > len(outer_str)
+            #       and inner_str.startswith(outer_str)):
             self.fail(f"{inner_str} is not in {outer_str}")
 
+    def assertProjectDirIsNotCwd(self):
+        basename = "marker"
+        in_cwd = Path.cwd() / basename
+        in_project = self.projectDir / basename
+
+        self.assertFalse(in_cwd.exists())
+        self.assertFalse(in_project.exists())
+
+        in_cwd.touch()
+
+        self.assertTrue(in_cwd.exists())
+        self.assertFalse(in_project.exists())
 
     def assertVenvDoesNotExist(self):
         self.assertFalse(self.expectedVenvDir.exists())
@@ -213,8 +226,9 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             os.chdir(temp_cwd)
             code_py = Path(temp_cwd) / "code.py"
             output_file = self.write_program(code_py)
-            self.assertNotEqual(Path.cwd().absolute(),
-                                self.projectDir.absolute())
+
+            # running the code that will create a json file
+            self.assertProjectDirIsNotCwd()
             with self.assertRaises(ChildExit) as ce:
                 main_entry_point(
                     ["-p", str(self.projectDir.absolute()),
@@ -222,17 +236,10 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                      str(code_py)])
             self.assertEqual(ce.exception.code, 0)
 
+            # loading json and checking the values
             d = json.loads(output_file.read_text())
-
             self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
             self.assertInVenv(Path(d["sys.executable"]))
-            # Path(d["sys.executable"]).is
-
-            # self.assertEqual(
-            #    Path((Path(temp_cwd) / "out.txt").read_text()).absolute(),
-            #    self.projectDir.absolute())
-
-
 
     def test_run_exit_code_0(self):
         """Test that main_entry_point returns the same exit code,
