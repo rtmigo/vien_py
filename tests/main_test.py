@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 import unittest
@@ -12,7 +13,7 @@ from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 
 from vien import main_entry_point
-from vien.main import VenvExistsExit, VenvDoesNotExistExit, ChildExit, \
+from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit
 from tests.time_limited import TimeLimited
 
@@ -59,6 +60,12 @@ class Test(unittest.TestCase):
         main_entry_point(["path"])
 
 
+# def is_in(inner: Path, outer: Path) -> bool:
+#     inner_str = str(inner.absolute())
+#     outer_str = str(outer.absolute())
+#     return len(inner_str) > len(outer_str) and inner_str.startswith(outer_str)
+
+
 class TestsInsideTempProjectDir(unittest.TestCase):
 
     def setUp(self):
@@ -80,6 +87,33 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self._td.cleanup()
         del os.environ["VIENDIR"]
 
+    def assertInVenv(self, inner: Path):
+        inner_str = str(inner.absolute())
+        outer_str = str(self.expectedVenvDir.absolute())
+
+        # macOS weirdness
+        inner_str = inner_str.replace("/private/var", "/var")
+        outer_str = outer_str.replace("/private/var", "/var")
+
+        if (os.path.commonpath([outer_str]) != os.path.commonpath(
+                [outer_str, inner_str])):
+            # if not (len(inner_str) > len(outer_str)
+            #       and inner_str.startswith(outer_str)):
+            self.fail(f"{inner_str} is not in {outer_str}")
+
+    def assertProjectDirIsNotCwd(self):
+        basename = "marker"
+        in_cwd = Path.cwd() / basename
+        in_project = self.projectDir / basename
+
+        self.assertFalse(in_cwd.exists())
+        self.assertFalse(in_project.exists())
+
+        in_cwd.touch()
+
+        self.assertTrue(in_cwd.exists())
+        self.assertFalse(in_project.exists())
+
     def assertVenvDoesNotExist(self):
         self.assertFalse(self.expectedVenvDir.exists())
         self.assertFalse(self.expectedVenvBin.exists())
@@ -95,6 +129,18 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def assertIsSuccessExit(self, exc: SystemExit):
         self.assertIsInstance(exc, SystemExit)
         self.assertTrue(exc.code is None or exc.code == 0)
+
+    def write_program(self, py_file_path: Path) -> Path:
+        out_file_path = py_file_path.parent / 'output.json'
+        code = "import pathlib, sys, json\n" \
+               "d={'sys.path': sys.path, \n" \
+               "   'sys.executable': sys.executable}\n" \
+               "js=json.dumps(d)\n" \
+               f'(pathlib.Path("{out_file_path}")).write_text(js)'
+        py_file_path.write_text(code)
+
+        assert not out_file_path.exists()
+        return out_file_path
 
     def test_create_with_argument(self):
         self.assertFalse(self.expectedVenvDir.exists())
@@ -170,6 +216,32 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def test_run_needs_venv(self):
         with self.assertRaises(VenvDoesNotExistExit):
             main_entry_point(["run", "python", "--version"])
+
+    def test_run_p(self):
+        """Checking the -p changes both venv directory and the first item
+        in PYTHONPATH"""
+        main_entry_point(["create"])
+        with TemporaryDirectory() as temp_cwd:
+            # we will run it NOT from the project dir as CWD
+            os.chdir(temp_cwd)
+
+            # creating .py file to run
+            code_py = Path(temp_cwd) / "code.py"
+            output_file = self.write_program(code_py)
+
+            # running the code that will create a json file
+            self.assertProjectDirIsNotCwd()
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(
+                    ["-p", str(self.projectDir.absolute()),
+                     "run", "python3",
+                     str(code_py)])
+            self.assertEqual(ce.exception.code, 0)
+
+            # loading json and checking the values
+            d = json.loads(output_file.read_text())
+            self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
+            self.assertInVenv(Path(d["sys.executable"]))
 
     def test_run_exit_code_0(self):
         """Test that main_entry_point returns the same exit code,
@@ -297,10 +369,21 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with TemporaryDirectory() as td:
             os.chdir(td)
 
-            # without -p we assume that the current dir is the project dir,
-            # but the current is temp. So we must get an exception
-            with self.assertRaises(VenvDoesNotExistExit):
-                main_entry_point(["call", run_py_str])
+            # NORMAL format
+
+            # this call specifies project dir relative to run.py.
+            # It runs the file successfully
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(["-p", "..", "call", run_py_str])
+            self.assertEqual(ce.exception.code, 5)
+
+            # this call specifies project dir relative to run.py.
+            # It runs the file successfully
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(["--project-dir", "..", "call", run_py_str])
+            self.assertEqual(ce.exception.code, 5)
+
+            # OUTDATED format
 
             # this call specifies project dir relative to run.py.
             # It runs the file successfully
@@ -313,6 +396,13 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             with self.assertRaises(ChildExit) as ce:
                 main_entry_point(["call", "--project-dir", "..", run_py_str])
             self.assertEqual(ce.exception.code, 5)
+
+            # ERRORS
+
+            # without -p we assume that the current dir is the project dir,
+            # but the current is temp. So we must get an exception
+            with self.assertRaises(VenvDoesNotExistExit):
+                main_entry_point(["call", run_py_str])
 
             # this call specifies *incorrect* project dir relative to run.py.
             with self.assertRaises(VenvDoesNotExistExit):
@@ -336,8 +426,34 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with TemporaryDirectory() as td:
             os.chdir(td)
             with self.assertRaises(ChildExit) as ce:
-                main_entry_point(["call", "-p", "..", run_py_str])
+                main_entry_point(["-p", "..", "call", run_py_str])
             self.assertEqual(ce.exception.code, 55)
+
+    def test_shell_p(self):
+        """Checking the -p changes both venv directory and the first item
+        in PYTHONPATH"""
+        main_entry_point(["create"])
+        with TemporaryDirectory() as temp_cwd:
+            # we will run it NOT from the project dir as CWD
+            os.chdir(temp_cwd)
+
+            # creating .py file to run
+            code_py = Path(temp_cwd) / "code.py"
+            output_file = self.write_program(code_py)
+
+            # running the code that will create a json file
+            self.assertProjectDirIsNotCwd()
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(
+                    ["-p", str(self.projectDir.absolute()),
+                     "shell", "--input",
+                     f'python3 "{code_py}"'])
+            self.assertEqual(ce.exception.code, 0)
+
+            # loading json and checking the values
+            d = json.loads(output_file.read_text())
+            self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
+            self.assertInVenv(Path(d["sys.executable"]))
 
     def test_shell_ok(self):
         main_entry_point(["create"])
@@ -391,3 +507,9 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with TimeLimited(10):  # safety net
             with self.assertRaises(VenvDoesNotExistExit) as cm:
                 main_entry_point(["shell"])
+
+
+if __name__ == "__main__":
+    suite = unittest.TestSuite()
+    suite.addTest(TestsInsideTempProjectDir("test_shell_p"))
+    unittest.TextTestRunner().run(suite)

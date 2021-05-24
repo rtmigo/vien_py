@@ -223,14 +223,11 @@ The optional `-p` parameter allows you to specify the project directory
 ``` bash 		
 $ cd any/where  # working dir is irrelevant
 
-# absolute (using venv for /abc/myProject):
-$ vien call -p /abc/myProject /abc/myProject/main.py
+# both of the following calls consider /abc/myProject
+# the project directory
 
-# relative (using venv for /abc/myProject):
-$ vien call -p . /abc/myProject/main.py
-
-# error (there is no venv for any/where)
-$ vien call /abc/myProject/main.py
+$ vien -p /abc/myProject call /abc/myProject/main.py
+$ vien -p . call /abc/myProject/main.py
 ```
 
 This parameter makes things like [shebang](#Shebang) possible.
@@ -261,6 +258,40 @@ If you decided to change the Python version:
 $ cd /path/to/myProject
 $ vien recreate /usr/local/opt/python@3.10/bin/python3
 ```
+
+# Options
+
+## --project-dir, -p
+
+This option must appear after `vien`, but before the command. For example,
+``` bash
+vien -p some/dir run ...
+vien -p other/dir shell ...
+```
+
+If `--project-dir` is specified, it is the project directory.
+
+If `--project-dir` is not specified, then all commands assume that the current 
+working directory is the project directory.
+
+The next two calls use the same project directory and the same virtual environment. However, the working directory is different.
+
+``` bash
+cd /abc/myProject
+vien run python3 /abc/myProject/main.py
+```
+
+``` bash
+cd /any/where
+vien -p /abc/myProject run python3 /abc/myProject/main.py
+```
+
+
+
+If `--project-dir` is specified as a **relative path**, its interpretation depends 
+on the command. For the `call` command, this is considered a path relative to 
+the parent directory of the `.py` file being run. For other commands, this is 
+a path relative to the current working directory.
 
 # Virtual environments location
 
@@ -332,9 +363,9 @@ shebang depends on the location of the file relative to the project directory.
 
 File                            | Shebang line
 --------------------------------|--------------------------------
-`myProject/runme.py`            | `#!/usr/bin/env vien call -p .`
-`myProject/pkg/runme.py`        | `#!/usr/bin/env vien call -p ..`
-`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien call -p ../..`
+`myProject/runme.py`            | `#!/usr/bin/env vien -p . call`
+`myProject/pkg/runme.py`        | `#!/usr/bin/env vien -p .. call`
+`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien -p ../.. call`
 
 After inserting the shebang, make the file executable:
 
