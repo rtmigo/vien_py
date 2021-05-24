@@ -262,6 +262,8 @@ $ cd /path/to/myProject
 $ vien recreate /usr/local/opt/python@3.10/bin/python3
 ```
 
+# Options
+
 ## --project-dir, -p
 
 If `--project-dir` is specified, it is the project directory.
