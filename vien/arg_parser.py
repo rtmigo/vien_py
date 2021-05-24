@@ -52,8 +52,7 @@ class Parsed:
 
         parser = argparse.ArgumentParser()
 
-        parser.add_argument("--project-dir", "-p", default=None, type=str,
-                            help=argparse.SUPPRESS)  # not ready yet
+        parser.add_argument("--project-dir", "-p", default=None, type=str)
 
         subparsers = parser.add_subparsers(dest='command', required=True)
 

@@ -217,13 +217,15 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with self.assertRaises(VenvDoesNotExistExit):
             main_entry_point(["run", "python", "--version"])
 
-    def test_run_respects_p(self):
+    def test_run_p(self):
         """Checking the -p changes both venv directory and the first item
         in PYTHONPATH"""
         main_entry_point(["create"])
         with TemporaryDirectory() as temp_cwd:
             # we will run it NOT from the project dir as CWD
             os.chdir(temp_cwd)
+
+            # creating .py file to run
             code_py = Path(temp_cwd) / "code.py"
             output_file = self.write_program(code_py)
 
@@ -367,10 +369,21 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with TemporaryDirectory() as td:
             os.chdir(td)
 
-            # without -p we assume that the current dir is the project dir,
-            # but the current is temp. So we must get an exception
-            with self.assertRaises(VenvDoesNotExistExit):
-                main_entry_point(["call", run_py_str])
+            # NORMAL format
+
+            # this call specifies project dir relative to run.py.
+            # It runs the file successfully
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(["-p", "..", "call", run_py_str])
+            self.assertEqual(ce.exception.code, 5)
+
+            # this call specifies project dir relative to run.py.
+            # It runs the file successfully
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(["--project-dir", "..", "call", run_py_str])
+            self.assertEqual(ce.exception.code, 5)
+
+            # OUTDATED format
 
             # this call specifies project dir relative to run.py.
             # It runs the file successfully
@@ -383,6 +396,13 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             with self.assertRaises(ChildExit) as ce:
                 main_entry_point(["call", "--project-dir", "..", run_py_str])
             self.assertEqual(ce.exception.code, 5)
+
+            # ERRORS
+
+            # without -p we assume that the current dir is the project dir,
+            # but the current is temp. So we must get an exception
+            with self.assertRaises(VenvDoesNotExistExit):
+                main_entry_point(["call", run_py_str])
 
             # this call specifies *incorrect* project dir relative to run.py.
             with self.assertRaises(VenvDoesNotExistExit):
@@ -406,8 +426,34 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with TemporaryDirectory() as td:
             os.chdir(td)
             with self.assertRaises(ChildExit) as ce:
-                main_entry_point(["call", "-p", "..", run_py_str])
+                main_entry_point(["-p", "..", "call", run_py_str])
             self.assertEqual(ce.exception.code, 55)
+
+    def test_shell_p(self):
+        """Checking the -p changes both venv directory and the first item
+        in PYTHONPATH"""
+        main_entry_point(["create"])
+        with TemporaryDirectory() as temp_cwd:
+            # we will run it NOT from the project dir as CWD
+            os.chdir(temp_cwd)
+
+            # creating .py file to run
+            code_py = Path(temp_cwd) / "code.py"
+            output_file = self.write_program(code_py)
+
+            # running the code that will create a json file
+            self.assertProjectDirIsNotCwd()
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(
+                    ["-p", str(self.projectDir.absolute()),
+                     "shell", "--input",
+                     f'python3 "{code_py}"'])
+            self.assertEqual(ce.exception.code, 0)
+
+            # loading json and checking the values
+            d = json.loads(output_file.read_text())
+            self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
+            self.assertInVenv(Path(d["sys.executable"]))
 
     def test_shell_ok(self):
         main_entry_point(["create"])
@@ -465,5 +511,5 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
-    suite.addTest(TestsInsideTempProjectDir("test_run_respects_p"))
+    suite.addTest(TestsInsideTempProjectDir("test_shell_p"))
     unittest.TextTestRunner().run(suite)

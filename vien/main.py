@@ -157,11 +157,11 @@ def guess_bash_ps1():
         ['/bin/bash', '-i', '-c', 'echo $PS1']).decode().rstrip()
 
 
-def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
-    if not venv_dir.exists():
-        raise VenvDoesNotExistExit(venv_dir)
+def main_shell(dirs: Dirs, input: str, input_delay: float):
+    if not dirs.venv_dir.exists():
+        raise VenvDoesNotExistExit(dirs.venv_dir)
 
-    activate_path_quoted = quote(str(venv_dir / "bin" / "activate"))
+    activate_path_quoted = quote(str(dirs.venv_dir / "bin" / "activate"))
 
     old_ps1 = os.environ.get("PS1") or guess_bash_ps1()
 
@@ -171,6 +171,7 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
     color_start = Colors.YELLOW
     color_end = Colors.NOCOLOR
 
+    venv_name = dirs.project_dir.name
     new_ps1 = f"{color_start}({venv_name}){color_end}:{old_ps1} "
 
     commands = [f'source {activate_path_quoted}']
@@ -201,7 +202,8 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
 
     cp = run_as_bash_script("\n".join(commands),
                             input=input.encode() if input else None,
-                            input_delay=input_delay)
+                            input_delay=input_delay,
+                            env=child_env(dirs.project_dir))
 
     # the vien will return the same exit code as the shell returned
     raise ChildExit(cp.returncode)
@@ -301,15 +303,6 @@ def main_call(venv_dir: Path,
     assert len(other_args) > 0
     args = [str(python_exe)] + other_args
 
-    # env: Optional[Dict]
-    # if proj_path != Path.cwd():
-    #     env = {
-    #         **os.environ,
-    #         'PYTHONPATH': _insert_into_pythonpath(str(proj_path))
-    #     }
-    # else:
-    #     env = None
-
     cp = subprocess.run(args, env=child_env(proj_path))
 
     raise ChildExit(cp.returncode)
@@ -346,7 +339,6 @@ def get_project_dir(parsed: Parsed) -> Path:
 def main_entry_point(args: Optional[List[str]] = None):
     parsed = Parsed(args)
 
-    # todo test -p for other commands than `call`
     # todo replace private _ns attrs with public properties
 
     dirs = Dirs(project_dir=get_project_dir(parsed))
@@ -363,7 +355,7 @@ def main_entry_point(args: Optional[List[str]] = None):
     elif parsed.command == Commands.run:
         main_run(dirs.venv_must_exist(), parsed._ns.otherargs)
     elif parsed.command == Commands.call:
-        # to move inside func
+        # todo move in func
         dirs.venv_must_exist()
         pyfile_arg = call_pyfile(parsed.args)
         assert pyfile_arg is not None
@@ -376,9 +368,7 @@ def main_entry_point(args: Optional[List[str]] = None):
     elif parsed.command == Commands.shell:
         # dirs = Dirs()  # todo move 'existing' check from func?
         # todo test shell respects project_dir
-        main_shell(dirs.venv_dir,
-                   dirs.project_dir.name,
-                   parsed._ns.input,
+        main_shell(dirs, parsed._ns.input,
                    parsed._ns.delay)
     else:
         raise ValueError

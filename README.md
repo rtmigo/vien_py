@@ -262,6 +262,32 @@ $ cd /path/to/myProject
 $ vien recreate /usr/local/opt/python@3.10/bin/python3
 ```
 
+## --project-dir, -p
+
+If `--project-dir` is specified, it is the project directory.
+
+If `--project-dir` is not specified, then all commands assume that the current 
+working directory is the project directory.
+
+The next two calls use the same project directory and the same virtual environment. However, the working directory is different.
+
+``` bash
+cd /abc/myProject
+vien run python3 /abc/myProject/main.py
+```
+
+``` bash
+cd /any/where
+vien -p /abc/myProject run python3 /abc/myProject/main.py
+```
+
+
+
+If `--project-dir` is specified as a **relative path**, its interpretation depends 
+on the command. For the `call` command, this is considered a path relative to 
+the parent directory of the `.py` file being run. For other commands, this is 
+a path relative to the current working directory.
+
 # Virtual environments location
 
 By default, `vien` places virtual environments in the `$HOME/.vien` directory.
