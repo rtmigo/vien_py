@@ -9,7 +9,6 @@ import os
 import shutil
 import subprocess
 import sys
-import warnings
 from enum import Enum
 from pathlib import Path
 from typing import *
@@ -441,7 +440,8 @@ class Parsed:
         parser_call.add_argument("--project-dir", "-p", default=None, type=str,
                                  dest="outdated_call_project_dir",
                                  help=argparse.SUPPRESS)
-        # parser_call.add_argument('file_py', type=str)
+        # this arg is for help only. Actually it's buggy (at least in 3.7),
+        # so we will never use its result, and get those args other way
         parser_call.add_argument('args_to_python', nargs=argparse.REMAINDER)
 
         subparsers.add_parser(
@@ -532,6 +532,7 @@ def main_entry_point(args: Optional[List[str]] = None):
     parsed = Parsed(args)
 
     # todo test -p for other commands than `call`
+    # todo replace private _ns attrs with public properties
 
     dirs = Dirs(project_dir=get_project_dir(parsed))
 
