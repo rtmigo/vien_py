@@ -3,98 +3,27 @@
 
 from __future__ import annotations
 
-import argparse
 import json
 import os
 import shutil
 import subprocess
 import sys
-from enum import Enum
 from pathlib import Path
 from typing import *
 
-import vien
+from vien.arg_parser import Commands, Parsed
 from vien.bash_runner import run_as_bash_script
-from vien.call_parser import call_pyfile, items_after
+from vien.call_parser import call_pyfile
 from vien.colors import Colors
+from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
+    PyFileNotFoundExit, PyFileArgNotFoundExit, FailedToCreateVenvExit, \
+    FailedToClearVenvExit, CannotFindExecutableExit
 
 verbose = False
 
 
 def exe_name() -> str:
     return os.path.basename(sys.argv[0])
-
-
-class VienExit(SystemExit):
-    """Base class for all the expected exceptions,
-    that show the error message and stop the program."""
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-
-class ChildExit(VienExit):
-    """When a child process finished, and vien must exit too with
-    the same code"""
-
-    def __init__(self, exit_code: int):
-        super().__init__(exit_code)
-
-
-class VenvExistsExit(VienExit):  # todo does it return error code?
-    pass
-
-
-class VenvDoesNotExistExit(VienExit):
-    def __init__(self, path: Path):
-        super().__init__(f'Virtual environment "{path}" does not exist.\n'
-                         f'You can create it with "{exe_name()} create".')
-
-
-class PyFileNotFoundExit(VienExit):
-    def __init__(self, path: Path):
-        super().__init__(f"File {path} not found.")
-
-
-class PyFileArgNotFoundExit(VienExit):
-    def __init__(self):
-        super().__init__(f"The arguments to the 'call' command must "
-                         f"include a .py file.")
-
-
-class FailedToCreateVenvExit(VienExit):
-    def __init__(self, path: Path):
-        super().__init__(f"Failed to create virtualenv {path}.")
-
-
-class FailedToClearVenvExit(VienExit):
-    def __init__(self, path: Path):
-        super().__init__(f"Failed to clear virtualenv {path}.")
-
-
-class CannotFindExecutableExit(VienExit):
-    def __init__(self, version: str):
-        super().__init__(f"Cannot resolve '{version}' to an executable file.")
-
-
-def version_message() -> str:
-    return "\n".join([
-        f"VIEN: Python Virtual Environments Tool {vien.__version__}",
-        vien.__copyright__
-    ])
-
-
-def usage_doc():
-    text = f"""{version_message()}
-
-See a detailed intro at
-https://github.com/rtmigo/vien_py#readme
-
-"""
-
-    doc = text.strip()
-    above_first_line = ("-" * len(doc.splitlines()[0]))
-    return f"{above_first_line}\n{doc}\n"
 
 
 def get_vien_dir() -> Path:
@@ -105,7 +34,7 @@ def get_vien_dir() -> Path:
         return Path(os.path.expandvars("$HOME")) / ".vien"
 
 
-def run_bash_sequence(commands: List[str]) -> int:
+def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
     bash_lines = [
         "#!/bin/bash"
         "set -e",  # fail on first error
@@ -119,7 +48,8 @@ def run_bash_sequence(commands: List[str]) -> int:
 
     return subprocess.call("\n".join(bash_lines),
                            shell=True,
-                           executable='/bin/bash')
+                           executable='/bin/bash',
+                           env=env)
 
 
 def quote(arg: str) -> str:
@@ -277,23 +207,25 @@ def main_shell(venv_dir: Path, venv_name: str, input: str, input_delay: float):
     raise ChildExit(cp.returncode)
 
 
-def _run(venv_dir: Path, other_args: List[str], prepend_py_path: str = None):
-    activate_file = (venv_dir / 'bin' / 'activate').absolute()
+def _run(dirs: Dirs, other_args: List[str]):
+    activate_file = (dirs.venv_dir / 'bin' / 'activate').absolute()
     if not activate_file.exists():
         raise FileNotFoundError(activate_file)
 
     commands: List[str] = list()
     commands.append(f'source "{activate_file}"')
-    if prepend_py_path:
-        commands.append(f'export PYTHONPATH="{prepend_py_path}:$PYTHONPATH"')
+    #if prepend_py_path:
+     #   commands.append(f'export PYTHONPATH="{prepend_py_path}:$PYTHONPATH"')
     commands.append(" ".join(quote(a) for a in other_args))
 
-    exit_code = run_bash_sequence(commands)
+    exit_code = run_bash_sequence(commands, env=child_env(dirs.project_dir))
     raise ChildExit(exit_code)
 
 
-def main_run(venv_dir: Path, other_args: List[str]):
-    _run(venv_dir=venv_dir, other_args=other_args)
+def main_run(dirs: Dirs, other_args: List[str]):
+    # todo prepend project dir only if it's not cwd
+    # todo use the same pythonpath modification way for `call` and `run`
+    _run(dirs, other_args=other_args)
 
 
 class Dirs:
@@ -352,6 +284,16 @@ def main_call_old(py_file: str, proj_rel_path: Optional[str],
     raise ChildExit(cp.returncode)
 
 
+def child_env(proj_path: Path) -> Optional[Dict]:
+    env: Optional[Dict]
+    if proj_path != Path.cwd():
+        return {
+            **os.environ,
+            'PYTHONPATH': _insert_into_pythonpath(str(proj_path))
+        }
+    else:
+        return None
+
 def main_call(venv_dir: Path,
               proj_path: Path,
               other_args: List[str]):
@@ -359,145 +301,18 @@ def main_call(venv_dir: Path,
     assert len(other_args) > 0
     args = [str(python_exe)] + other_args
 
-    env: Optional[Dict]
-    if proj_path != Path.cwd():
-        env = {
-            **os.environ,
-            'PYTHONPATH': _insert_into_pythonpath(str(proj_path))
-        }
-    else:
-        env = None
+    # env: Optional[Dict]
+    # if proj_path != Path.cwd():
+    #     env = {
+    #         **os.environ,
+    #         'PYTHONPATH': _insert_into_pythonpath(str(proj_path))
+    #     }
+    # else:
+    #     env = None
 
-    cp = subprocess.run(args, env=env)
+    cp = subprocess.run(args, env=child_env(proj_path))
 
     raise ChildExit(cp.returncode)
-
-
-class CallProjectDirWarning(UserWarning):
-    pass
-
-
-def remove_leading_p(args: List[str]) -> List[str]:
-    # fixing a problem that is outdated since 2021-05
-    if len(args) < 2:
-        return args
-    if args[0] == "-p" or args[0] == "--project-dir":
-        args = args[2:]
-    return args
-
-
-class Commands(Enum):
-    create = "create"
-    delete = "delete"
-    recreate = "recreate"
-    shell = "shell"
-    run = "run"
-    call = "call"
-    path = "path"
-
-
-class Parsed:
-    def __init__(self, args: Optional[List[str]]):
-        super().__init__()
-
-        parser = argparse.ArgumentParser()
-
-        parser.add_argument("--project-dir", "-p", default=None, type=str,
-                            help=argparse.SUPPRESS)  # not ready yet
-
-        subparsers = parser.add_subparsers(dest='command', required=True)
-
-        parser_init = subparsers.add_parser(Commands.create.name,
-                                            help="create new virtualenv")
-        parser_init.add_argument('python', type=str, default="python3",
-                                 nargs='?')
-
-        subparsers.add_parser(Commands.delete.name,
-                              help="delete existing virtualenv")
-
-        parser_reinit = subparsers.add_parser(
-            Commands.recreate.name,
-            help="delete existing virtualenv and create new")
-        parser_reinit.add_argument('python', type=str, default="python3",
-                                   nargs='?')
-
-        shell_parser = subparsers.add_parser(
-            Commands.shell.name,
-            help="dive into Bash sub-shell using the virtualenv")
-        shell_parser.add_argument("--input", type=str, default=None)
-        shell_parser.add_argument("--delay", type=float, default=None,
-                                  help=argparse.SUPPRESS)
-
-        parser_run = subparsers.add_parser(
-            Commands.run.name,
-            help="run a command inside the virtualenv")
-        parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)
-
-        parser_call = subparsers.add_parser(
-            Commands.call.name,
-            help="run a script inside the virtualenv")
-        # todo [call -p] is outdated since 2021-05
-        parser_call.add_argument("--project-dir", "-p", default=None, type=str,
-                                 dest="outdated_call_project_dir",
-                                 help=argparse.SUPPRESS)
-        # this arg is for help only. Actually it's buggy (at least in 3.7),
-        # so we will never use its result, and get those args other way
-        parser_call.add_argument('args_to_python', nargs=argparse.REMAINDER)
-
-        subparsers.add_parser(
-            Commands.path.name,
-            help="show the supposed path of the virtualenv "
-                 "for the current directory")
-
-        if args is None:
-            args = sys.argv[1:]
-
-        if not args:
-            print(usage_doc())
-            parser.print_help()
-            exit(2)
-
-        self.args = args
-
-        # it seems, nargs.REMAINDER is buggy in 2021:
-        # https://bugs.python.org/issue17050
-        #
-        # For example, when the first REMAINDER argument is an option
-        # such as "-d", argparse shows error instead of just remembering "-d"
-        #
-        # But "-d" actually can be the first REMAINDER arg after the CALL
-        # command.
-        #
-        # That's why we parse args twice. First time with `parse_known_args` -
-        # to get the command name. And then, if it's not CALL - we parse
-        # again with a stricter parse_args.
-
-        self._ns: argparse.Namespace
-
-        self._ns, _ = parser.parse_known_args(self.args)
-        if self.command == Commands.call:
-            # todo check that all unknown args are after the `call` word
-            self.args_to_python = list(items_after(args, 'call'))
-            # todo [call -p] is outdated since 2021-05
-            self.args_to_python = remove_leading_p(self.args_to_python)
-        else:
-            self._ns = parser.parse_args(self.args)
-
-    @property
-    def command(self) -> Commands:
-        return Commands(self._ns.command)
-
-    @property
-    def project_dir_arg(self) -> Optional[str]:
-        """Returns either outdated [call -p ...] or normal [vien -p ...]
-        value."""
-        project_dir_after_call = self._ns.__dict__ \
-            .get('outdated_call_project_dir')
-        if project_dir_after_call is not None:
-            print("'vien call -p proj/dir file.py' syntax is outdated. "
-                  "Use 'vien -p proj/dir call file.py'.")
-            return project_dir_after_call
-        return self._ns.project_dir
 
 
 def normalize_path(reference: Path, path: Path) -> Path:
@@ -537,15 +352,16 @@ def main_entry_point(args: Optional[List[str]] = None):
     dirs = Dirs(project_dir=get_project_dir(parsed))
 
     if parsed.command == Commands.create:
-        main_create(dirs.venv_dir, parsed._ns.python)
+        main_create(dirs.venv_dir, parsed.python_executable)
     elif parsed.command == Commands.recreate:
-        main_recreate(dirs.venv_dir, parsed._ns.python)  # todo .existing()?
+        main_recreate(dirs.venv_dir,
+                      parsed.python_executable)  # todo .existing()?
     elif parsed.command == Commands.delete:  # todo move 'existing' check from func?
         main_delete(dirs.venv_dir)
     elif parsed.command == Commands.path:
         print(dirs.venv_dir)  # does not need to be existing
     elif parsed.command == Commands.run:
-        main_run(dirs.venv_must_exist().venv_dir, parsed._ns.otherargs)
+        main_run(dirs.venv_must_exist(), parsed._ns.otherargs)
     elif parsed.command == Commands.call:
         # to move inside func
         dirs.venv_must_exist()
@@ -559,6 +375,7 @@ def main_entry_point(args: Optional[List[str]] = None):
 
     elif parsed.command == Commands.shell:
         # dirs = Dirs()  # todo move 'existing' check from func?
+        # todo test shell respects project_dir
         main_shell(dirs.venv_dir,
                    dirs.project_dir.name,
                    parsed._ns.input,

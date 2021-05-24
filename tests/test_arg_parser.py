@@ -1,7 +1,8 @@
 import unittest
 from pathlib import Path
 
-from vien.main import Parsed, get_project_dir
+from vien.main import get_project_dir
+from vien.arg_parser import Parsed
 
 
 class TestProjectDir(unittest.TestCase):
@@ -44,6 +45,14 @@ class TestCallOtherArgs(unittest.TestCase):
     def test_p(self):
         pd = Parsed('-p a/b/c call -d myfile.py a b c'.split())
         self.assertEqual(pd.args_to_python, ['-d', 'myfile.py', 'a', 'b', 'c'])
+
+    def test_unrecoginzed(self):
+        """Unrecognized arguments that are NOT after the 'call' word."""
+        with self.assertRaises(SystemExit) as ce:
+            Parsed('-labuda call myfile.py a b c'.split())
+        self.assertEqual(ce.exception.code, 2)
+
+
 
 
 
