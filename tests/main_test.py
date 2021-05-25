@@ -71,7 +71,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def setUp(self):
 
         self._old_cwd = Path.cwd()
-        #№self._td = TemporaryDirectory()
+        # №self._td = TemporaryDirectory()
 
         self._temp_dir = tempfile.mkdtemp()
 
@@ -92,9 +92,9 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def tearDown(self):
         try:
 
-            os.chdir(self._old_cwd) # moving out of temp dir
+            os.chdir(self._old_cwd)  # moving out of temp dir
             shutil.rmtree(self._temp_dir)
-            #self._td.cleanup()
+            # self._td.cleanup()
         except PermissionError as e:
             # fails on Windows:
             #   PermissionError: [WinError 32] The process cannot access
@@ -167,23 +167,27 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         assert not out_file_path.exists()
         return out_file_path
 
-    #@unittest.skipUnless(is_posix(), "not POSIX")
+    ############################################################################
+
     def test_create_with_argument(self):
+        # actually this is not a good test: we are not testing whether
+        # argument is really used and not ignored
         self.assertVenvDoesNotExist()
-
-        # if is_posix():
         main_entry_point(["create", sys.executable])
-        # else:
-        #    main_entry_point(["create", "python3.exe"])
-
         self.assertVenvExists()
 
-    #@unittest.skipUnless(is_posix(), "not POSIX")
+    def test_create_without_argument(self):
+        self.assertVenvDoesNotExist()
+        main_entry_point(["create"])
+        self.assertVenvExists()
+
     def test_create_fails_if_twice(self):
         main_entry_point(["create"])
         with self.assertRaises(VenvExistsExit) as ce:
             main_entry_point(["create"])
         self.assertIsErrorExit(ce.exception)
+
+    ############################################################################
 
     @unittest.skipUnless(is_posix(), "not POSIX")
     def test_recreate_with_argument(self):
@@ -208,13 +212,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         main_entry_point(["recreate", "python3"])
         self.assertVenvBinExists()
 
-    #@unittest.skipUnless(is_posix(), "not POSIX")
-    def test_create_without_argument(self):
-        self.assertVenvDoesNotExist()
-
-        main_entry_point(["create"])
-
-        self.assertVenvExists()
+    # @unittest.skipUnless(is_posix(), "not POSIX")
 
     @unittest.skipUnless(is_posix(), "not POSIX")
     def test_recreate_without_argument(self):
