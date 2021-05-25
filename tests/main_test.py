@@ -5,7 +5,9 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import sys
+import tempfile
 import unittest
 from io import StringIO
 from pathlib import Path
@@ -67,9 +69,14 @@ class Test(unittest.TestCase):
 class TestsInsideTempProjectDir(unittest.TestCase):
 
     def setUp(self):
-        self._td = TemporaryDirectory()
-        self.svetDir = Path(self._td.name) / "svetdir"
-        self.projectDir = Path(self._td.name) / "project"
+
+        self._old_cwd = Path.cwd()
+        #№self._td = TemporaryDirectory()
+
+        self._temp_dir = tempfile.mkdtemp()
+
+        self.svetDir = Path(self._temp_dir) / "svetdir"
+        self.projectDir = Path(self._temp_dir) / "project"
 
         self.projectDir.mkdir()
         self.svetDir.mkdir()
@@ -84,7 +91,9 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     def tearDown(self):
         try:
-            self._td.cleanup()
+            os.chdir(self._old_cwd)
+            shutil.rmtree(self._temp_dir)
+            #self._td.cleanup()
         except PermissionError as e:
             # fails on Windows:
             #   PermissionError: [WinError 32] The process cannot access
@@ -157,7 +166,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         assert not out_file_path.exists()
         return out_file_path
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    #@unittest.skipUnless(is_posix(), "not POSIX")
     def test_create_with_argument(self):
         self.assertVenvDoesNotExist()
 
