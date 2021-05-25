@@ -7,10 +7,12 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 
+from tests.common import is_posix
 from vien.bash_runner import *
 from tests.time_limited import TimeLimited
 
 
+@unittest.skipUnless(is_posix(), "not POSIX")
 class TestRunAsBash(unittest.TestCase):
 
     # python3 -m unittest svet.bash_runner_test

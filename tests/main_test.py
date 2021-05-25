@@ -12,6 +12,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 
+from tests.common import is_posix
 from vien import main_entry_point
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit
