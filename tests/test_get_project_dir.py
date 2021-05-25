@@ -8,14 +8,19 @@ from vien.exceptions import PyFileArgNotFoundExit
 from vien.arg_parser import Parsed
 
 
+def unipath(s: str):
+    if is_posix():
+        s = s.replace('W:/', '/')
+    return s
+
+
 class TestGetProjectDir(unittest.TestCase):
 
     def setUp(self) -> None:
         os.chdir(os.path.dirname(__file__))
 
     def _gpd(self, cmd: str) -> Path:
-        if is_posix():
-            cmd = cmd.replace('W:/', '/')
+        cmd = unipath(cmd)
         result = get_project_dir(Parsed(cmd.split()))
         self.assertTrue(result.is_absolute())
         return result
@@ -34,7 +39,7 @@ class TestGetProjectDir(unittest.TestCase):
 
     def test_run_absolute(self):
         pd = self._gpd('-p W:/abc/def run python3 myfile.py')
-        self.assertEqual(pd, Path('W:/abc/def'))
+        self.assertEqual(pd, Path(unipath('W:/abc/def')))
 
     def test_call_no_file(self):
         with self.assertRaises(PyFileArgNotFoundExit):
@@ -42,19 +47,19 @@ class TestGetProjectDir(unittest.TestCase):
 
     def test_call_file_abs_proj_abs(self):
         pd = self._gpd('-p W:/aa/bb/proj call python3 W:/xx/yy/file.py')
-        self.assertEqual(pd, Path('W:/aa/bb/proj'))
+        self.assertEqual(pd, Path(unipath('W:/aa/bb/proj')))
 
     def test_call_file_abs_proj_rel(self):
         pd = self._gpd('-p aa/bb/proj call python3 W:/xx/yy/file.py')
-        self.assertEqual(pd, Path('W:/xx/yy/aa/bb/proj'))
+        self.assertEqual(pd, Path(unipath('W:/xx/yy/aa/bb/proj')))
 
     def test_call_file_abs_proj_rel_dots(self):
         pd = self._gpd('-p .. call python3 W:/abc/project/pkg/file.py')
-        self.assertEqual(pd, Path('W:/abc/project'))
+        self.assertEqual(pd, Path(unipath('W:/abc/project')))
 
     def test_call_file_rel_proj_abs(self):
         pd = self._gpd('-p W:/aa/bb/proj call python3 xx/yy/file.py')
-        self.assertEqual(pd, Path('W:/aa/bb/proj'))
+        self.assertEqual(pd, Path(unipath('W:/aa/bb/proj')))
 
     def test_call_file_rel_proj_rel(self):
         pd = self._gpd('-p aa/bb/proj call python3 xx/yy/file.py')
