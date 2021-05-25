@@ -82,7 +82,15 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         os.environ["VIENDIR"] = str(self.svetDir.absolute())
 
     def tearDown(self):
-        self._td.cleanup()
+        try:
+            self._td.cleanup()
+        except PermissionError as e:
+            # fails on Windows:
+            #   PermissionError: [WinError 32] The process cannot access
+            #   the file because it is being used by another process:
+            #   C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\tmpzl8g6j0u\\project
+            assert "WinError" in str(e)  # hmm...
+
         del os.environ["VIENDIR"]
 
     def assertInVenv(self, inner: Path):
