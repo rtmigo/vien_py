@@ -11,6 +11,8 @@ import sys
 from pathlib import Path
 from typing import *
 
+from vien import is_posix
+from vien._common import need_posix
 from vien.arg_parser import Commands, Parsed
 from vien.bash_runner import run_as_bash_script
 from vien.call_parser import call_pyfile
@@ -45,6 +47,8 @@ def get_vien_dir() -> Path:
 
 
 def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
+    need_posix()
+
     bash_lines = [
         "#!/bin/bash"
         "set -e",  # fail on first error

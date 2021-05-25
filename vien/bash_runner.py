@@ -6,6 +6,8 @@ import time
 from subprocess import Popen, TimeoutExpired, CalledProcessError, \
     CompletedProcess, PIPE
 
+from vien._common import need_posix
+
 
 def run_as_bash_script(script: str, timeout: float = None,
                        input_delay: float = None,
@@ -14,6 +16,8 @@ def run_as_bash_script(script: str, timeout: float = None,
                        **kwargs
                        ) -> subprocess.CompletedProcess:
     """Runs the provided string as a .sh script."""
+
+    need_posix()
 
     # we need executable='/bin/bash' for Ubuntu 18.04, it will run '/bin/sh'
     # otherwise. For MacOS 10.13 it seems to be optional
