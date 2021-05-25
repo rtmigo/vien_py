@@ -67,6 +67,7 @@ class Test(unittest.TestCase):
 #     return len(inner_str) > len(outer_str) and inner_str.startswith(outer_str)
 
 
+@unittest.skipUnless(is_posix(), "not POSIX")
 class TestsInsideTempProjectDir(unittest.TestCase):
 
     def setUp(self):

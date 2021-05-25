@@ -1,10 +1,11 @@
 import unittest
 from pathlib import Path
 
+from tests.common import is_posix
 from vien.main import get_project_dir
 from vien.arg_parser import Parsed, Commands
 
-
+@unittest.skipUnless(is_posix(), "not POSIX")
 class TestProjectDir(unittest.TestCase):
 
     def test_run_short_left(self):
@@ -36,6 +37,7 @@ class TestProjectDir(unittest.TestCase):
         self.assertEqual(pd.project_dir_arg, 'd/e/f')
 
 
+@unittest.skipUnless(is_posix(), "not POSIX")
 class TestCallOtherArgs(unittest.TestCase):
 
     def test_outdated_p(self):
@@ -53,6 +55,7 @@ class TestCallOtherArgs(unittest.TestCase):
         self.assertEqual(ce.exception.code, 2)
 
 
+@unittest.skipUnless(is_posix(), "not POSIX")
 class TestShell(unittest.TestCase):
     def test_no_args(self):
         pd = Parsed('shell'.split())
