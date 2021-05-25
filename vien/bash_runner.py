@@ -5,15 +5,13 @@ import subprocess
 import time
 from subprocess import Popen, TimeoutExpired, CalledProcessError, \
     CompletedProcess, PIPE
-from typing import Optional, Dict
 
 
 def run_as_bash_script(script: str, timeout: float = None,
                        input_delay: float = None,
                        capture_output: bool = False,
                        input: bytes = None,
-**kwargs
-                       #env: Optional[Dict],
+                       **kwargs
                        ) -> subprocess.CompletedProcess:
     """Runs the provided string as a .sh script."""
 

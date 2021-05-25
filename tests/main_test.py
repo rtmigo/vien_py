@@ -214,8 +214,9 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertIsErrorExit(cm.exception)
 
     def test_run_needs_venv(self):
-        with self.assertRaises(VenvDoesNotExistExit):
-            main_entry_point(["run", "python", "--version"])
+        with self.assertRaises(VenvDoesNotExistExit) as cm:
+            main_entry_point(["run", "python", "-c", "pass"])
+        self.assertIsErrorExit(cm.exception)
 
     def test_run_p(self):
         """Checking the -p changes both venv directory and the first item
@@ -502,8 +503,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             self.assertFalse(ce.exception.code, 0)
 
     def test_shell_but_no_venv(self):
-        # python3 -m unittest svet.main_test.TestsInsideTempProjectDir.test_shell
-
         with TimeLimited(10):  # safety net
             with self.assertRaises(VenvDoesNotExistExit) as cm:
                 main_entry_point(["shell"])
