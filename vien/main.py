@@ -71,6 +71,9 @@ def quote(arg: str) -> str:
 
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
+    # this method is being tested indirectly each time the venv is created:
+    # the executable will be found to be printed to stdout, otherwise
+    # exception is thrown
     for sub in ("bin/python",
                 "bin/python3",
                 "Scripts/python.exe",

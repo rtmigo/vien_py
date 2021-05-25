@@ -77,7 +77,8 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         os.chdir(self.projectDir)
 
         self.expectedVenvDir = self.svetDir / "project_venv"
-        self.expectedVenvBin = self.expectedVenvDir / "bin" / "python"
+        self.expectedVenvBinPosix = self.expectedVenvDir / "bin" / "python"
+        self.expectedVenvBinWindows = self.expectedVenvDir / "Scripts" / "python.exe"
 
         os.environ["VIENDIR"] = str(self.svetDir.absolute())
 
@@ -107,6 +108,14 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             #       and inner_str.startswith(outer_str)):
             self.fail(f"{inner_str} is not in {outer_str}")
 
+    def assertVenvBinExists(self):
+        self.assertTrue(
+            self.expectedVenvBinPosix.exists() or self.expectedVenvBinWindows.exists())
+
+    def assertVenvBinNotExists(self):
+        self.assertTrue(
+            self.expectedVenvBinPosix.exists() or self.expectedVenvBinWindows.exists())
+
     def assertProjectDirIsNotCwd(self):
         basename = "marker"
         in_cwd = Path.cwd() / basename
@@ -122,11 +131,11 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     def assertVenvDoesNotExist(self):
         self.assertFalse(self.expectedVenvDir.exists())
-        self.assertFalse(self.expectedVenvBin.exists())
+        self.assertVenvBinNotExists()
 
     def assertVenvExists(self):
         self.assertTrue(self.expectedVenvDir.exists())
-        self.assertTrue(self.expectedVenvBin.exists())
+        self.assertVenvBinExists()
 
     def assertIsErrorExit(self, exc: SystemExit):
         self.assertIsInstance(exc, SystemExit)
@@ -149,16 +158,14 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         return out_file_path
 
     def test_create_with_argument(self):
-        self.assertFalse(self.expectedVenvDir.exists())
-        self.assertFalse(self.expectedVenvBin.exists())
+        self.assertVenvDoesNotExist()
 
-        #if is_posix():
+        # if is_posix():
         main_entry_point(["create", sys.executable])
-        #else:
+        # else:
         #    main_entry_point(["create", "python3.exe"])
 
-        self.assertTrue(self.expectedVenvDir.exists())
-        self.assertTrue(self.expectedVenvBin.exists())
+        self.assertVenvExists()
 
     @unittest.skipUnless(is_posix(), "not POSIX")
     def test_create_fails_if_twice(self):
@@ -169,43 +176,42 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     @unittest.skipUnless(is_posix(), "not POSIX")
     def test_recreate_with_argument(self):
-        self.assertFalse(self.expectedVenvDir.exists())
-        self.assertFalse(self.expectedVenvBin.exists())
+        self.assertVenvDoesNotExist()
 
         main_entry_point(["create", "python3"])
 
         self.assertTrue(self.expectedVenvDir.exists())
-        self.assertTrue(self.expectedVenvBin.exists())
 
-        os.remove(self.expectedVenvBin)
+        if self.expectedVenvBinWindows.exists():
+            os.remove(self.expectedVenvBinWindows)
+        elif self.expectedVenvBinPosix.exists():
+            os.remove(self.expectedVenvBinPosix)
+        else:
+            raise AssertionError
 
-        self.assertFalse(self.expectedVenvBin.exists())
+        self.assertVenvBinNotExists()
 
         main_entry_point(["recreate", "python3"])
-        self.assertTrue(self.expectedVenvBin.exists())
+        self.assertVenvBinExists()
 
         main_entry_point(["recreate", "python3"])
-        self.assertTrue(self.expectedVenvBin.exists())
+        self.assertVenvBinExists()
 
     @unittest.skipUnless(is_posix(), "not POSIX")
     def test_create_without_argument(self):
-        self.assertFalse(self.expectedVenvDir.exists())
-        self.assertFalse(self.expectedVenvBin.exists())
+        self.assertVenvDoesNotExist()
 
         main_entry_point(["create"])
 
-        self.assertTrue(self.expectedVenvDir.exists())
-        self.assertTrue(self.expectedVenvBin.exists())
+        self.assertVenvExists()
 
     @unittest.skipUnless(is_posix(), "not POSIX")
     def test_recreate_without_argument(self):
-        self.assertFalse(self.expectedVenvDir.exists())
-        self.assertFalse(self.expectedVenvBin.exists())
+        self.assertVenvDoesNotExist()
 
         main_entry_point(["recreate"])
 
-        self.assertTrue(self.expectedVenvDir.exists())
-        self.assertTrue(self.expectedVenvBin.exists())
+        self.assertVenvExists()
 
     @unittest.skipUnless(is_posix(), "not POSIX")
     def test_create_then_delete(self):
