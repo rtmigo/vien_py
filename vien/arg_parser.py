@@ -58,7 +58,7 @@ class Parsed:
 
         parser_init = subparsers.add_parser(Commands.create.name,
                                             help="create new virtualenv")
-        parser_init.add_argument('python', type=str, default="python3",
+        parser_init.add_argument('python', type=str, default=None,
                                  nargs='?')
 
         subparsers.add_parser(Commands.delete.name,
@@ -161,10 +161,10 @@ class Parsed:
         return self._ns.project_dir
 
     @property
-    def python_executable(self) -> str:
+    def python_executable(self) -> Optional[str]:
         if self.command not in (Commands.create, Commands.recreate):
             raise RuntimeError
-        assert self._ns.python is not None
+        #assert self._ns.python is not None
         return self._ns.python
 
     @property

@@ -71,25 +71,33 @@ def quote(arg: str) -> str:
 
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
-    for sub in ("bin/python", "bin/python3"):
+    # this method is being tested indirectly each time the venv is created:
+    # the executable will be found to be printed to stdout, otherwise
+    # exception is thrown
+    for sub in ("bin/python",
+                "bin/python3",
+                "Scripts/python.exe",
+                "Scripts/python3.exe"):
         p = venv_dir / sub
         if p.exists():
             return p
     raise Exception(f"Cannot find the Python interpreter in {venv_dir}.")
 
 
-def get_python_interpreter(argument: str) -> str:
+def arg_to_python_interpreter(argument: Optional[str]) -> str:
+    if argument is None:
+        return sys.executable
     exe = shutil.which(argument)
     if not exe:
         raise CannotFindExecutableExit(argument)
     return exe
 
 
-def main_create(venv_dir: Path, version: str):
+def main_create(venv_dir: Path, interpreter: Optional[str]):
     if venv_dir.exists():
         raise VenvExistsExit("Virtualenv already exists.")
 
-    exe = get_python_interpreter(version)
+    exe = arg_to_python_interpreter(interpreter)
 
     print(f"Creating {venv_dir}")
 
@@ -117,10 +125,10 @@ def main_delete(venv_dir: Path):
     shutil.rmtree(str(venv_dir))
 
 
-def main_recreate(venv_dir: Path, version: str):
+def main_recreate(venv_dir: Path, interpreter: Optional[str]):
     if venv_dir.exists():
         main_delete(venv_dir)
-    main_create(venv_dir=venv_dir, version=version)
+    main_create(venv_dir=venv_dir, interpreter=interpreter)
 
 
 def guess_bash_ps1():
