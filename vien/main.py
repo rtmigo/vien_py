@@ -157,7 +157,7 @@ def guess_bash_ps1():
         ['/bin/bash', '-i', '-c', 'echo $PS1']).decode().rstrip()
 
 
-def main_shell(dirs: Dirs, input: str, input_delay: float):
+def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     dirs.venv_must_exist()
 
     activate_path_quoted = quote(str(dirs.venv_dir / "bin" / "activate"))
@@ -208,7 +208,11 @@ def main_shell(dirs: Dirs, input: str, input_delay: float):
     raise ChildExit(cp.returncode)
 
 
-def _run(dirs: Dirs, other_args: List[str]):
+# def _run(dirs: Dirs, other_args: List[str]):
+
+
+def main_run(dirs: Dirs, other_args: List[str]):
+    dirs.venv_must_exist()
     activate_file = (dirs.venv_dir / 'bin' / 'activate').absolute()
     if not activate_file.exists():
         raise FileNotFoundError(activate_file)
@@ -221,12 +225,6 @@ def _run(dirs: Dirs, other_args: List[str]):
 
     exit_code = run_bash_sequence(commands, env=child_env(dirs.project_dir))
     raise ChildExit(exit_code)
-
-
-def main_run(dirs: Dirs, other_args: List[str]):
-    # todo prepend project dir only if it's not cwd
-    # todo use the same pythonpath modification way for `call` and `run`
-    _run(dirs, other_args=other_args)
 
 
 class Dirs:
@@ -353,7 +351,8 @@ def main_entry_point(args: Optional[List[str]] = None):
     elif parsed.command == Commands.path:
         print(dirs.venv_dir)  # does not need to be existing
     elif parsed.command == Commands.run:
-        main_run(dirs.venv_must_exist(), parsed._ns.otherargs)
+        # todo allow running commands from strings
+        main_run(dirs.venv_must_exist(), parsed.run_args)
     elif parsed.command == Commands.call:
         # todo move in func
         dirs.venv_must_exist()
@@ -366,6 +365,6 @@ def main_entry_point(args: Optional[List[str]] = None):
                   other_args=parsed.args_to_python)
 
     elif parsed.command == Commands.shell:
-        main_shell(dirs, parsed._ns.input, parsed._ns.delay)
+        main_shell(dirs, parsed.shell_input, parsed.shell_delay)
     else:
         raise ValueError
