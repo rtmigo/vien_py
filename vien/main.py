@@ -33,16 +33,14 @@ def get_vien_dir() -> Path:
         path_from_var = os.path.expanduser(path_from_var)
         return Path(path_from_var)
     else:
-        # It looks like storing dot files in your home directory
-        # is the de facto standard for both systems.
+        # It looks like storing dot files in the home directory
+        # is the de facto standard for both worlds.
         #
-        # VSCode:
-        #   POSIX: ~\.vscode
-        #   Windows: %USERPROFILE%\.vscode
+        # App    | POSIX     | Windows
+        # -------|-----------|----------------------
+        # VSCode | ~/.vscode | %USERPROFILE%\.vscode
+        # AWS:   | ~/.aws    | %USERPROFILE%\.aws
         #
-        # AWS:
-        #   POSIX:   ~/.aws
-        #   Windows: %USERPROFILE%\.aws
         return Path.home() / ".vien"
 
 
