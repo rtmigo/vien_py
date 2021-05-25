@@ -2,9 +2,10 @@ import os
 import unittest
 from pathlib import Path
 
+from tests.common import is_posix
 from vien.main import get_vien_dir
 
-
+@unittest.skipUnless(is_posix(), "not POSIX")
 class TestVenvsDir(unittest.TestCase):
 
     def test_if_set_plain(self):

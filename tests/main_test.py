@@ -12,6 +12,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 
+from tests.common import is_posix
 from vien import main_entry_point
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit
@@ -43,7 +44,7 @@ class CapturedOutput:
     def err(self) -> str:
         return self._new_err.getvalue()
 
-
+@unittest.skipUnless(is_posix(), "not POSIX")
 class Test(unittest.TestCase):
     def test_no_args(self):
         with self.assertRaises(SystemExit) as cp:
@@ -66,6 +67,7 @@ class Test(unittest.TestCase):
 #     return len(inner_str) > len(outer_str) and inner_str.startswith(outer_str)
 
 
+@unittest.skipUnless(is_posix(), "not POSIX")
 class TestsInsideTempProjectDir(unittest.TestCase):
 
     def setUp(self):

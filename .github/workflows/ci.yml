@@ -20,7 +20,10 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        # Windows is not really supported: many tests are skipped on Windows.
+        # But we still run the tests, gradually increasing the count
+        # of windows-compatible ones
+        os: [ ubuntu-latest, macos-latest, windows-latest ] #
         python-version: [ 3.7, 3.9 ]
 
     steps:
@@ -34,7 +37,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install flake8 mypy
           pip install -e .
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r requirements.txt
+          #if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
