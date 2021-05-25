@@ -92,18 +92,18 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def tearDown(self):
         # moving out of project dir to stop "using" the _temp_dir
         os.chdir(self._old_cwd)
+        del os.environ["VIENDIR"]
 
         try:
             shutil.rmtree(self._temp_dir)
             # self._td.cleanup()
         except PermissionError as e:
-            # fails on Windows:
-            #   PermissionError: [WinError 32] The process cannot access
-            #   the file because it is being used by another process:
-            #   C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\tmpzl8g6j0u\\project
-            assert "WinError" in str(e)  # hmm...
-
-        del os.environ["VIENDIR"]
+            # PermissionError: [WinError 32] The process cannot access
+            # the file because it is being used by another process:
+            # C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\tmpzl8g6j0u\\project
+            assert "WinError" in str(e)
+            # It seems the reason for this exception was the CWD in _temp_dir.
+            # But anyway I'll try to ignore it if it's possible
 
     def assertInVenv(self, inner: Path):
         inner_str = str(inner.absolute())
