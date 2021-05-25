@@ -20,6 +20,8 @@ from tests.time_limited import TimeLimited
 
 
 class CapturedOutput:
+    """Captures output of python functions (not a child process output,
+    but own output)."""
     # ? maybe replace with https://pypi.org/project/stream-redirect/
     def __init__(self):
         self._new_out = StringIO()

@@ -27,11 +27,23 @@ def exe_name() -> str:
 
 
 def get_vien_dir() -> Path:
-    s = os.environ.get("VIENDIR")
-    if s:
-        return Path(os.path.expanduser(os.path.expandvars(s)))
+    path_from_var = os.environ.get("VIENDIR")
+    if path_from_var:
+        path_from_var = os.path.expandvars(path_from_var)
+        path_from_var = os.path.expanduser(path_from_var)
+        return Path(path_from_var)
     else:
-        return Path(os.path.expandvars("$HOME")) / ".vien"
+        # It looks like storing dot files in your home directory
+        # is the de facto standard for both systems.
+        #
+        # VSCode:
+        #   POSIX: ~\.vscode
+        #   Windows: %USERPROFILE%\.vscode
+        #
+        # AWS:
+        #   POSIX:   ~/.aws
+        #   Windows: %USERPROFILE%\.aws
+        return Path.home() / ".vien"
 
 
 def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
