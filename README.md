@@ -217,8 +217,17 @@ $ cd /path/to/myProject
 $ vien call main.py
 ```
 
-The optional `-p` parameter allows you to specify the project directory
-**relative** to the parent directory of the **file** being run.
+In fact, all arguments following the `call` command are passed directly to the
+python executable.
+
+``` bash 		
+# passing arguments [-B, -OO] to Python and [arg1, arg2] to main.py
+$ vien call -B -OO main.py arg1 arg2  
+```
+
+The optional `-p` parameter can be specified before the `call` word. It allows
+you to set the project directory **relative** to the parent directory of the **
+file** being run.
 
 ``` bash 		
 $ cd any/where  # working dir is irrelevant
@@ -318,6 +327,37 @@ in `/x/y/z/aaa_venv`.
 
 The `_venv` suffix tells the utility that this directory can be safely removed.
 
+# Shebang
+
+On POSIX systems, you can make a `.py` file executable, with `vien` executing it
+inside a virtual environment.
+
+Insert the shebang line to the top of the file you want to run. The value of the
+shebang depends on the location of the file relative to the project directory.
+
+File                            | Shebang line
+--------------------------------|--------------------------------
+`myProject/runme.py`            | `#!/usr/bin/env vien -p . call`
+`myProject/pkg/runme.py`        | `#!/usr/bin/env vien -p .. call`
+`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien -p ../.. call`
+
+After inserting the shebang, make the file executable:
+
+``` bash
+$ chmod +x runme.py  
+```
+
+Now you can run the `runme.py` directly from command line. This will use the
+virtual environment associated with the `myProject`. The working directory can
+be anything.
+
+``` bash
+# runs the runme.py in virtual environment for myProject
+
+$ cd anywhere/somewhere
+$ /abc/myProject/pkg/main.py   
+```
+
 # Shell prompt
 
 By default the `vien shell` adds a prefix to
@@ -353,34 +393,3 @@ personalized:prompt> PS1=$PS1 vien shell
 
 To avoid doing this each time, `export` your `PS1` to make it available for
 subprocesses.
-
-# Shebang
-
-On POSIX systems, you can make a `.py` file executable, with `vien` executing it
-inside a virtual environment.
-
-Insert the shebang line to the top of the file you want to run. The value of the
-shebang depends on the location of the file relative to the project directory.
-
-File                            | Shebang line
---------------------------------|--------------------------------
-`myProject/runme.py`            | `#!/usr/bin/env vien -p . call`
-`myProject/pkg/runme.py`        | `#!/usr/bin/env vien -p .. call`
-`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien -p ../.. call`
-
-After inserting the shebang, make the file executable:
-
-``` bash
-$ chmod +x runme.py  
-```
-
-Now you can run the `runme.py` directly from command line. This will use the
-virtual environment associated with the `myProject`. The working directory can
-be anything.
-
-``` bash
-# runs the runme.py in virtual environment for myProject
-
-$ cd anywhere/somewhere
-$ /abc/myProject/pkg/main.py   
-```
