@@ -78,7 +78,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         self.expectedVenvDir = self.svetDir / "project_venv"
         self.expectedVenvBinPosix = self.expectedVenvDir / "bin" / "python"
-        self.expectedVenvBinWindows = self.expectedVenvDir / "Scripts" / "python.exe"
+        self.expectedVenvBinWindows = self.expectedVenvDir / "Scripts" / "python3.exe"
 
         os.environ["VIENDIR"] = str(self.svetDir.absolute())
 
