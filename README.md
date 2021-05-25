@@ -263,7 +263,8 @@ $ vien recreate /usr/local/opt/python@3.10/bin/python3
 
 ## --project-dir, -p
 
-This option must appear after `vien`, but before the command. For example,
+This option must appear after `vien`, but before the command.
+
 ``` bash
 vien -p some/dir run ...
 vien -p other/dir shell ...
