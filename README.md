@@ -217,8 +217,17 @@ $ cd /path/to/myProject
 $ vien call main.py
 ```
 
-The optional `-p` parameter allows you to specify the project directory
-**relative** to the parent directory of the **file** being run.
+In fact, all arguments following the `call` command are passed directly to the
+python executable.
+
+``` bash 		
+# passing arguments [-B, -OO] to Python and [arg1, arg2] to main.py
+$ vien call -B -OO main.py arg1 arg2  
+```
+
+The optional `-p` parameter can be specified before the `call` word. It allows
+you to set the project directory **relative** to the parent directory of the **
+file** being run.
 
 ``` bash 		
 $ cd any/where  # working dir is irrelevant
