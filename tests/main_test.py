@@ -90,9 +90,10 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         os.environ["VIENDIR"] = str(self.svetDir.absolute())
 
     def tearDown(self):
-        try:
+        # moving out of project dir to stop "using" the _temp_dir
+        os.chdir(self._old_cwd)
 
-            os.chdir(self._old_cwd)  # moving out of temp dir
+        try:
             shutil.rmtree(self._temp_dir)
             # self._td.cleanup()
         except PermissionError as e:

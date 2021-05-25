@@ -1,6 +1,6 @@
-- `create` and `recreate` commands without an argument will create a virtual 
-  environment with the same interpreter that started `vien`, instead of 
-  the interpreter available as `python3`
+- `create` and `recreate` commands without arguments will create a virtual
+  environment with the same interpreter that started `vien`, instead of the
+  interpreter available as `python3`
 
 # 5.0
 
