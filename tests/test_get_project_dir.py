@@ -14,6 +14,8 @@ class TestGetProjectDir(unittest.TestCase):
         os.chdir(os.path.dirname(__file__))
 
     def _gpd(self, cmd: str) -> Path:
+        if is_posix():
+            cmd = cmd.replace('W:/', '/')
         result = get_project_dir(Parsed(cmd.split()))
         self.assertTrue(result.is_absolute())
         return result
@@ -31,28 +33,28 @@ class TestGetProjectDir(unittest.TestCase):
         self.assertEqual(pd, Path.cwd() / "abc" / "def")
 
     def test_run_absolute(self):
-        pd = self._gpd('-p /abc/def run python3 myfile.py')
-        self.assertEqual(pd, Path('/abc/def'))
+        pd = self._gpd('-p W:/abc/def run python3 myfile.py')
+        self.assertEqual(pd, Path('W:/abc/def'))
 
     def test_call_no_file(self):
         with self.assertRaises(PyFileArgNotFoundExit):
-            self._gpd('-p /aa/bb/proj call python3 --version')
+            self._gpd('-p W:/aa/bb/proj call python3 --version')
 
     def test_call_file_abs_proj_abs(self):
-        pd = self._gpd('-p /aa/bb/proj call python3 /xx/yy/file.py')
-        self.assertEqual(pd, Path('/aa/bb/proj'))
+        pd = self._gpd('-p W:/aa/bb/proj call python3 W:/xx/yy/file.py')
+        self.assertEqual(pd, Path('W:/aa/bb/proj'))
 
     def test_call_file_abs_proj_rel(self):
-        pd = self._gpd('-p aa/bb/proj call python3 /xx/yy/file.py')
-        self.assertEqual(pd, Path('/xx/yy/aa/bb/proj'))
+        pd = self._gpd('-p aa/bb/proj call python3 W:/xx/yy/file.py')
+        self.assertEqual(pd, Path('W:/xx/yy/aa/bb/proj'))
 
     def test_call_file_abs_proj_rel_dots(self):
-        pd = self._gpd('-p .. call python3 /abc/project/pkg/file.py')
-        self.assertEqual(pd, Path('/abc/project'))
+        pd = self._gpd('-p .. call python3 W:/abc/project/pkg/file.py')
+        self.assertEqual(pd, Path('W:/abc/project'))
 
     def test_call_file_rel_proj_abs(self):
-        pd = self._gpd('-p /aa/bb/proj call python3 xx/yy/file.py')
-        self.assertEqual(pd, Path('/aa/bb/proj'))
+        pd = self._gpd('-p W:/aa/bb/proj call python3 xx/yy/file.py')
+        self.assertEqual(pd, Path('W:/aa/bb/proj'))
 
     def test_call_file_rel_proj_rel(self):
         pd = self._gpd('-p aa/bb/proj call python3 xx/yy/file.py')
