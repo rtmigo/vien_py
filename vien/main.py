@@ -84,7 +84,9 @@ def venv_dir_to_python_exe(venv_dir: Path) -> Path:
     raise Exception(f"Cannot find the Python interpreter in {venv_dir}.")
 
 
-def get_python_interpreter(argument: str) -> str:
+def arg_to_python_interpreter(argument: Optional[str]) -> str:
+    if argument is None:
+        return sys.executable
     exe = shutil.which(argument)
     if not exe:
         raise CannotFindExecutableExit(argument)
@@ -95,7 +97,7 @@ def main_create(venv_dir: Path, version: str):
     if venv_dir.exists():
         raise VenvExistsExit("Virtualenv already exists.")
 
-    exe = get_python_interpreter(version)
+    exe = arg_to_python_interpreter(version)
 
     print(f"Creating {venv_dir}")
 

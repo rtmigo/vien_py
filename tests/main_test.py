@@ -157,6 +157,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         assert not out_file_path.exists()
         return out_file_path
 
+    @unittest.skipUnless(is_posix(), "not POSIX")
     def test_create_with_argument(self):
         self.assertVenvDoesNotExist()
 
