@@ -43,7 +43,7 @@ class CapturedOutput:
     def err(self) -> str:
         return self._new_err.getvalue()
 
-
+@unittest.skipUnless(is_posix(), "not POSIX")
 class Test(unittest.TestCase):
     def test_no_args(self):
         with self.assertRaises(SystemExit) as cp:

@@ -2,11 +2,13 @@ import os
 import unittest
 from pathlib import Path
 
+from tests.common import is_posix
 from vien.main import get_project_dir
 from vien.exceptions import PyFileArgNotFoundExit
 from vien.arg_parser import Parsed
 
 
+@unittest.skipUnless(is_posix(), "not POSIX")
 class TestGetProjectDir(unittest.TestCase):
 
     def setUp(self) -> None:
