@@ -91,7 +91,8 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     def tearDown(self):
         try:
-            os.chdir(self._old_cwd)
+
+            os.chdir(self._old_cwd) # moving out of temp dir
             shutil.rmtree(self._temp_dir)
             #self._td.cleanup()
         except PermissionError as e:
@@ -177,7 +178,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         self.assertVenvExists()
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    #@unittest.skipUnless(is_posix(), "not POSIX")
     def test_create_fails_if_twice(self):
         main_entry_point(["create"])
         with self.assertRaises(VenvExistsExit) as ce:
@@ -207,7 +208,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         main_entry_point(["recreate", "python3"])
         self.assertVenvBinExists()
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    #@unittest.skipUnless(is_posix(), "not POSIX")
     def test_create_without_argument(self):
         self.assertVenvDoesNotExist()
 
