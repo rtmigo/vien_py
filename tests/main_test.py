@@ -15,10 +15,10 @@ from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 
 from tests.common import is_posix
+from tests.time_limited import TimeLimited
 from vien import main_entry_point
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit
-from tests.time_limited import TimeLimited
 
 
 class CapturedOutput:
@@ -173,6 +173,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         # actually this is not a good test: we are not testing whether
         # argument is really used and not ignored
         self.assertVenvDoesNotExist()
+        # todo test "python3" as argument
         main_entry_point(["create", sys.executable])
         self.assertVenvExists()
 
