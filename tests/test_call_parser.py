@@ -3,7 +3,7 @@ import unittest
 from tests.common import is_posix
 from vien.call_parser import items_after, call_pyfile
 
-@unittest.skipUnless(is_posix(), "not POSIX")
+
 class Test(unittest.TestCase):
     def test_items_after(self):
         self.assertEqual(list(items_after(['A', 'B', 'C'], 'A')),
