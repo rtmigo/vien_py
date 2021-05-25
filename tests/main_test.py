@@ -78,7 +78,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         self.expectedVenvDir = self.svetDir / "project_venv"
         self.expectedVenvBinPosix = self.expectedVenvDir / "bin" / "python"
-        self.expectedVenvBinWindows = self.expectedVenvDir / "Scripts" / "python3.exe"
+        self.expectedVenvBinWindows = self.expectedVenvDir / "Scripts" / "python.exe"
 
         os.environ["VIENDIR"] = str(self.svetDir.absolute())
 
@@ -113,7 +113,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             self.expectedVenvBinPosix.exists() or self.expectedVenvBinWindows.exists())
 
     def assertVenvBinNotExists(self):
-        self.assertTrue(
+        self.assertFalse(
             self.expectedVenvBinPosix.exists() or self.expectedVenvBinWindows.exists())
 
     def assertProjectDirIsNotCwd(self):
