@@ -21,8 +21,9 @@ jobs:
     strategy:
       matrix:
         # Windows is not really supported: many tests are skipped on Windows.
-        # But we still run the tests
-        os: [ windows-latest ] # ubuntu-latest, macos-latest,
+        # But we still run the tests, gradually increasing the count
+        # of windows-compatible ones
+        os: [ ubuntu-latest, macos-latest, windows-latest ] #
         python-version: [ 3.7, 3.9 ]
 
     steps:
