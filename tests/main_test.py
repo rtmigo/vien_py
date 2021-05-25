@@ -12,6 +12,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 
+from tests.common import is_posix
 from vien import main_entry_point
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit
@@ -19,6 +20,8 @@ from tests.time_limited import TimeLimited
 
 
 class CapturedOutput:
+    """Captures output of python functions (not a child process output,
+    but own output)."""
     # ? maybe replace with https://pypi.org/project/stream-redirect/
     def __init__(self):
         self._new_out = StringIO()
@@ -43,7 +46,7 @@ class CapturedOutput:
     def err(self) -> str:
         return self._new_err.getvalue()
 
-
+#@unittest.skipUnless(is_posix(), "not POSIX")
 class Test(unittest.TestCase):
     def test_no_args(self):
         with self.assertRaises(SystemExit) as cp:
@@ -66,6 +69,7 @@ class Test(unittest.TestCase):
 #     return len(inner_str) > len(outer_str) and inner_str.startswith(outer_str)
 
 
+@unittest.skipUnless(is_posix(), "not POSIX")
 class TestsInsideTempProjectDir(unittest.TestCase):
 
     def setUp(self):
@@ -214,8 +218,9 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertIsErrorExit(cm.exception)
 
     def test_run_needs_venv(self):
-        with self.assertRaises(VenvDoesNotExistExit):
-            main_entry_point(["run", "python", "--version"])
+        with self.assertRaises(VenvDoesNotExistExit) as cm:
+            main_entry_point(["run", "python", "-c", "pass"])
+        self.assertIsErrorExit(cm.exception)
 
     def test_run_p(self):
         """Checking the -p changes both venv directory and the first item
@@ -502,8 +507,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             self.assertFalse(ce.exception.code, 0)
 
     def test_shell_but_no_venv(self):
-        # python3 -m unittest svet.main_test.TestsInsideTempProjectDir.test_shell
-
         with TimeLimited(10):  # safety net
             with self.assertRaises(VenvDoesNotExistExit) as cm:
                 main_entry_point(["shell"])

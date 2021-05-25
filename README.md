@@ -226,8 +226,8 @@ $ vien call -B -OO main.py arg1 arg2
 ```
 
 The optional `-p` parameter can be specified before the `call` word. It allows
-you to set the project directory **relative** to the parent directory of the **
-file** being run.
+you to set the project directory **relative** to the parent directory of the 
+**file** being run.
 
 ``` bash 		
 $ cd any/where  # working dir is irrelevant
@@ -284,7 +284,8 @@ If `--project-dir` is specified, it is the project directory.
 If `--project-dir` is not specified, then all commands assume that the current 
 working directory is the project directory.
 
-The next two calls use the same project directory and the same virtual environment. However, the working directory is different.
+The next two calls use the same project directory and the same virtual
+environment. However, the working directory is different.
 
 ``` bash
 cd /abc/myProject

@@ -11,6 +11,8 @@ import sys
 from pathlib import Path
 from typing import *
 
+from vien import is_posix
+from vien._common import need_posix
 from vien.arg_parser import Commands, Parsed
 from vien.bash_runner import run_as_bash_script
 from vien.call_parser import call_pyfile
@@ -27,14 +29,26 @@ def exe_name() -> str:
 
 
 def get_vien_dir() -> Path:
-    s = os.environ.get("VIENDIR")
-    if s:
-        return Path(os.path.expanduser(os.path.expandvars(s)))
+    path_from_var = os.environ.get("VIENDIR")
+    if path_from_var:
+        path_from_var = os.path.expandvars(path_from_var)
+        path_from_var = os.path.expanduser(path_from_var)
+        return Path(path_from_var)
     else:
-        return Path(os.path.expandvars("$HOME")) / ".vien"
+        # It looks like storing dot files in the home directory
+        # is the de facto standard for both worlds.
+        #
+        # App    | POSIX     | Windows
+        # -------|-----------|----------------------
+        # VSCode | ~/.vscode | %USERPROFILE%\.vscode
+        # AWS:   | ~/.aws    | %USERPROFILE%\.aws
+        #
+        return Path.home() / ".vien"
 
 
 def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
+    need_posix()
+
     bash_lines = [
         "#!/bin/bash"
         "set -e",  # fail on first error
@@ -157,7 +171,7 @@ def guess_bash_ps1():
         ['/bin/bash', '-i', '-c', 'echo $PS1']).decode().rstrip()
 
 
-def main_shell(dirs: Dirs, input: str, input_delay: float):
+def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     dirs.venv_must_exist()
 
     activate_path_quoted = quote(str(dirs.venv_dir / "bin" / "activate"))
@@ -208,7 +222,11 @@ def main_shell(dirs: Dirs, input: str, input_delay: float):
     raise ChildExit(cp.returncode)
 
 
-def _run(dirs: Dirs, other_args: List[str]):
+# def _run(dirs: Dirs, other_args: List[str]):
+
+
+def main_run(dirs: Dirs, other_args: List[str]):
+    dirs.venv_must_exist()
     activate_file = (dirs.venv_dir / 'bin' / 'activate').absolute()
     if not activate_file.exists():
         raise FileNotFoundError(activate_file)
@@ -221,12 +239,6 @@ def _run(dirs: Dirs, other_args: List[str]):
 
     exit_code = run_bash_sequence(commands, env=child_env(dirs.project_dir))
     raise ChildExit(exit_code)
-
-
-def main_run(dirs: Dirs, other_args: List[str]):
-    # todo prepend project dir only if it's not cwd
-    # todo use the same pythonpath modification way for `call` and `run`
-    _run(dirs, other_args=other_args)
 
 
 class Dirs:
@@ -353,7 +365,8 @@ def main_entry_point(args: Optional[List[str]] = None):
     elif parsed.command == Commands.path:
         print(dirs.venv_dir)  # does not need to be existing
     elif parsed.command == Commands.run:
-        main_run(dirs.venv_must_exist(), parsed._ns.otherargs)
+        # todo allow running commands from strings
+        main_run(dirs.venv_must_exist(), parsed.run_args)
     elif parsed.command == Commands.call:
         # todo move in func
         dirs.venv_must_exist()
@@ -366,6 +379,6 @@ def main_entry_point(args: Optional[List[str]] = None):
                   other_args=parsed.args_to_python)
 
     elif parsed.command == Commands.shell:
-        main_shell(dirs, parsed._ns.input, parsed._ns.delay)
+        main_shell(dirs, parsed.shell_input, parsed.shell_delay)
     else:
         raise ValueError

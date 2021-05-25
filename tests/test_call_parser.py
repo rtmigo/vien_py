@@ -1,5 +1,6 @@
 import unittest
 
+from tests.common import is_posix
 from vien.call_parser import items_after, call_pyfile
 
 

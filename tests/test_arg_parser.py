@@ -1,8 +1,9 @@
 import unittest
 from pathlib import Path
 
+from tests.common import is_posix
 from vien.main import get_project_dir
-from vien.arg_parser import Parsed
+from vien.arg_parser import Parsed, Commands
 
 
 class TestProjectDir(unittest.TestCase):
@@ -36,7 +37,7 @@ class TestProjectDir(unittest.TestCase):
         self.assertEqual(pd.project_dir_arg, 'd/e/f')
 
 
-class TestCallOtherArgs(unittest.TestCase):
+class TestParseCall(unittest.TestCase):
 
     def test_outdated_p(self):
         pd = Parsed('-p a/b/c call -p d/e/f myfile.py arg1 arg2'.split())
@@ -53,7 +54,32 @@ class TestCallOtherArgs(unittest.TestCase):
         self.assertEqual(ce.exception.code, 2)
 
 
+class TestParseShell(unittest.TestCase):
+    def test_no_args(self):
+        pd = Parsed('shell'.split())
+        self.assertEqual(pd.command, Commands.shell)
+        self.assertEqual(pd.shell_delay, None)
+        self.assertEqual(pd.shell_input, None)
 
+    def test_input(self):
+        pd = Parsed(['shell', '--input', 'cd / && ls'])
+        self.assertEqual(pd.shell_input, 'cd / && ls')
+
+    def test_delay(self):
+        pd = Parsed('shell --delay 1.2'.split())
+        self.assertEqual(pd.shell_delay, 1.2)
+
+    def test_labuda(self):
+        with self.assertRaises(SystemExit) as ce:
+            pd = Parsed('shell --labuda'.split())
+        self.assertEqual(ce.exception.code, 2)
+
+
+class TestParseRun(unittest.TestCase):
+    def test(self):
+        pd = Parsed(['run', 'python3', '-OO', 'file.py'])
+        self.assertEqual(pd.command, Commands.run)
+        self.assertEqual(pd.run_args, ['python3', '-OO', 'file.py'])
 
 
 if __name__ == "__main__":

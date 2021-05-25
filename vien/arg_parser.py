@@ -166,3 +166,23 @@ class Parsed:
             raise RuntimeError
         assert self._ns.python is not None
         return self._ns.python
+
+    @property
+    def shell_input(self) -> Optional[str]:
+        if self.command != Commands.shell:
+            raise RuntimeError
+        return self._ns.input
+
+    @property
+    def shell_delay(self) -> Optional[float]:
+        if self.command != Commands.shell:
+            raise RuntimeError
+        return self._ns.delay
+
+    @property
+    def run_args(self) -> List[str]:
+        if self.command != Commands.run:
+            raise RuntimeError
+        return self._ns.otherargs
+
+
