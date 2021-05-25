@@ -6,7 +6,6 @@ from vien.main import get_project_dir
 from vien.arg_parser import Parsed, Commands
 
 
-@unittest.skipUnless(is_posix(), "not POSIX")
 class TestProjectDir(unittest.TestCase):
 
     def test_run_short_left(self):

@@ -8,7 +8,6 @@ from vien.exceptions import PyFileArgNotFoundExit
 from vien.arg_parser import Parsed
 
 
-@unittest.skipUnless(is_posix(), "not POSIX")
 class TestGetProjectDir(unittest.TestCase):
 
     def setUp(self) -> None:
