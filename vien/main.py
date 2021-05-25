@@ -71,7 +71,10 @@ def quote(arg: str) -> str:
 
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
-    for sub in ("bin/python", "bin/python3"):
+    for sub in ("bin/python",
+                "bin/python3",
+                "Scripts/python.exe",
+                "Scripts/python3.exe"):
         p = venv_dir / sub
         if p.exists():
             return p
