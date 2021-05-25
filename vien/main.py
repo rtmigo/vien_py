@@ -93,11 +93,11 @@ def arg_to_python_interpreter(argument: Optional[str]) -> str:
     return exe
 
 
-def main_create(venv_dir: Path, version: str):
+def main_create(venv_dir: Path, interpreter: Optional[str]):
     if venv_dir.exists():
         raise VenvExistsExit("Virtualenv already exists.")
 
-    exe = arg_to_python_interpreter(version)
+    exe = arg_to_python_interpreter(interpreter)
 
     print(f"Creating {venv_dir}")
 
@@ -125,10 +125,10 @@ def main_delete(venv_dir: Path):
     shutil.rmtree(str(venv_dir))
 
 
-def main_recreate(venv_dir: Path, version: str):
+def main_recreate(venv_dir: Path, interpreter: Optional[str]):
     if venv_dir.exists():
         main_delete(venv_dir)
-    main_create(venv_dir=venv_dir, version=version)
+    main_create(venv_dir=venv_dir, interpreter=interpreter)
 
 
 def guess_bash_ps1():
