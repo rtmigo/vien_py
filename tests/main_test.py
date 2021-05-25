@@ -153,7 +153,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertFalse(self.expectedVenvBin.exists())
 
         #if is_posix():
-        main_entry_point(["create", "python3"])
+        main_entry_point(["create", sys.executable])
         #else:
         #    main_entry_point(["create", "python3.exe"])
 
