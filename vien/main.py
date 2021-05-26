@@ -71,9 +71,18 @@ def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
 def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
     need_windows()
 
+    # https://stackoverflow.com/questions/734598/how-do-i-make-a-batch-file-terminate-upon-encountering-an-error
+
     # to stop on first error
     #if len(commands) > 1:
-    commands = [f"{c} || exit /b %errorlevel%" for c in commands]
+
+    # unlike bash, cmd.exe returns exit code 0 even if last command returned
+    # non-zero
+
+    # if any command returns non-zero exit code, we exit from
+    # the shell with the same code
+
+    commands = [f"{c} || exit /b %ERRORLEVEL%" for c in commands]
 
     #    lines.extend(commands)
 
