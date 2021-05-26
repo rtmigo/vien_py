@@ -1,7 +1,6 @@
-`vien` supports Python 3.7+ on Linux and macOS.
-In the case of Windows, all commands work, except for `run` and `shell`.
-
------
+[![PyPI version shields.io](https://img.shields.io/pypi/v/vien.svg)](https://pypi.python.org/pypi/vien/)
+[![Generic badge](https://img.shields.io/badge/Python-3.7+-blue.svg)](#)
+[![Generic badge](https://img.shields.io/badge/OS-Linux%20|%20macOS-blue.svg)](#)
 
 # [vien](https://github.com/rtmigo/vien_py#readme)
 
@@ -48,6 +47,11 @@ $ source /i/lost/that/.venv/bin/activate
 So there is the `vien`. A tool for a half asleep developer.
 
 # Install
+
+`vien` requires Python 3.7+ on Linux or macOS. A limited set of commands works 
+on Windows.
+
+-----
 
 <details>
   <summary>Get a working Python ≥3.7, pip3 and venv.</summary><br/>
