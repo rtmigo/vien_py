@@ -1,12 +1,10 @@
 import os
 import unittest
 
-from vien import is_posix
-from vien._common import is_windows
 from vien.main import _insert_into_pythonpath
 
 
-@unittest.skipUnless(is_posix, "posix format")
+@unittest.skipUnless(os.name == 'posix', "posix colons format")
 class PythonPathTestPosix(unittest.TestCase):
     def test_empty(self):
         os.environ["PYTHONPATH"] = ''
@@ -28,15 +26,13 @@ class PythonPathTestPosix(unittest.TestCase):
         self.assertEqual(_insert_into_pythonpath('bbb'),
                          'aaa:bbb:ccc')
 
-
-
     def test_two(self):
         os.environ["PYTHONPATH"] = ' /bbb/ccc :  /dd/ee/ff '
         self.assertEqual(_insert_into_pythonpath('/a/b/c'),
                          '/a/b/c:/bbb/ccc:/dd/ee/ff')
 
 
-@unittest.skipUnless(is_windows, "windows format")
+@unittest.skipUnless(os.name == 'nt', "windows semicolons format")
 class PythonPathTestWindows(unittest.TestCase):
     # most tests are done on POSIX. Here we just test ';' and 'C:/'
     def test_two(self):
