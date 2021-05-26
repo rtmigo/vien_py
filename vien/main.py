@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import *
 
 from vien import is_posix
-from vien._common import need_posix
+from vien._common import need_posix, is_windows
 from vien.arg_parser import Commands, Parsed
 from vien.bash_runner import run_as_bash_script
 from vien.call_parser import call_pyfile
@@ -125,9 +125,15 @@ def main_delete(venv_dir: Path):
 
     result = subprocess.run([python_exe, "-m", "venv", "--clear", str(venv_dir)], capture_output=True, encoding=sys.stdout.encoding)
     if result.returncode != 0:
-        print(f"stdout: {result.stdout}")
-        print(f"stderr: {result.stderr}")
-        raise FailedToClearVenvExit(venv_dir)
+
+        if is_windows and "WinError 5" in result.stderr:
+            # we all love Windows
+            # Error: [WinError 5] Access is denied: '...python.exe'
+            pass
+        else:
+            print(f"stdout: {result.stdout}")
+            print(f"stderr: {result.stderr}")
+            raise FailedToClearVenvExit(venv_dir)
     print(f"Deleting {venv_dir}")
     shutil.rmtree(str(venv_dir))
 
