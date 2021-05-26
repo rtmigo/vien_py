@@ -18,7 +18,7 @@ from tests.common import is_posix
 from tests.time_limited import TimeLimited
 from vien import main_entry_point
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
-    PyFileNotFoundExit, FailedToCreateVenvExit
+    PyFileNotFoundExit, FailedToCreateVenvExit, CannotFindExecutableExit
 
 
 class CapturedOutput:
