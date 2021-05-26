@@ -182,7 +182,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         # actually this is not a good test: we are not testing whether
         # argument is really used and not ignored
         self.assertVenvNotExists()
-        with self.assertRaises(FailedToCreateVenvExit) as ce:
+        with self.assertRaises(CannotFindExecutableExit) as ce:
             main_entry_point(["create", "labuda-ladeda-hehe"])
         self.assertIsErrorExit(ce.exception)
         self.assertVenvNotExists()
@@ -197,6 +197,13 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with self.assertRaises(VenvExistsExit) as ce:
             main_entry_point(["create"])
         self.assertIsErrorExit(ce.exception)
+
+    @unittest.skipUnless(is_posix, "not sure what to resolve in windows")
+    def test_create_resolves_python3(self):
+        self.assertVenvNotExists()
+        main_entry_point(["create", "python3"])
+        self.assertVenvExists()
+
 
     ############################################################################
 
@@ -247,7 +254,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         # actually this is not a good test: we are not testing whether
         # argument is really used and not ignored
         self.assertVenvNotExists()
-        with self.assertRaises(FailedToCreateVenvExit) as ce:
+        with self.assertRaises(CannotFindExecutableExit) as ce:
             main_entry_point(["recreate", "labuda-ladeda-hehe"])
         self.assertIsErrorExit(ce.exception)
         self.assertVenvNotExists()
