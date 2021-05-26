@@ -97,12 +97,12 @@ class TestParseCreate(unittest.TestCase):
 class TestParseRecreate(unittest.TestCase):
     def test_with_arg(self):
         pd = Parsed(['recreate', 'python3'])
-        self.assertEqual(pd.command, Commands.create)
+        self.assertEqual(pd.command, Commands.recreate)
         self.assertEqual(pd.python_executable, "python3")
 
     def test_without_arg(self):
         pd = Parsed(['recreate'])
-        self.assertEqual(pd.command, Commands.create)
+        self.assertEqual(pd.command, Commands.recreate)
         self.assertEqual(pd.python_executable, None)
 
 

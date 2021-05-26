@@ -185,7 +185,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with self.assertRaises(FailedToCreateVenvExit) as ce:
             main_entry_point(["create", "labuda-ladeda-hehe"])
         self.assertIsErrorExit(ce.exception)
-        self.assertVenvExists()
+        self.assertVenvNotExists()
 
     def test_create_without_argument(self):
         self.assertVenvNotExists()
@@ -242,6 +242,15 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         main_entry_point(["recreate", sys.executable])
         self.assertVenvBinExists()
+
+    def test_recreate_fails_with_unresolvable_argument(self):
+        # actually this is not a good test: we are not testing whether
+        # argument is really used and not ignored
+        self.assertVenvNotExists()
+        with self.assertRaises(FailedToCreateVenvExit) as ce:
+            main_entry_point(["recreate", "labuda-ladeda-hehe"])
+        self.assertIsErrorExit(ce.exception)
+        self.assertVenvNotExists()
 
     # @unittest.skipUnless(is_posix, "not POSIX")
 
