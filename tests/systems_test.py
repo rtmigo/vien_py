@@ -1,6 +1,6 @@
 import unittest
 
-from vien._common import need_posix, UnexpectedOsError
+from vien._common import need_posix, UnexpectedOsError, need_windows
 
 
 def is_posix_importable() -> bool:
@@ -24,7 +24,7 @@ class Test(unittest.TestCase):
     def test_need_windows(self):
         if is_posix_importable():
             with self.assertRaises(UnexpectedOsError):
-                need_posix()
+                need_windows()
         else:
-            need_posix() # no exception
+            need_windows() # no exception
 
