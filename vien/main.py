@@ -84,7 +84,7 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
     # We'll modify each command to exit with the exit code on first non-zero
 
     glued = " && ".join(f'( {c} )' for c in commands)
-    glued = f"({glued}) || exit /b %ERRORLEVEL%"
+    glued = f"({glued}) & exit /b %ERRORLEVEL%"
 
     # commands = [f"{c} || exit /b %ERRORLEVEL%" for c in commands]
     #
@@ -99,13 +99,15 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
                            # executable='/bin/bash',
                            env=env)
 
+import shlex
 
 def quote(arg: str) -> str:
     if is_posix:
-        return json.dumps(arg)
+        return shlex.quote(arg)
+        #return json.dumps(arg)
     else:
         if ' ' in arg:
-            arg = f'"{arg}"'  # todo is it correct?
+            arg = f'"{arg}"'  # todo how to correctly quote windows args?
         return arg
 
 
