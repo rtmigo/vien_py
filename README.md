@@ -126,8 +126,8 @@ $ cd /path/to/myProject
 $ vien create 
 ```
 
-By default `vien` will use the Python interpreter that runs `vien` itself as the
-interpreter for the virtual environment.
+By default `vien` will use the Python interpreter that running `vien` itself as
+the interpreter for the virtual environment.
 
 If you have more than one Python version, you can provide an argument to point
 to the proper interpreter.
@@ -275,8 +275,9 @@ $ vien recreate /usr/local/opt/python@3.10/bin/python3
 This option must appear after `vien`, but before the command.
 
 ``` bash
-vien -p some/dir run ...
-vien -p other/dir shell ...
+vien -p /abc/myProject create ...
+vien -p /abc/myProject run ...
+vien -p /abc/myProject shell ...
 ```
 
 If `--project-dir` is specified, it is the project directory.
