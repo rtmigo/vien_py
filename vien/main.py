@@ -69,28 +69,24 @@ def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
 
 
 def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
+
+    # todo test independently
+
     need_windows()
 
     # https://stackoverflow.com/questions/734598/how-do-i-make-a-batch-file-terminate-upon-encountering-an-error
 
-    # to stop on first error
-    #if len(commands) > 1:
-
-    # unlike bash, cmd.exe returns exit code 0 even if last command returned
+    # unlike bash, cmd.exe returns exit code zero even if last command returned
+    # non-zero. There is also no evident way to stop batch when a command
+    # fails. We'll modify every command to exit with the exit code on first
     # non-zero
-
-    # if any command returns non-zero exit code, we exit from
-    # the shell with the same code
 
     commands = [f"{c} || exit /b %ERRORLEVEL%" for c in commands]
 
-    #    lines.extend(commands)
+    glued = "&&".join(f'({c})' for c in commands)
 
-    # Ubuntu really needs executable='/bin/bash'.
-    # Otherwise the command is executed in /bin/sh, ignoring the hashbang,
-    # but SH fails to execute commands like 'source'
 
-    return subprocess.call("\n".join(commands),
+    return subprocess.call(glued,
                            shell=True,
                            # executable='/bin/bash',
                            env=env)
