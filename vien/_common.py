@@ -15,7 +15,7 @@ def need_posix():
     if not is_posix:
         raise UnexpectedOsError
 
-def need_windows():
-    if not is_posix:
-        raise UnexpectedOsError
 
+def need_windows():
+    if not is_windows:
+        raise UnexpectedOsError
