@@ -8,11 +8,22 @@ from tests.common import is_posix
 from vien.main import get_project_dir
 from vien.arg_parser import Parsed, Commands
 
+
 def windows_too(args: List[str]) -> List[str]:
     if is_windows:
         return [Parsed.PARAM_WINDOWS_ALL_ARGS] + args
     else:
         return args
+
+
+@unittest.skipUnless(is_windows, "Windows-only tests")
+class TestWindowsAllArgs(unittest.TestCase):
+    def test_all_args_accepted_only_on_windows(self):
+        # is the PARAM_WINDOWS_ALL_ARGS is set, we must run windows.
+        # Otherwise, AssertionError is thrown
+        with self.assertRaises(AssertionError):
+            Parsed([Parsed.PARAM_WINDOWS_ALL_ARGS, 'shell'])
+
 
 class TestProjectDir(unittest.TestCase):
 
