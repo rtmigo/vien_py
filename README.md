@@ -48,10 +48,8 @@ So there is the `vien`. A tool for a half asleep developer.
 
 # Install
 
-`vien` requires Python 3.7+ on Linux or macOS. A limited set of commands works 
-on Windows.
+`vien` requires Python 3.7+ on Linux or macOS.
 
------
 
 <details>
   <summary>Get a working Python ≥3.7, pip3 and venv.</summary><br/>
