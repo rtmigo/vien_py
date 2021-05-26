@@ -16,7 +16,7 @@ name = "vien"
 constants = load_module_dict(f'{name}/constants.py')
 
 readme = (Path(__file__).parent / 'README.md').read_text(encoding="utf-8")
-readme = "# " + readme.partition("\n#")[-1]
+#readme = "# " + readme.partition("\n#")[-1]
 
 setup(
     name=name,
@@ -56,6 +56,7 @@ setup(
         "Typing :: Typed",
         "Topic :: Software Development :: Build Tools",
         "Operating System :: POSIX",
+        "Operating System :: Microsoft :: Windows"
     ],
 
     test_suite="test_unit.suite"
