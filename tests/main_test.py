@@ -158,11 +158,13 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     def write_program(self, py_file_path: Path) -> Path:
         out_file_path = py_file_path.parent / 'output.json'
+        out_file_path_str = repr(str(out_file_path))
         code = "import pathlib, sys, json\n" \
                "d={'sys.path': sys.path, \n" \
                "   'sys.executable': sys.executable}\n" \
                "js=json.dumps(d)\n" \
-               f'(pathlib.Path("{out_file_path}")).write_text(js, encoding="utf-8")'
+               f"file=pathlib.Path({out_file_path_str})\n" \
+               'file.write_text(js, encoding="utf-8")'
         py_file_path.write_text(code, encoding='utf-8')
 
         assert not out_file_path.exists()
