@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import *
 
 from vien import is_posix
-from vien._common import need_posix, is_windows
+from vien._common import need_posix, is_windows, need_windows
 from vien.arg_parser import Commands, Parsed
 from vien.bash_runner import run_as_bash_script
 from vien.call_parser import call_pyfile
@@ -47,12 +47,12 @@ def get_vien_dir() -> Path:
 
 
 def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
-    # need_posix()
+    need_posix()
 
     # command || exit /b 666
 
     lines = [
-        #"#!/bin/bash"  # necessary?
+        # shebang not necessary as we specify executable in subprocess.call
         "set -e",  # fail on first error
     ]
 
@@ -65,6 +65,25 @@ def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
     return subprocess.call("\n".join(lines),
                            shell=True,
                            executable='/bin/bash',
+                           env=env)
+
+
+def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
+    need_windows()
+
+    # to stop on first error
+    if len(commands) > 1:
+        commands = [f"{c} || exit /b 1" for c in commands]
+
+    #    lines.extend(commands)
+
+    # Ubuntu really needs executable='/bin/bash'.
+    # Otherwise the command is executed in /bin/sh, ignoring the hashbang,
+    # but SH fails to execute commands like 'source'
+
+    return subprocess.call("\n".join(commands),
+                           shell=True,
+                           # executable='/bin/bash',
                            env=env)
 
 
@@ -265,17 +284,28 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
 
 def main_run(dirs: Dirs, other_args: List[str]):
     dirs.venv_must_exist()
-    activate_file = (dirs.venv_dir / 'bin' / 'activate').absolute()
+
+    commands: List[str] = list()
+
+    if is_posix:
+        activate_file = posix_bash_activate(dirs.venv_dir)
+        commands.append(f'source "{activate_file}"')
+        run_func = run_bash_sequence
+    elif is_windows:
+        activate_file = windows_cmdexe_activate(dirs.venv_dir)
+        commands.append(f'CALL "{activate_file}"')
+        run_func = run_cmdexe_sequence
+    else:
+        raise AssertionError("Unexpected OS")
+    #    activate_file = (dirs.venv_dir / 'bin' / 'activate').absolute()
     if not activate_file.exists():
         raise FileNotFoundError(activate_file)
 
-    commands: List[str] = list()
-    commands.append(f'source "{activate_file}"')
     # if prepend_py_path:
     #   commands.append(f'export PYTHONPATH="{prepend_py_path}:$PYTHONPATH"')
     commands.append(" ".join(quote(a) for a in other_args))
 
-    exit_code = run_bash_sequence(commands, env=child_env(dirs.project_dir))
+    exit_code = run_func(commands, env=child_env(dirs.project_dir))
     raise ChildExit(exit_code)
 
 
