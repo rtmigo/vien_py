@@ -174,7 +174,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         # actually this is not a good test: we are not testing whether
         # argument is really used and not ignored
         self.assertVenvNotExists()
-        # todo test "python3" as argument
         main_entry_point(["create", sys.executable])
         self.assertVenvExists()
 
@@ -258,6 +257,12 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["recreate", "labuda-ladeda-hehe"])
         self.assertIsErrorExit(ce.exception)
         self.assertVenvNotExists()
+
+    @unittest.skipUnless(is_posix, "not sure what to resolve in windows")
+    def test_recreate_resolves_python3(self):
+        self.assertVenvNotExists()
+        main_entry_point(["recreate", "python3"])
+        self.assertVenvExists()
 
     # @unittest.skipUnless(is_posix, "not POSIX")
 
