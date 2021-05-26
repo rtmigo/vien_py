@@ -123,8 +123,10 @@ def main_delete(venv_dir: Path):
     python_exe = venv_dir_to_python_exe(venv_dir)
     print(f"Clearing {venv_dir}")
 
-    result = subprocess.run([python_exe, "-m", "venv", "--clear", str(venv_dir)])
+    result = subprocess.run([python_exe, "-m", "venv", "--clear", str(venv_dir)], capture_output=True, encoding=sys.stdout.encoding)
     if result.returncode != 0:
+        print(f"stdout: {result.stdout}")
+        print(f"stderr: {result.stderr}")
         raise FailedToClearVenvExit(venv_dir)
     print(f"Deleting {venv_dir}")
     shutil.rmtree(str(venv_dir))
