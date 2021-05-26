@@ -72,8 +72,8 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
     need_windows()
 
     # to stop on first error
-    if len(commands) > 1:
-        commands = [f"{c} || exit /b 1" for c in commands]
+    #if len(commands) > 1:
+    commands = [f"{c} || exit /b %errorlevel%" for c in commands]
 
     #    lines.extend(commands)
 
