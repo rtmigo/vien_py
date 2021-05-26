@@ -73,6 +73,8 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
 
     need_windows()
 
+    raise NotImplemented
+
     # https://stackoverflow.com/questions/734598/how-do-i-make-a-batch-file-terminate-upon-encountering-an-error
 
     # unlike bash, cmd.exe returns exit code zero even if last command returned

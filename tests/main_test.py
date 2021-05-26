@@ -269,7 +269,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python", "-c", "pass"])
         self.assertIsErrorExit(cm.exception)
 
-    #@unittest.skipUnless(is_posix, "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_exit_code_0(self):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
@@ -278,7 +278,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python3", "-c", "exit(0)"])
         self.assertEqual(ce.exception.code, 0)
 
-    #@unittest.skipUnless(is_posix, "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_exit_code_1(self):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
@@ -287,7 +287,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python3", "-c", "exit(1)"])
         self.assertEqual(ce.exception.code, 1)
 
-    #@unittest.skipUnless(is_posix, "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_exit_code_2(self):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
