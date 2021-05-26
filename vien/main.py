@@ -86,7 +86,7 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
     # We'll modify each command to exit with the exit code on first non-zero
 
     glued = " && ".join(f'( {c} )' for c in commands)
-    glued = f"({glued}) & exit /b %ERRORLEVEL%"
+    #glued = f"({glued}) & exit /b %ERRORLEVEL%"
 
     # commands = [f"{c} || exit /b %ERRORLEVEL%" for c in commands]
     #
