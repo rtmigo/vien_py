@@ -121,7 +121,12 @@ def main_delete(venv_dir: Path):
     if not venv_dir.exists():
         raise VenvDoesNotExistExit(venv_dir)
 
-    # todo test we are not running the same executable we about to delete
+    # todo try to use the same executable that created the environment
+    # If we use sys.executable, we may clear the venv in some incompatible way.
+    # But we can't just use executable from the venv when clearing it:
+    # Windows will fail with [WinError 5] Access is denied: '...python.exe'
+
+    # todo check we are not running the same executable we about to delete
     # python_exe = venv_dir_to_python_exe(venv_dir)
     print(f"Clearing {venv_dir}")
 
@@ -129,11 +134,6 @@ def main_delete(venv_dir: Path):
         [sys.executable, "-m", "venv", "--clear", str(venv_dir)],
         capture_output=True, encoding=sys.stdout.encoding)
     if result.returncode != 0:
-        # if is_windows and "WinError 5" in result.stderr:
-        #     # we all love Windows
-        #     # Error: [WinError 5] Access is denied: '...python.exe'
-        #     pass
-        # else:
         print(f"stdout: {result.stdout}")
         print(f"stderr: {result.stderr}")
         raise FailedToClearVenvExit(venv_dir)

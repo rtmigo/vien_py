@@ -375,7 +375,9 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertTrue("svetdir" in interpreter_path.parts)
         self.assertTrue("project_venv" in interpreter_path.parts)
 
-    @unittest.skipUnless(is_posix, "not POSIX")
+    ## CALL ####################################################################
+
+    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_call_needs_venv(self):
         """File exists, but venv does not exist"""
         runme_py = self.projectDir / "runme.py"
@@ -384,7 +386,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["call", str(runme_py)])
         self.assertIsErrorExit(ce.exception)
 
-    @unittest.skipUnless(is_posix, "not POSIX")
+    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_call_nonexistent_file(self):
         main_entry_point(["create"])
         with self.assertRaises(PyFileNotFoundExit) as ce:
