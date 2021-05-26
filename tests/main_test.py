@@ -18,7 +18,7 @@ from tests.common import is_posix
 from tests.time_limited import TimeLimited
 from vien import main_entry_point
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
-    PyFileNotFoundExit
+    PyFileNotFoundExit, FailedToCreateVenvExit, CannotFindExecutableExit
 
 
 class CapturedOutput:
@@ -140,7 +140,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertTrue(in_cwd.exists())
         self.assertFalse(in_project.exists())
 
-    def assertVenvDoesNotExist(self):
+    def assertVenvNotExists(self):
         self.assertFalse(self.expectedVenvDir.exists())
         self.assertVenvBinNotExists()
 
@@ -173,13 +173,22 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def test_create_with_argument(self):
         # actually this is not a good test: we are not testing whether
         # argument is really used and not ignored
-        self.assertVenvDoesNotExist()
+        self.assertVenvNotExists()
         # todo test "python3" as argument
         main_entry_point(["create", sys.executable])
         self.assertVenvExists()
 
+    def test_create_fails_with_unresolvable_argument(self):
+        # actually this is not a good test: we are not testing whether
+        # argument is really used and not ignored
+        self.assertVenvNotExists()
+        with self.assertRaises(CannotFindExecutableExit) as ce:
+            main_entry_point(["create", "labuda-ladeda-hehe"])
+        self.assertIsErrorExit(ce.exception)
+        self.assertVenvNotExists()
+
     def test_create_without_argument(self):
-        self.assertVenvDoesNotExist()
+        self.assertVenvNotExists()
         main_entry_point(["create"])
         self.assertVenvExists()
 
@@ -189,30 +198,40 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["create"])
         self.assertIsErrorExit(ce.exception)
 
+    @unittest.skipUnless(is_posix, "not sure what to resolve in windows")
+    def test_create_resolves_python3(self):
+        self.assertVenvNotExists()
+        main_entry_point(["create", "python3"])
+        self.assertVenvExists()
+
+
     ############################################################################
 
-    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_create_then_delete(self):
-        self.assertVenvDoesNotExist()
+        self.assertVenvNotExists()
         main_entry_point(["create"])
         self.assertVenvExists()
         main_entry_point(["delete"])
-        self.assertVenvDoesNotExist()
+        self.assertVenvNotExists()
 
-    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_delete_fails_if_not_exists(self):
-        self.assertVenvDoesNotExist()
+        self.assertVenvNotExists()
         with self.assertRaises(VenvDoesNotExistExit) as cm:
             main_entry_point(["delete"])
         self.assertIsErrorExit(cm.exception)
 
     ############################################################################
 
-    @unittest.skipUnless(is_posix, "not POSIX")
-    def test_recreate_with_argument(self):
-        self.assertVenvDoesNotExist()
+    def test_recreate_without_argument(self):
+        self.assertVenvNotExists()
+        main_entry_point(["recreate"])
+        self.assertVenvExists()
 
-        main_entry_point(["create", "python3"])
+    # @unittest.skipUnless(is_posix, "not POSIX")
+    def test_recreate_with_argument(self):
+        self.assertVenvNotExists()
+
+        main_entry_point(["create", sys.executable])
 
         self.assertTrue(self.expectedVenvDir.exists())
 
@@ -221,29 +240,32 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         elif self.expectedVenvBinPosix.exists():
             os.remove(self.expectedVenvBinPosix)
         else:
-            raise AssertionError
+            raise AssertionError("executable not found")
 
         self.assertVenvBinNotExists()
 
-        main_entry_point(["recreate", "python3"])
+        main_entry_point(["recreate", sys.executable])
         self.assertVenvBinExists()
 
-        main_entry_point(["recreate", "python3"])
+        main_entry_point(["recreate", sys.executable])
         self.assertVenvBinExists()
+
+    def test_recreate_fails_with_unresolvable_argument(self):
+        # actually this is not a good test: we are not testing whether
+        # argument is really used and not ignored
+        self.assertVenvNotExists()
+        with self.assertRaises(CannotFindExecutableExit) as ce:
+            main_entry_point(["recreate", "labuda-ladeda-hehe"])
+        self.assertIsErrorExit(ce.exception)
+        self.assertVenvNotExists()
 
     # @unittest.skipUnless(is_posix, "not POSIX")
 
-    @unittest.skipUnless(is_posix, "not POSIX")
-    def test_recreate_without_argument(self):
-        self.assertVenvDoesNotExist()
-
-        main_entry_point(["recreate"])
-
-        self.assertVenvExists()
+    ############################################################################
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_fails_if_not_exist(self):
-        self.assertVenvDoesNotExist()
+        self.assertVenvNotExists()
         with self.assertRaises(VenvDoesNotExistExit) as cm:
             main_entry_point(["shell"])
         self.assertIsErrorExit(cm.exception)
