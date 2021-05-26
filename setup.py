@@ -56,6 +56,7 @@ setup(
         "Typing :: Typed",
         "Topic :: Software Development :: Build Tools",
         "Operating System :: POSIX",
+        "Operating System :: Microsoft :: Windows"
     ],
 
     test_suite="test_unit.suite"

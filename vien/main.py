@@ -72,6 +72,7 @@ def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
 
 def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
     # todo test independently
+    # This function does not work "officially" yet.
 
     need_windows()
 
@@ -93,14 +94,6 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
                            shell=True,
                            # executable='/bin/bash',
                            env=env)
-
-
-# def quote_shell_arg(arg: str) -> str:
-#     # todo two separate functions called on need
-#     if is_posix:
-#         return shlex.quote(arg)
-#     else:
-#         return cmd_escape_arg(arg)
 
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
@@ -292,8 +285,6 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     raise ChildExit(cp.returncode)
 
 
-# def _run(dirs: Dirs, other_args: List[str]):
-
 def bash_args_to_str(args: List[str]) -> str:
     return ' '.join(shlex.quote(arg) for arg in args)
 
@@ -322,10 +313,6 @@ def main_run(dirs: Dirs, command: List[str]):
     #    activate_file = (dirs.venv_dir / 'bin' / 'activate').absolute()
     if not activate_file.exists():
         raise FileNotFoundError(activate_file)
-
-    # if prepend_py_path:
-    #   commands.append(f'export PYTHONPATH="{prepend_py_path}:$PYTHONPATH"')
-    # sequence.append(" ".join(quote_shell_arg(a) for a in command))
 
     exit_code = run_func(sequence, env=child_env(dirs.project_dir))
     raise ChildExit(exit_code)
@@ -406,9 +393,6 @@ def get_project_dir(parsed: Parsed) -> Path:
 
 def main_entry_point(args: Optional[List[str]] = None):
     parsed = Parsed(args)
-
-    if is_windows:
-        print("WARNING: Windows is not yet fully supported.")
 
     # todo replace private _ns attrs with public properties
 

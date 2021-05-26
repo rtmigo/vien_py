@@ -51,7 +51,7 @@ class Commands(Enum):
 
 
 class Parsed:
-    PARAM_WINDOWS_ALL_ARGS = "--windows-all-args"
+    PARAM_WINDOWS_ALL_ARGS = "--vien-secret-windows-all-args"
 
     def __init__(self, args: Optional[List[str]]):
         super().__init__()

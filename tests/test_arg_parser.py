@@ -22,7 +22,6 @@ def windows_too(args: List[str]) -> List[str]:
         return args
 
 
-
 class TestWindowsAllArgs(unittest.TestCase):
     @unittest.skipUnless(is_posix, "posix-only")
     def test_windowsallargs_fails_on_posix(self):
@@ -39,7 +38,8 @@ class TestProjectDir(unittest.TestCase):
         self.assertEqual(pd.project_dir_arg, 'a/b/c')
 
     def test_run_long_left(self):
-        pd = Parsed(windows_too('--project-dir a/b/c run python3 myfile.py'.split()))
+        pd = Parsed(
+            windows_too('--project-dir a/b/c run python3 myfile.py'.split()))
         self.assertEqual(pd.project_dir_arg, 'a/b/c')
 
     def test_call_short_right(self):

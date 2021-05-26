@@ -1,3 +1,7 @@
+# 7.0
+
+- The `create`, `call`, `delete`, `recreate` and `path` commands work on Windows.
+
 # 6.0
 
 - The `create` and `recreate` commands without arguments will create a virtual
