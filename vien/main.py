@@ -87,7 +87,7 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
 
     glued = " && ".join(f'( {c} )' for c in commands)
 
-    #print(f"CMD running {glued}")
+    # print(f"CMD running {glued}")
 
     return subprocess.call(glued,
                            shell=True,
@@ -95,12 +95,12 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
                            env=env)
 
 
-def quote_shell_arg(arg: str) -> str:
-    # todo two separate functions called on need
-    if is_posix:
-        return shlex.quote(arg)
-    else:
-        return cmd_escape_arg(arg)
+# def quote_shell_arg(arg: str) -> str:
+#     # todo two separate functions called on need
+#     if is_posix:
+#         return shlex.quote(arg)
+#     else:
+#         return cmd_escape_arg(arg)
 
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
@@ -243,7 +243,7 @@ def guess_bash_ps1():
 def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     dirs.venv_must_exist()
 
-    activate_path_quoted = quote_shell_arg(
+    activate_path_quoted = shlex.quote(
         str(dirs.venv_dir / "bin" / "activate"))
 
     old_ps1 = os.environ.get("PS1") or guess_bash_ps1()
@@ -294,19 +294,28 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
 
 # def _run(dirs: Dirs, other_args: List[str]):
 
+def bash_args_to_str(args: List[str]) -> str:
+    return ' '.join(shlex.quote(arg) for arg in args)
 
-def main_run(dirs: Dirs, other_args: List[str]):
+
+def cmdexe_args_to_str(args: List[str]) -> str:
+    return ' '.join(cmd_escape_arg(arg) for arg in args)
+
+
+def main_run(dirs: Dirs, command: List[str]):
     dirs.venv_must_exist()
 
-    commands: List[str] = list()
+    sequence: List[str] = list()
 
     if is_posix:
         activate_file = posix_bash_activate(dirs.venv_dir)
-        commands.append(f'source "{activate_file}"')
+        sequence.append(f'source {shlex.quote(str(activate_file))}')
+        sequence.append(bash_args_to_str(command))
         run_func = run_bash_sequence
     elif is_windows:
         activate_file = windows_cmdexe_activate(dirs.venv_dir)
-        commands.append(f'CALL "{activate_file}"')
+        sequence.append(f'CALL {activate_file}"')
+        sequence.append(cmdexe_args_to_str(command))
         run_func = run_cmdexe_sequence
     else:
         raise AssertionError("Unexpected OS")
@@ -316,9 +325,9 @@ def main_run(dirs: Dirs, other_args: List[str]):
 
     # if prepend_py_path:
     #   commands.append(f'export PYTHONPATH="{prepend_py_path}:$PYTHONPATH"')
-    commands.append(" ".join(quote_shell_arg(a) for a in other_args))
+    # sequence.append(" ".join(quote_shell_arg(a) for a in command))
 
-    exit_code = run_func(commands, env=child_env(dirs.project_dir))
+    exit_code = run_func(sequence, env=child_env(dirs.project_dir))
     raise ChildExit(exit_code)
 
 
