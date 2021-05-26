@@ -73,21 +73,24 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
 
     need_windows()
 
-    raise NotImplemented
+    #raise NotImplemented
 
     # https://stackoverflow.com/questions/734598/how-do-i-make-a-batch-file-terminate-upon-encountering-an-error
 
     # unlike bash, cmd.exe returns exit code zero even if last command returned
-    # non-zero. There is also no evident way to turn on (set -e) mode - to exit
-    # on the first failure.
+    # non-zero. There is also no evident way to turn on 'set -e' mode, i.e.
+    # exit on the first failure.
     #
     # We'll modify each command to exit with the exit code on first non-zero
 
-    commands = [f"{c} || exit /b %ERRORLEVEL%" for c in commands]
+    glued = " && ".join(f'( {c} )' for c in commands)
+    glued = f"({glued}) || exit /b %ERRORLEVEL%"
 
-    # combining commands like (command one)&&(command two)&&(command three)
-
-    glued = "&&".join(f'({c})' for c in commands)
+    # commands = [f"{c} || exit /b %ERRORLEVEL%" for c in commands]
+    #
+    # # combining commands like ( cmd one ) && ( cmd two ) && ( cmd three )
+    #
+    # glued = " && ".join(f'( {c} )' for c in commands)
 
     print(f"CMD running {glued}")
 
