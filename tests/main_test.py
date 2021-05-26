@@ -295,7 +295,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python3", "-c", "exit(2)"])
         self.assertEqual(ce.exception.code, 2)
 
-    #@unittest.skipUnless(is_posix, "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_p(self):
         """Checking the -p changes both venv directory and the first item
         in PYTHONPATH"""
@@ -323,7 +323,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             self.assertInVenv(Path(d["sys.executable"]))
 
     # @unittest.skipUnless(is_posix, "not POSIX")
-    def test_run(self):
+    def test_run_python_version(self):
         main_entry_point(["create"])
 
         with self.assertRaises(ChildExit):
@@ -331,7 +331,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             # (was failing with nargs='*', ok with nargs=argparse.REMAINDER)
             main_entry_point(["run", "python3", "--version"])
 
-    # @unittest.skipUnless(is_posix, "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_python_code(self):
         """Testing vien run python3 -c '...'"""
         main_entry_point(["create"])
