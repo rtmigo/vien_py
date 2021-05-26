@@ -1,5 +1,4 @@
 import unittest
-from pathlib import PosixPath, WindowsPath, Path
 
 from vien._common import need_posix, NotPosixOsError
 
