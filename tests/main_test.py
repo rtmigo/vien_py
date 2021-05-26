@@ -158,12 +158,14 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     def write_program(self, py_file_path: Path) -> Path:
         out_file_path = py_file_path.parent / 'output.json'
+        out_file_path_str = repr(str(out_file_path))
         code = "import pathlib, sys, json\n" \
                "d={'sys.path': sys.path, \n" \
                "   'sys.executable': sys.executable}\n" \
                "js=json.dumps(d)\n" \
-               f'(pathlib.Path("{out_file_path}")).write_text(js)'
-        py_file_path.write_text(code)
+               f"file=pathlib.Path({out_file_path_str})\n" \
+               'file.write_text(js, encoding="utf-8")'
+        py_file_path.write_text(code, encoding='utf-8')
 
         assert not out_file_path.exists()
         return out_file_path
@@ -269,7 +271,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python", "-c", "pass"])
         self.assertIsErrorExit(cm.exception)
 
-    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_run_exit_code_0(self):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
@@ -278,7 +279,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python3", "-c", "exit(0)"])
         self.assertEqual(ce.exception.code, 0)
 
-    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_run_exit_code_1(self):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
@@ -287,7 +287,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python3", "-c", "exit(1)"])
         self.assertEqual(ce.exception.code, 1)
 
-    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_exit_code_2(self):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
@@ -319,14 +318,12 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             self.assertEqual(ce.exception.code, 0)
 
             # loading json and checking the values
-            d = json.loads(output_file.read_text())
+            d = json.loads(output_file.read_text(encoding="utf-8"))
             self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
             self.assertInVenv(Path(d["sys.executable"]))
 
-
-
-    @unittest.skipUnless(is_posix, "not POSIX")
-    def test_run(self):
+    # @unittest.skipUnless(is_posix, "not POSIX")
+    def test_run_python_version(self):
         main_entry_point(["create"])
 
         with self.assertRaises(ChildExit):

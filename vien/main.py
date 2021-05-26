@@ -83,16 +83,9 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
     # non-zero. There is also no evident way to turn on 'set -e' mode, i.e.
     # exit on the first failure.
     #
-    # We'll modify each command to exit with the exit code on first non-zero
+    # We'll just glue all the commands with &&
 
     glued = " && ".join(f'( {c} )' for c in commands)
-    #glued = f"({glued}) & exit /b %ERRORLEVEL%"
-
-    # commands = [f"{c} || exit /b %ERRORLEVEL%" for c in commands]
-    #
-    # # combining commands like ( cmd one ) && ( cmd two ) && ( cmd three )
-    #
-    # glued = " && ".join(f'( {c} )' for c in commands)
 
     print(f"CMD running {glued}")
 
