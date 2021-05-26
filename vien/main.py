@@ -47,12 +47,12 @@ def get_vien_dir() -> Path:
 
 
 def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
-    #need_posix()
+    # need_posix()
 
     # command || exit /b 666
 
     lines = [
-        "#!/bin/bash" # necessary?
+        #"#!/bin/bash"  # necessary?
         "set -e",  # fail on first error
     ]
 
@@ -299,40 +299,6 @@ def _insert_into_pythonpath(insert_me: str) -> str:
     # pathnames separated by os.pathsep (e.g. colons on Unix or semicolons
     # on Windows)"
     return os.pathsep.join([insert_me] + sys.path)
-
-
-def main_call_old(py_file: str, proj_rel_path: Optional[str],
-                  other_args: List[str]):
-    file = Path(py_file)
-    if not file.exists():
-        raise PyFileNotFoundExit(file)
-
-    assert isinstance(other_args, list)
-
-    if proj_rel_path is not None:
-        proj_path = Path(os.path.normpath(file.parent / proj_rel_path))
-    else:
-        proj_path = Path('.')
-
-    dirs = Dirs(proj_path).venv_must_exist()
-
-    # todo allow python options (before file name)
-
-    python_exe = venv_dir_to_python_exe(dirs.venv_dir)
-    args = [str(python_exe), str(file)] + other_args
-
-    env: Optional[Dict]
-    if proj_rel_path:
-        env = {
-            **os.environ,
-            'PYTHONPATH': _insert_into_pythonpath(str(proj_path))
-        }
-    else:
-        env = None
-
-    cp = subprocess.run(args, env=env)
-
-    raise ChildExit(cp.returncode)
 
 
 def child_env(proj_path: Path) -> Optional[Dict]:
