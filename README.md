@@ -1,8 +1,6 @@
-[![PyPI version shields.io](https://img.shields.io/pypi/v/vien.svg)](https://pypi.python.org/pypi/vien/)
-[![Generic badge](https://img.shields.io/badge/Python-3.7+-blue.svg)](#)
-[![Generic badge](https://img.shields.io/badge/OS-Linux%20|%20macOS-blue.svg)](#)
-[![Generic badge](https://img.shields.io/badge/OS-Windows-yellow.svg)](#)
-
+`vien` supports Python 3.7+ on Linux and macOS.
+In the case of Windows, all commands work, except for `run` and `shell`.
+-----
 
 # [vien](https://github.com/rtmigo/vien_py#readme)
 
@@ -14,11 +12,6 @@ It provides one-line shortcuts for:
 - creating and deleting environments
 - running commands inside environments
 - switching between environments in bash shell
-
------
-
-`vien` supports Python 3.7+ on Linux and macOS.
-In the case of Windows, all commands work, except for `run` and `shell`.
 
 -----
 
