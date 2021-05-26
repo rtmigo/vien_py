@@ -12,7 +12,7 @@ from vien.bash_runner import *
 from tests.time_limited import TimeLimited
 
 
-@unittest.skipUnless(is_posix(), "not POSIX")
+@unittest.skipUnless(is_posix, "not POSIX")
 class TestRunAsBash(unittest.TestCase):
 
     # python3 -m unittest svet.bash_runner_test

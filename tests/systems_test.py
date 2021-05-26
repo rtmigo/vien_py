@@ -1,17 +1,25 @@
 import unittest
-from pathlib import PosixPath, WindowsPath, Path
 
-from vien._common import need_posix, NotPosixError
+from vien._common import need_posix, NotPosixOsError
 
-is_cwd_posix = isinstance(Path().cwd(), PosixPath)
-is_cwd_windows = isinstance(Path().cwd(), WindowsPath)
+
+def is_posix_importable() -> bool:
+    try:
+        import posix
+        return True
+    except ImportError:
+        return False
+
+
+# is_cwd_posix = isinstance(Path().cwd(), PosixPath)
+# is_cwd_windows = isinstance(Path().cwd(), WindowsPath)
 
 
 class Test(unittest.TestCase):
 
     def test_need_posix(self):
-        if is_cwd_posix:
+        if is_posix_importable():
             need_posix()  # no exception
         else:
-            with self.assertRaises(NotPosixError):
+            with self.assertRaises(NotPosixOsError):
                 need_posix()

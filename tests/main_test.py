@@ -92,11 +92,11 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def tearDown(self):
         # moving out of project dir to stop "using" the _temp_dir
         os.chdir(self._old_cwd)
+        # VIENDIR was assigned in setUp
         del os.environ["VIENDIR"]
 
         try:
             shutil.rmtree(self._temp_dir)
-            # self._td.cleanup()
         except PermissionError as e:
             # PermissionError: [WinError 32] The process cannot access
             # the file because it is being used by another process:
@@ -191,7 +191,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     ############################################################################
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_recreate_with_argument(self):
         self.assertVenvDoesNotExist()
 
@@ -214,9 +214,9 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         main_entry_point(["recreate", "python3"])
         self.assertVenvBinExists()
 
-    # @unittest.skipUnless(is_posix(), "not POSIX")
+    # @unittest.skipUnless(is_posix, "not POSIX")
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_recreate_without_argument(self):
         self.assertVenvDoesNotExist()
 
@@ -224,7 +224,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         self.assertVenvExists()
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_create_then_delete(self):
         self.assertVenvDoesNotExist()
         main_entry_point(["create"])
@@ -232,27 +232,27 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         main_entry_point(["delete"])
         self.assertVenvDoesNotExist()
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_delete_fails_if_not_exist(self):
         self.assertVenvDoesNotExist()
         with self.assertRaises(VenvDoesNotExistExit) as cm:
             main_entry_point(["delete"])
         self.assertIsErrorExit(cm.exception)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_fails_if_not_exist(self):
         self.assertVenvDoesNotExist()
         with self.assertRaises(VenvDoesNotExistExit) as cm:
             main_entry_point(["shell"])
         self.assertIsErrorExit(cm.exception)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_needs_venv(self):
         with self.assertRaises(VenvDoesNotExistExit) as cm:
             main_entry_point(["run", "python", "-c", "pass"])
         self.assertIsErrorExit(cm.exception)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_p(self):
         """Checking the -p changes both venv directory and the first item
         in PYTHONPATH"""
@@ -279,7 +279,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
             self.assertInVenv(Path(d["sys.executable"]))
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_exit_code_0(self):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
@@ -288,7 +288,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python3", "-c", "exit(0)"])
         self.assertEqual(ce.exception.code, 0)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_exit_code_1(self):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
@@ -297,7 +297,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python3", "-c", "exit(1)"])
         self.assertEqual(ce.exception.code, 1)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_exit_code_2(self):
         """Test that main_entry_point returns the same exit code,
         as the called command"""
@@ -306,7 +306,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python3", "-c", "exit(2)"])
         self.assertEqual(ce.exception.code, 2)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run(self):
         main_entry_point(["create"])
 
@@ -315,7 +315,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             # (was failing with nargs='*', ok with nargs=argparse.REMAINDER)
             main_entry_point(["run", "python3", "--version"])
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_python_code(self):
         """Testing vien run python3 -c '...'"""
         main_entry_point(["create"])
@@ -349,7 +349,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertTrue("svetdir" in interpreter_path.parts)
         self.assertTrue("project_venv" in interpreter_path.parts)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_call_needs_venv(self):
         """File exists, but venv does not exist"""
         runme_py = self.projectDir / "runme.py"
@@ -358,7 +358,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["call", str(runme_py)])
         self.assertIsErrorExit(ce.exception)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_call_nonexistent_file(self):
         main_entry_point(["create"])
         with self.assertRaises(PyFileNotFoundExit) as ce:
@@ -372,19 +372,19 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["call", "main.py"])
         self.assertEqual(ce.exception.code, exit_code)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_call_42(self):
         """Calling a temporary .py script that must return 42.
         Testing whether it runs and whether we get correct exit code."""
         self._call_for_exit_code(42)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_call_23(self):
         """Calling a temporary .py script that must return 23.
         Testing whether it runs and whether we get correct exit code."""
         self._call_for_exit_code(23)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_call_parameters(self):
         """Testing that call really passes parameters to child."""
 
@@ -400,7 +400,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["call", "main.py", "aaa", "bbb", "ccc"])
         self.assertEqual(ce.exception.code, 4)  # received len(argv)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_call_project_dir_venv(self):
         """Tests that the -p parameter actually changes the project directory,
         so the correct virtual environment is found."""
@@ -455,7 +455,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             with self.assertRaises(VenvDoesNotExistExit):
                 main_entry_point(["call", "--project-dir", "../..", run_py_str])
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_call_project_dir_relative_imports(self):
         """ Tests that modules are importable from the project dir
         set by -p parameter"""
@@ -477,7 +477,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                 main_entry_point(["-p", "..", "call", run_py_str])
             self.assertEqual(ce.exception.code, 55)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_p(self):
         """Checking the -p changes both venv directory and the first item
         in PYTHONPATH"""
@@ -504,7 +504,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
             self.assertInVenv(Path(d["sys.executable"]))
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_ok(self):
         main_entry_point(["create"])
 
@@ -537,7 +537,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             self.assertLess(end - start, 3)
             self.assertTrue(dir_to_create.exists())
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_exit_code_non_zero(self):
         main_entry_point(["create"])
         with TimeLimited(10):  # safety net
@@ -545,7 +545,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                 main_entry_point(["shell", "--input", "exit 42"])
             self.assertEqual(ce.exception.code, 42)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_exit_code_zero(self):
         main_entry_point(["create"])
         with TimeLimited(10):  # safety net
@@ -553,7 +553,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                 main_entry_point(["shell", "--input", "exit"])
             self.assertFalse(ce.exception.code, 0)
 
-    @unittest.skipUnless(is_posix(), "not POSIX")
+    @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_but_no_venv(self):
         with TimeLimited(10):  # safety net
             with self.assertRaises(VenvDoesNotExistExit) as cm:
