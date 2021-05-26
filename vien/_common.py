@@ -7,10 +7,15 @@ if not is_windows and not is_posix:
     raise SystemExit(f"System '{os.name}' is not supported.")
 
 
-class NotPosixOsError(Exception):
+class UnexpectedOsError(Exception):
     pass
 
 
 def need_posix():
     if not is_posix:
-        raise NotPosixOsError
+        raise UnexpectedOsError
+
+
+def need_windows():
+    if not is_windows:
+        raise UnexpectedOsError

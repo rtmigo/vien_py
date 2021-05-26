@@ -264,18 +264,37 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     ############################################################################
 
-    @unittest.skipUnless(is_posix, "not POSIX")
-    def test_shell_fails_if_not_exist(self):
-        self.assertVenvNotExists()
-        with self.assertRaises(VenvDoesNotExistExit) as cm:
-            main_entry_point(["shell"])
-        self.assertIsErrorExit(cm.exception)
-
-    @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_needs_venv(self):
         with self.assertRaises(VenvDoesNotExistExit) as cm:
             main_entry_point(["run", "python", "-c", "pass"])
         self.assertIsErrorExit(cm.exception)
+
+    @unittest.skipUnless(is_posix, "not POSIX")
+    def test_run_exit_code_0(self):
+        """Test that main_entry_point returns the same exit code,
+        as the called command"""
+        main_entry_point(["create"])  # need venv to run
+        with self.assertRaises(ChildExit) as ce:
+            main_entry_point(["run", "python3", "-c", "exit(0)"])
+        self.assertEqual(ce.exception.code, 0)
+
+    @unittest.skipUnless(is_posix, "not POSIX")
+    def test_run_exit_code_1(self):
+        """Test that main_entry_point returns the same exit code,
+        as the called command"""
+        main_entry_point(["create"])  # need venv to run
+        with self.assertRaises(ChildExit) as ce:
+            main_entry_point(["run", "python3", "-c", "exit(1)"])
+        self.assertEqual(ce.exception.code, 1)
+
+    @unittest.skipUnless(is_posix, "not POSIX")
+    def test_run_exit_code_2(self):
+        """Test that main_entry_point returns the same exit code,
+        as the called command"""
+        main_entry_point(["create"])  # need venv to run
+        with self.assertRaises(ChildExit) as ce:
+            main_entry_point(["run", "python3", "-c", "exit(2)"])
+        self.assertEqual(ce.exception.code, 2)
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_p(self):
@@ -304,32 +323,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
             self.assertInVenv(Path(d["sys.executable"]))
 
-    @unittest.skipUnless(is_posix, "not POSIX")
-    def test_run_exit_code_0(self):
-        """Test that main_entry_point returns the same exit code,
-        as the called command"""
-        main_entry_point(["create"])  # need venv to run
-        with self.assertRaises(ChildExit) as ce:
-            main_entry_point(["run", "python3", "-c", "exit(0)"])
-        self.assertEqual(ce.exception.code, 0)
 
-    @unittest.skipUnless(is_posix, "not POSIX")
-    def test_run_exit_code_1(self):
-        """Test that main_entry_point returns the same exit code,
-        as the called command"""
-        main_entry_point(["create"])  # need venv to run
-        with self.assertRaises(ChildExit) as ce:
-            main_entry_point(["run", "python3", "-c", "exit(1)"])
-        self.assertEqual(ce.exception.code, 1)
-
-    @unittest.skipUnless(is_posix, "not POSIX")
-    def test_run_exit_code_2(self):
-        """Test that main_entry_point returns the same exit code,
-        as the called command"""
-        main_entry_point(["create"])  # need venv to run
-        with self.assertRaises(ChildExit) as ce:
-            main_entry_point(["run", "python3", "-c", "exit(2)"])
-        self.assertEqual(ce.exception.code, 2)
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_run(self):
@@ -534,6 +528,13 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             d = json.loads(output_file.read_text())
             self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
             self.assertInVenv(Path(d["sys.executable"]))
+
+    @unittest.skipUnless(is_posix, "not POSIX")
+    def test_shell_fails_if_not_exist(self):
+        self.assertVenvNotExists()
+        with self.assertRaises(VenvDoesNotExistExit) as cm:
+            main_entry_point(["shell"])
+        self.assertIsErrorExit(cm.exception)
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_ok(self):
