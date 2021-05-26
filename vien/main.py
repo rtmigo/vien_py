@@ -120,20 +120,23 @@ def main_delete(venv_dir: Path):
         raise ValueError(venv_dir)
     if not venv_dir.exists():
         raise VenvDoesNotExistExit(venv_dir)
-    python_exe = venv_dir_to_python_exe(venv_dir)
+
+    # todo test we are not running the same executable we about to delete
+    # python_exe = venv_dir_to_python_exe(venv_dir)
     print(f"Clearing {venv_dir}")
 
-    result = subprocess.run([python_exe, "-m", "venv", "--clear", str(venv_dir)], capture_output=True, encoding=sys.stdout.encoding)
+    result = subprocess.run(
+        [sys.executable, "-m", "venv", "--clear", str(venv_dir)],
+        capture_output=True, encoding=sys.stdout.encoding)
     if result.returncode != 0:
-
-        if is_windows and "WinError 5" in result.stderr:
-            # we all love Windows
-            # Error: [WinError 5] Access is denied: '...python.exe'
-            pass
-        else:
-            print(f"stdout: {result.stdout}")
-            print(f"stderr: {result.stderr}")
-            raise FailedToClearVenvExit(venv_dir)
+        # if is_windows and "WinError 5" in result.stderr:
+        #     # we all love Windows
+        #     # Error: [WinError 5] Access is denied: '...python.exe'
+        #     pass
+        # else:
+        print(f"stdout: {result.stdout}")
+        print(f"stderr: {result.stderr}")
+        raise FailedToClearVenvExit(venv_dir)
     print(f"Deleting {venv_dir}")
     shutil.rmtree(str(venv_dir))
 
