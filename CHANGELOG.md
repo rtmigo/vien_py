@@ -1,3 +1,8 @@
+# 7.1
+
+- Fixed: `call` command sometimes received incorrect `$PYTHONPATH` values on systems 
+  with multiple versions of Python
+
 # 7.0
 
 - The `create`, `call`, `delete`, `recreate` and `path` commands work on Windows.
