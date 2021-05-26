@@ -1,13 +1,21 @@
 # SPDX-FileCopyrightText: Holger Just
 # SPDX-License-Identifier: CC BY-SA 3.0
-# code from https://stackoverflow.com/a/29215357
+# code taken from https://stackoverflow.com/a/29215357
 
 import re
 
 
+# original link on SO is broken:
+#   http://blogs.msdn.com/b/twistylittlepassagesallalike/archive/2011/04/23/
+#   everyone-quotes-arguments-the-wrong-way.aspx
+# same link on web-archive:
+#   https://web.archive.org/web/20161228144344/https://blogs.msdn.microsoft.com/
+#   twistylittlepassagesallalike/2011/04/23/
+#   everyone-quotes-command-line-arguments-the-wrong-way/
+
+
 def cmd_escape_arg(arg):
     # Escape the argument for the cmd.exe shell.
-    # See http://blogs.msdn.com/b/twistylittlepassagesallalike/archive/2011/04/23/everyone-quotes-arguments-the-wrong-way.aspx
     #
     # First we escape the quote chars to produce a argument suitable for
     # CommandLineToArgvW. We don't need to do this for simple arguments.

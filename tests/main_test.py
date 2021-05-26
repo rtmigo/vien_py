@@ -162,7 +162,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                "d={'sys.path': sys.path, \n" \
                "   'sys.executable': sys.executable}\n" \
                "js=json.dumps(d)\n" \
-               f'(pathlib.Path("{out_file_path}")).write_text(js)'
+               f'(pathlib.Path("{out_file_path}")).write_text(js, encoding="utf-8")'
         py_file_path.write_text(code)
 
         assert not out_file_path.exists()
@@ -316,7 +316,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             self.assertEqual(ce.exception.code, 0)
 
             # loading json and checking the values
-            d = json.loads(output_file.read_text())
+            d = json.loads(output_file.read_text(encoding="utf-8"))
             self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
             self.assertInVenv(Path(d["sys.executable"]))
 
