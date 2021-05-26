@@ -191,7 +191,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     ############################################################################
 
-    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_create_then_delete(self):
         self.assertVenvDoesNotExist()
         main_entry_point(["create"])
@@ -199,7 +198,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         main_entry_point(["delete"])
         self.assertVenvDoesNotExist()
 
-    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_delete_fails_if_not_exists(self):
         self.assertVenvDoesNotExist()
         with self.assertRaises(VenvDoesNotExistExit) as cm:
@@ -208,7 +206,13 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     ############################################################################
 
-    @unittest.skipUnless(is_posix, "not POSIX")
+    def test_recreate_without_argument(self):
+        self.assertVenvDoesNotExist()
+        main_entry_point(["recreate"])
+        self.assertVenvExists()
+
+
+    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_recreate_with_argument(self):
         self.assertVenvDoesNotExist()
 
@@ -233,13 +237,8 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     # @unittest.skipUnless(is_posix, "not POSIX")
 
-    @unittest.skipUnless(is_posix, "not POSIX")
-    def test_recreate_without_argument(self):
-        self.assertVenvDoesNotExist()
 
-        main_entry_point(["recreate"])
-
-        self.assertVenvExists()
+    ############################################################################
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_fails_if_not_exist(self):

@@ -11,10 +11,6 @@ def is_posix_importable() -> bool:
         return False
 
 
-# is_cwd_posix = isinstance(Path().cwd(), PosixPath)
-# is_cwd_windows = isinstance(Path().cwd(), WindowsPath)
-
-
 class Test(unittest.TestCase):
 
     def test_need_posix(self):
