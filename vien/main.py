@@ -89,6 +89,18 @@ def venv_dir_to_python_exe(venv_dir: Path) -> Path:
     raise Exception(f"Cannot find the Python interpreter in {venv_dir}.")
 
 
+def windows_cmdexe_activate(venv_dir: Path) -> Path:
+    # https://docs.python.org/3/library/venv.html
+    assert is_windows
+    return venv_dir / 'Scripts' / 'activate.bat'
+
+
+def posix_bash_activate(venv_dir: Path) -> Path:
+    # https://docs.python.org/3/library/venv.html
+    assert is_posix
+    return venv_dir / 'bin' / 'activate'
+
+
 def arg_to_python_interpreter(argument: Optional[str]) -> str:
     if argument is None:
         return sys.executable
