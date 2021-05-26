@@ -351,7 +351,8 @@ def _insert_into_pythonpath(insert_me: str) -> str:
              os.environ.get("PYTHONPATH", '').split(os.pathsep)]
     parts = [p for p in parts if p]
 
-    parts.insert(0, insert_me)
+    if insert_me not in parts:
+        parts.insert(0, insert_me)
     return os.pathsep.join(parts)
 
 
