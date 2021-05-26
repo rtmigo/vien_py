@@ -349,10 +349,8 @@ def _insert_into_pythonpath(insert_me: str) -> str:
 
     parts = [p.strip() for p in
              os.environ.get("PYTHONPATH", '').split(os.pathsep)]
+    parts = [p for p in parts if p]
 
-    if len(parts) == 1 and not parts[0]:
-        # if it's only one string and it's empty
-        parts = []
     parts.insert(0, insert_me)
     return os.pathsep.join(parts)
 
