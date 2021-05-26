@@ -8,15 +8,17 @@ import os
 import shutil
 import subprocess
 import sys
+import shlex
 from pathlib import Path
 from typing import *
 
 from vien import is_posix
-from vien._common import need_posix, is_windows
+from vien._common import need_posix, is_windows, need_windows
 from vien.arg_parser import Commands, Parsed
 from vien.bash_runner import run_as_bash_script
 from vien.call_parser import call_pyfile
 from vien.colors import Colors
+from vien.escaping_cmd import cmd_escape_arg
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit, PyFileArgNotFoundExit, FailedToCreateVenvExit, \
     FailedToClearVenvExit, CannotFindExecutableExit
@@ -49,25 +51,56 @@ def get_vien_dir() -> Path:
 def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
     need_posix()
 
-    bash_lines = [
-        "#!/bin/bash"
+    # command || exit /b 666
+
+    lines = [
+        # shebang not necessary as we specify executable in subprocess.call
         "set -e",  # fail on first error
     ]
 
-    bash_lines.extend(commands)
+    lines.extend(commands)
 
     # Ubuntu really needs executable='/bin/bash'.
     # Otherwise the command is executed in /bin/sh, ignoring the hashbang,
     # but SH fails to execute commands like 'source'
 
-    return subprocess.call("\n".join(bash_lines),
+    return subprocess.call("\n".join(lines),
                            shell=True,
                            executable='/bin/bash',
                            env=env)
 
 
-def quote(arg: str) -> str:
-    return json.dumps(arg)
+def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
+    # todo test independently
+
+    need_windows()
+
+    # raise NotImplemented
+
+    # https://stackoverflow.com/questions/734598/how-do-i-make-a-batch-file-terminate-upon-encountering-an-error
+
+    # unlike bash, cmd.exe returns exit code zero even if last command returned
+    # non-zero. There is also no evident way to turn on 'set -e' mode, i.e.
+    # exit on the first failure.
+    #
+    # We'll just glue all the commands with &&
+
+    glued = " && ".join(f'( {c} )' for c in commands)
+
+    #print(f"CMD running {glued}")
+
+    return subprocess.call(glued,
+                           shell=True,
+                           # executable='/bin/bash',
+                           env=env)
+
+
+def quote_shell_arg(arg: str) -> str:
+    # todo two separate functions called on need
+    if is_posix:
+        return shlex.quote(arg)
+    else:
+        return cmd_escape_arg(arg)
 
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
@@ -87,6 +120,18 @@ def venv_dir_to_python_exe(venv_dir: Path) -> Path:
             return executable
 
     raise Exception(f"Cannot find the Python interpreter in {venv_dir}.")
+
+
+def windows_cmdexe_activate(venv_dir: Path) -> Path:
+    # https://docs.python.org/3/library/venv.html
+    assert is_windows
+    return venv_dir / 'Scripts' / 'activate.bat'
+
+
+def posix_bash_activate(venv_dir: Path) -> Path:
+    # https://docs.python.org/3/library/venv.html
+    assert is_posix
+    return venv_dir / 'bin' / 'activate'
 
 
 def arg_to_python_interpreter(argument: Optional[str]) -> str:
@@ -121,7 +166,12 @@ def main_delete(venv_dir: Path):
     if not venv_dir.exists():
         raise VenvDoesNotExistExit(venv_dir)
 
-    # todo test we are not running the same executable we about to delete
+    # todo try to use the same executable that created the environment
+    # If we use sys.executable, we may clear the venv in some incompatible way.
+    # But we can't just use executable from the venv when clearing it:
+    # Windows will fail with [WinError 5] Access is denied: '...python.exe'
+
+    # todo check we are not running the same executable we about to delete
     # python_exe = venv_dir_to_python_exe(venv_dir)
     print(f"Clearing {venv_dir}")
 
@@ -129,11 +179,6 @@ def main_delete(venv_dir: Path):
         [sys.executable, "-m", "venv", "--clear", str(venv_dir)],
         capture_output=True, encoding=sys.stdout.encoding)
     if result.returncode != 0:
-        # if is_windows and "WinError 5" in result.stderr:
-        #     # we all love Windows
-        #     # Error: [WinError 5] Access is denied: '...python.exe'
-        #     pass
-        # else:
         print(f"stdout: {result.stdout}")
         print(f"stderr: {result.stderr}")
         raise FailedToClearVenvExit(venv_dir)
@@ -198,7 +243,8 @@ def guess_bash_ps1():
 def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     dirs.venv_must_exist()
 
-    activate_path_quoted = quote(str(dirs.venv_dir / "bin" / "activate"))
+    activate_path_quoted = quote_shell_arg(
+        str(dirs.venv_dir / "bin" / "activate"))
 
     old_ps1 = os.environ.get("PS1") or guess_bash_ps1()
 
@@ -251,17 +297,28 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
 
 def main_run(dirs: Dirs, other_args: List[str]):
     dirs.venv_must_exist()
-    activate_file = (dirs.venv_dir / 'bin' / 'activate').absolute()
+
+    commands: List[str] = list()
+
+    if is_posix:
+        activate_file = posix_bash_activate(dirs.venv_dir)
+        commands.append(f'source "{activate_file}"')
+        run_func = run_bash_sequence
+    elif is_windows:
+        activate_file = windows_cmdexe_activate(dirs.venv_dir)
+        commands.append(f'CALL "{activate_file}"')
+        run_func = run_cmdexe_sequence
+    else:
+        raise AssertionError("Unexpected OS")
+    #    activate_file = (dirs.venv_dir / 'bin' / 'activate').absolute()
     if not activate_file.exists():
         raise FileNotFoundError(activate_file)
 
-    commands: List[str] = list()
-    commands.append(f'source "{activate_file}"')
     # if prepend_py_path:
     #   commands.append(f'export PYTHONPATH="{prepend_py_path}:$PYTHONPATH"')
-    commands.append(" ".join(quote(a) for a in other_args))
+    commands.append(" ".join(quote_shell_arg(a) for a in other_args))
 
-    exit_code = run_bash_sequence(commands, env=child_env(dirs.project_dir))
+    exit_code = run_func(commands, env=child_env(dirs.project_dir))
     raise ChildExit(exit_code)
 
 
@@ -285,40 +342,6 @@ def _insert_into_pythonpath(insert_me: str) -> str:
     # pathnames separated by os.pathsep (e.g. colons on Unix or semicolons
     # on Windows)"
     return os.pathsep.join([insert_me] + sys.path)
-
-
-def main_call_old(py_file: str, proj_rel_path: Optional[str],
-                  other_args: List[str]):
-    file = Path(py_file)
-    if not file.exists():
-        raise PyFileNotFoundExit(file)
-
-    assert isinstance(other_args, list)
-
-    if proj_rel_path is not None:
-        proj_path = Path(os.path.normpath(file.parent / proj_rel_path))
-    else:
-        proj_path = Path('.')
-
-    dirs = Dirs(proj_path).venv_must_exist()
-
-    # todo allow python options (before file name)
-
-    python_exe = venv_dir_to_python_exe(dirs.venv_dir)
-    args = [str(python_exe), str(file)] + other_args
-
-    env: Optional[Dict]
-    if proj_rel_path:
-        env = {
-            **os.environ,
-            'PYTHONPATH': _insert_into_pythonpath(str(proj_path))
-        }
-    else:
-        env = None
-
-    cp = subprocess.run(args, env=env)
-
-    raise ChildExit(cp.returncode)
 
 
 def child_env(proj_path: Path) -> Optional[Dict]:
@@ -374,6 +397,9 @@ def get_project_dir(parsed: Parsed) -> Path:
 
 def main_entry_point(args: Optional[List[str]] = None):
     parsed = Parsed(args)
+
+    if is_windows:
+        print("WARNING: Windows is not yet fully supported.")
 
     # todo replace private _ns attrs with public properties
 

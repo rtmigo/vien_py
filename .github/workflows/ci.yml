@@ -23,8 +23,8 @@ jobs:
         # Windows is not really supported: many tests are skipped on Windows.
         # But we still run the tests, gradually increasing the number
         # of windows-compatible tests
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-        python-version: [ 3.7, 3.9 ]
+        os: [  windows-latest, ubuntu-latest, macos-latest ] # ,
+        python-version: [ 3.7, 3.9] #
 
     steps:
       - uses: actions/checkout@v2

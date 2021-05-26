@@ -4,7 +4,9 @@
   environment with the same interpreter that started `vien`, instead of the
   interpreter available as `python3`
 - Fixed: virtual environments were not cleared (`venv --clear`) before deletion  
-
+- Attempting to run the program on Windows will display a message stating that 
+  the system is not fully supported
+  
 # 5.0
 
 - Option `--project-dir` aka `-p` is now supported by all commands
