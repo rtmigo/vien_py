@@ -47,22 +47,22 @@ def get_vien_dir() -> Path:
 
 
 def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
-    need_posix()
+    #need_posix()
 
     # command || exit /b 666
 
-    bash_lines = [
+    lines = [
         "#!/bin/bash" # necessary?
         "set -e",  # fail on first error
     ]
 
-    bash_lines.extend(commands)
+    lines.extend(commands)
 
     # Ubuntu really needs executable='/bin/bash'.
     # Otherwise the command is executed in /bin/sh, ignoring the hashbang,
     # but SH fails to execute commands like 'source'
 
-    return subprocess.call("\n".join(bash_lines),
+    return subprocess.call("\n".join(lines),
                            shell=True,
                            executable='/bin/bash',
                            env=env)
