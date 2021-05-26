@@ -18,6 +18,12 @@ class PythonPathTestPosix(unittest.TestCase):
         self.assertEqual(_insert_into_pythonpath('/a/b/c'),
                          '/a/b/c')
 
+    def test_empties_skipped(self):
+        os.environ["PYTHONPATH"] = ':xx:::::yy:::'
+        self.assertEqual(_insert_into_pythonpath('/a/b/c'),
+                         '/a/b/c')
+
+
 
     def test_two(self):
         os.environ["PYTHONPATH"] = ' /bbb/ccc :  /dd/ee/ff '
@@ -27,6 +33,7 @@ class PythonPathTestPosix(unittest.TestCase):
 
 @unittest.skipUnless(is_windows, "windows format")
 class PythonPathTestWindows(unittest.TestCase):
+    # most tests are done on POSIX. Here we just test ';' and 'C:/'
     def test_two(self):
         os.environ["PYTHONPATH"] = ' C:/bbb/ccc ;  D:/dd/ee/ff '
         self.assertEqual(_insert_into_pythonpath('E:/a/b/c'),
