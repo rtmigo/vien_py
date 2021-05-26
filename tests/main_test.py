@@ -163,7 +163,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                "   'sys.executable': sys.executable}\n" \
                "js=json.dumps(d)\n" \
                f'(pathlib.Path("{out_file_path}")).write_text(js, encoding="utf-8")'
-        py_file_path.write_text(code)
+        py_file_path.write_text(code, encoding='utf-8')
 
         assert not out_file_path.exists()
         return out_file_path
