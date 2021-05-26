@@ -92,11 +92,11 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def tearDown(self):
         # moving out of project dir to stop "using" the _temp_dir
         os.chdir(self._old_cwd)
+        # VIENDIR was assigned in setUp
         del os.environ["VIENDIR"]
 
         try:
             shutil.rmtree(self._temp_dir)
-            # self._td.cleanup()
         except PermissionError as e:
             # PermissionError: [WinError 32] The process cannot access
             # the file because it is being used by another process:
