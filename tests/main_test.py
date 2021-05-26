@@ -400,19 +400,19 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["call", "main.py"])
         self.assertEqual(ce.exception.code, exit_code)
 
-    @unittest.skipUnless(is_posix, "not POSIX")
+    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_call_42(self):
         """Calling a temporary .py script that must return 42.
         Testing whether it runs and whether we get correct exit code."""
         self._call_for_exit_code(42)
 
-    @unittest.skipUnless(is_posix, "not POSIX")
+    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_call_23(self):
         """Calling a temporary .py script that must return 23.
         Testing whether it runs and whether we get correct exit code."""
         self._call_for_exit_code(23)
 
-    @unittest.skipUnless(is_posix, "not POSIX")
+    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_call_parameters(self):
         """Testing that call really passes parameters to child."""
 
