@@ -337,23 +337,24 @@ def _insert_into_pythonpath(insert_me: str) -> str:
     # "The format is the same as the shell’s PATH: one or more directory
     # pathnames separated by os.pathsep (e.g. colons on Unix or semicolons
     # on Windows)"
-    ####
-    # $PYTHONPATH and sys.path are not the same.
-    # - sys.path contains directories used by the current interpreter
-    #   (the one that runs vien)
-    # - $PYTHONPATH is the variable to be used by all interpreters
     #
-    # For example, if we run vien on Python 3.7 and trying to use venv with
-    # Python 3.9, we should not provide out own sys.path (3.7) to the child
-    # interpreter (3.9).
+    ####
+    #
+    # $PYTHONPATH and sys.path are not the same.
+    # - $PYTHONPATH is the variable to be used by all Python interpreters
+    #   in the current shell environment
+    # - sys.path is values for the current interpreter
+    #
+    # Passing values from own sys.path to other interpreter would be a mistake.
+    # The current interpreter may be Python 3.7, and the other interpreter is
+    # Python 3.9. Our sys.path leads to 3.7 system libraries, that are
+    # unnecessary and even cause errors if added to $PYTHONPATH of 3.9.
+    #
+    ######
+    # keeping it simple: not parsing the old string, just adding a prefix
 
-    parts = [p.strip() for p in
-             os.environ.get("PYTHONPATH", '').split(os.pathsep)]
-    parts = [p for p in parts if p]
-
-    if insert_me not in parts:
-        parts.insert(0, insert_me)
-    return os.pathsep.join(parts)
+    old = os.environ.get("PYTHONPATH", '')
+    return f'{insert_me}{os.pathsep}{old}'
 
 
 def child_env(proj_path: Path) -> Optional[Dict]:
