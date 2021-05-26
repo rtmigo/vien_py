@@ -74,13 +74,19 @@ def venv_dir_to_python_exe(venv_dir: Path) -> Path:
     # this method is being tested indirectly each time the venv is created:
     # the executable will be found to be printed to stdout, otherwise
     # exception is thrown
-    for sub in ("bin/python",
-                "bin/python3",
-                "Scripts/python.exe",
-                "Scripts/python3.exe"):
-        p = venv_dir / sub
+
+    if is_posix:
+        parent = venv_dir / "bin"
+        basenames = "python", "python3"
+    else:
+        parent = venv_dir / "Scripts"
+        basenames = "python.exe", "python3.exe"
+
+    for bn in basenames:
+        p = parent / bn
         if p.exists():
             return p
+
     raise Exception(f"Cannot find the Python interpreter in {venv_dir}.")
 
 
