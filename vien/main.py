@@ -337,7 +337,23 @@ def _insert_into_pythonpath(insert_me: str) -> str:
     # "The format is the same as the shell’s PATH: one or more directory
     # pathnames separated by os.pathsep (e.g. colons on Unix or semicolons
     # on Windows)"
-    return os.pathsep.join([insert_me] + sys.path)
+    ####
+    # $PYTHONPATH and sys.path are not the same.
+    # - sys.path contains directories used by the current interpreter
+    #   (the one that runs vien)
+    # - $PYTHONPATH is the variable to be used by all interpreters
+    #
+    # For example, if we run vien on Python 3.7 and trying to use venv with
+    # Python 3.9, we should not provide out own sys.path (3.7) to the child
+    # interpreter (3.9).
+
+    parts = [p.strip() for p in
+             os.environ.get("PYTHONPATH", '').split(os.pathsep)]
+    parts = [p for p in parts if p]
+
+    if insert_me not in parts:
+        parts.insert(0, insert_me)
+    return os.pathsep.join(parts)
 
 
 def child_env(proj_path: Path) -> Optional[Dict]:
@@ -355,6 +371,7 @@ def main_call(venv_dir: Path,
               proj_path: Path,
               other_args: List[str]):
     python_exe = venv_dir_to_python_exe(venv_dir)
+    # print("EXE",python_exe)
     assert len(other_args) > 0
     args = [str(python_exe)] + other_args
 
