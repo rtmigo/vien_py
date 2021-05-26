@@ -105,7 +105,8 @@ def quote(arg: str) -> str:
         return json.dumps(arg)
     else:
         if ' ' in arg:
-            return f'"{arg}"'  # todo is it correct?
+            arg = f'"{arg}"'  # todo is it correct?
+        return arg
 
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
