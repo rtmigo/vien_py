@@ -74,6 +74,8 @@ class Test(unittest.TestCase):
 def windows_too(args: List[str]) -> List[str]:
     if is_windows:
         return [Parsed.PARAM_WINDOWS_ALL_ARGS] + args
+    else:
+        return args
 
 
 class TestsInsideTempProjectDir(unittest.TestCase):

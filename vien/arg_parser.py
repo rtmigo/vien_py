@@ -3,6 +3,8 @@ import sys
 from enum import Enum
 from typing import List, Optional
 
+from vien._common import is_windows
+
 from vien import is_posix
 
 import vien
@@ -58,6 +60,10 @@ class Parsed:
             args = sys.argv[1:]
 
         enable_windows_all_args = self.PARAM_WINDOWS_ALL_ARGS in args
+        if enable_windows_all_args:
+            # for more transparent testing, I don't want this param
+            # to ever affect posix behavior
+            assert is_windows
 
         parser = argparse.ArgumentParser()
 
