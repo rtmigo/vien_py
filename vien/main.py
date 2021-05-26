@@ -87,7 +87,7 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
 
     glued = " && ".join(f'( {c} )' for c in commands)
 
-    print(f"CMD running {glued}")
+    #print(f"CMD running {glued}")
 
     return subprocess.call(glued,
                            shell=True,
@@ -397,6 +397,9 @@ def get_project_dir(parsed: Parsed) -> Path:
 
 def main_entry_point(args: Optional[List[str]] = None):
     parsed = Parsed(args)
+
+    if is_windows:
+        print("WARNING: Windows is not yet fully supported.")
 
     # todo replace private _ns attrs with public properties
 

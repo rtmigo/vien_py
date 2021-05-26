@@ -295,6 +295,14 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["run", "python3", "-c", "exit(2)"])
         self.assertEqual(ce.exception.code, 2)
 
+    def test_run_python_version(self):
+        main_entry_point(["create"])
+
+        with self.assertRaises(ChildExit):
+            # just check the argparser handles --version properly
+            # (was failing with nargs='*', ok with nargs=argparse.REMAINDER)
+            main_entry_point(["run", "python3", "--version"])
+
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_p(self):
         """Checking the -p changes both venv directory and the first item
@@ -321,15 +329,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             d = json.loads(output_file.read_text(encoding="utf-8"))
             self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
             self.assertInVenv(Path(d["sys.executable"]))
-
-    # @unittest.skipUnless(is_posix, "not POSIX")
-    def test_run_python_version(self):
-        main_entry_point(["create"])
-
-        with self.assertRaises(ChildExit):
-            # just check the argparser handles --version properly
-            # (was failing with nargs='*', ok with nargs=argparse.REMAINDER)
-            main_entry_point(["run", "python3", "--version"])
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_python_code(self):
@@ -466,7 +465,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                 with self.assertRaises(VenvDoesNotExistExit):
                     main_entry_point(["call", run_py_str])
 
-                # this call specifies *incorrect* project dir relative to run.py.
+                # this call specifies INCORRECT project dir relative to run.py
                 with self.assertRaises(VenvDoesNotExistExit):
                     main_entry_point(
                         ["call", "--project-dir", "../..", run_py_str])
