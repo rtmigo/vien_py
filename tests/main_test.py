@@ -72,9 +72,6 @@ class Test(unittest.TestCase):
         main_entry_point(["path"])
 
 
-
-
-
 class TestsInsideTempProjectDir(unittest.TestCase):
 
     def setUp(self):
@@ -276,7 +273,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     ############################################################################
 
     @unittest.skipUnless(is_windows, "testing windows limitations")
-    def test_no_run_command_in_windows(self):
+    def test_run_missing_in_windows(self):
         with self.assertRaises(SystemExit) as cm:
             main_entry_point(["run", "python", "-c", "pass"])
         self.assertEqual(cm.exception.code, 2)
@@ -517,6 +514,12 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                 os.chdir(self._old_cwd)  # to safely delete the temp dir
 
     ############################################################################
+
+    @unittest.skipUnless(is_windows, "testing windows limitations")
+    def test_shell_missing_in_windows(self):
+        with self.assertRaises(SystemExit) as cm:
+            main_entry_point(["run", "shell"])
+        self.assertEqual(cm.exception.code, 2)
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_p(self):
