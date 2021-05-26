@@ -1,10 +1,18 @@
 import unittest
 from pathlib import Path
+from typing import List
+
+from vien._common import is_windows
 
 from tests.common import is_posix
 from vien.main import get_project_dir
 from vien.arg_parser import Parsed, Commands
 
+def windows_too(args: List[str]) -> List[str]:
+    if is_windows:
+        return [Parsed.PARAM_WINDOWS_ALL_ARGS] + args
+    else:
+        return args
 
 class TestProjectDir(unittest.TestCase):
 
@@ -56,28 +64,28 @@ class TestParseCall(unittest.TestCase):
 
 class TestParseShell(unittest.TestCase):
     def test_no_args(self):
-        pd = Parsed('shell'.split())
+        pd = Parsed(windows_too('shell'.split()))
         self.assertEqual(pd.command, Commands.shell)
         self.assertEqual(pd.shell_delay, None)
         self.assertEqual(pd.shell_input, None)
 
     def test_input(self):
-        pd = Parsed(['shell', '--input', 'cd / && ls'])
+        pd = Parsed(windows_too(['shell', '--input', 'cd / && ls']))
         self.assertEqual(pd.shell_input, 'cd / && ls')
 
     def test_delay(self):
-        pd = Parsed('shell --delay 1.2'.split())
+        pd = Parsed(windows_too('shell --delay 1.2'.split()))
         self.assertEqual(pd.shell_delay, 1.2)
 
     def test_labuda(self):
         with self.assertRaises(SystemExit) as ce:
-            pd = Parsed('shell --labuda'.split())
+            pd = Parsed(windows_too('shell --labuda'.split()))
         self.assertEqual(ce.exception.code, 2)
 
 
 class TestParseRun(unittest.TestCase):
     def test(self):
-        pd = Parsed(['run', 'python3', '-OO', 'file.py'])
+        pd = Parsed(windows_too(['run', 'python3', '-OO', 'file.py']))
         self.assertEqual(pd.command, Commands.run)
         self.assertEqual(pd.run_args, ['python3', '-OO', 'file.py'])
 

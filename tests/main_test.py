@@ -15,6 +15,7 @@ from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 from typing import List
 
+from tests.test_arg_parser import windows_too
 from vien.arg_parser import Parsed
 
 from vien._common import is_windows
@@ -71,11 +72,7 @@ class Test(unittest.TestCase):
         main_entry_point(["path"])
 
 
-def windows_too(args: List[str]) -> List[str]:
-    if is_windows:
-        return [Parsed.PARAM_WINDOWS_ALL_ARGS] + args
-    else:
-        return args
+
 
 
 class TestsInsideTempProjectDir(unittest.TestCase):
