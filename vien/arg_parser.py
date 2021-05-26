@@ -67,7 +67,7 @@ class Parsed:
         parser_reinit = subparsers.add_parser(
             Commands.recreate.name,
             help="delete existing virtualenv and create new")
-        parser_reinit.add_argument('python', type=str, default="python3",
+        parser_reinit.add_argument('python', type=str, default=None,
                                    nargs='?')
 
         shell_parser = subparsers.add_parser(

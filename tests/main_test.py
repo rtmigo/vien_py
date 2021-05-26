@@ -18,7 +18,7 @@ from tests.common import is_posix
 from tests.time_limited import TimeLimited
 from vien import main_entry_point
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
-    PyFileNotFoundExit
+    PyFileNotFoundExit, FailedToCreateVenvExit
 
 
 class CapturedOutput:
@@ -178,6 +178,15 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         main_entry_point(["create", sys.executable])
         self.assertVenvExists()
 
+    def test_create_fails_with_unresolvable_argument(self):
+        # actually this is not a good test: we are not testing whether
+        # argument is really used and not ignored
+        self.assertVenvNotExists()
+        with self.assertRaises(FailedToCreateVenvExit) as ce:
+            main_entry_point(["create", "labuda-ladeda-hehe"])
+        self.assertIsErrorExit(ce.exception)
+        self.assertVenvExists()
+
     def test_create_without_argument(self):
         self.assertVenvNotExists()
         main_entry_point(["create"])
@@ -211,8 +220,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         main_entry_point(["recreate"])
         self.assertVenvExists()
 
-
-    #@unittest.skipUnless(is_posix, "not POSIX")
+    # @unittest.skipUnless(is_posix, "not POSIX")
     def test_recreate_with_argument(self):
         self.assertVenvNotExists()
 
@@ -236,7 +244,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertVenvBinExists()
 
     # @unittest.skipUnless(is_posix, "not POSIX")
-
 
     ############################################################################
 
