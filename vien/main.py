@@ -8,6 +8,7 @@ import os
 import shutil
 import subprocess
 import sys
+import shlex
 from pathlib import Path
 from typing import *
 
@@ -17,6 +18,7 @@ from vien.arg_parser import Commands, Parsed
 from vien.bash_runner import run_as_bash_script
 from vien.call_parser import call_pyfile
 from vien.colors import Colors
+from vien.escaping_cmd import cmd_escape_arg
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit, PyFileArgNotFoundExit, FailedToCreateVenvExit, \
     FailedToClearVenvExit, CannotFindExecutableExit
@@ -99,16 +101,13 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
                            # executable='/bin/bash',
                            env=env)
 
-import shlex
 
-def quote(arg: str) -> str:
+def quote_shell_arg(arg: str) -> str:
+    # todo two separate functions called on need
     if is_posix:
         return shlex.quote(arg)
-        #return json.dumps(arg)
     else:
-        if ' ' in arg:
-            arg = f'"{arg}"'  # todo how to correctly quote windows args?
-        return arg
+        return cmd_escape_arg(arg)
 
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
@@ -251,7 +250,8 @@ def guess_bash_ps1():
 def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     dirs.venv_must_exist()
 
-    activate_path_quoted = quote(str(dirs.venv_dir / "bin" / "activate"))
+    activate_path_quoted = quote_shell_arg(
+        str(dirs.venv_dir / "bin" / "activate"))
 
     old_ps1 = os.environ.get("PS1") or guess_bash_ps1()
 
@@ -323,7 +323,7 @@ def main_run(dirs: Dirs, other_args: List[str]):
 
     # if prepend_py_path:
     #   commands.append(f'export PYTHONPATH="{prepend_py_path}:$PYTHONPATH"')
-    commands.append(" ".join(quote(a) for a in other_args))
+    commands.append(" ".join(quote_shell_arg(a) for a in other_args))
 
     exit_code = run_func(commands, env=child_env(dirs.project_dir))
     raise ChildExit(exit_code)
