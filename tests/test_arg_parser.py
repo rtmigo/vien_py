@@ -28,11 +28,11 @@ class TestWindowsAllArgs(unittest.TestCase):
 class TestProjectDir(unittest.TestCase):
 
     def test_run_short_left(self):
-        pd = Parsed('-p a/b/c run python3 myfile.py'.split())
+        pd = Parsed(windows_too('-p a/b/c run python3 myfile.py'.split()))
         self.assertEqual(pd.project_dir_arg, 'a/b/c')
 
     def test_run_long_left(self):
-        pd = Parsed('--project-dir a/b/c run python3 myfile.py'.split())
+        pd = Parsed(windows_too('--project-dir a/b/c run python3 myfile.py'.split()))
         self.assertEqual(pd.project_dir_arg, 'a/b/c')
 
     def test_call_short_right(self):

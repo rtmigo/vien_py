@@ -276,7 +276,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     ############################################################################
 
     @unittest.skipUnless(is_windows, "testing windows limitations")
-    def test_no_run_in_windows(self):
+    def test_no_run_command_in_windows(self):
         with self.assertRaises(SystemExit) as cm:
             main_entry_point(["run", "python", "-c", "pass"])
         self.assertEqual(cm.exception.code, 2)

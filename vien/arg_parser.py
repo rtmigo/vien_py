@@ -59,6 +59,8 @@ class Parsed:
         if args is None:
             args = sys.argv[1:]
 
+        # secret parameter PARAM_WINDOWS_ALL_ARGS allows to run commands that
+        # are not yet fully supported on Windows.
         enable_windows_all_args = self.PARAM_WINDOWS_ALL_ARGS in args
         if enable_windows_all_args:
             # for more transparent testing, I don't want this param
