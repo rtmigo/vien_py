@@ -72,8 +72,7 @@ def quote(arg: str) -> str:
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
     # this method is being tested indirectly each time the venv is created:
-    # the executable will be found to be printed to stdout, otherwise
-    # exception is thrown
+    # vien prints the path to executable after running this function
 
     if is_posix:
         parent = venv_dir / "bin"
@@ -82,10 +81,10 @@ def venv_dir_to_python_exe(venv_dir: Path) -> Path:
         parent = venv_dir / "Scripts"
         basenames = "python.exe", "python3.exe"
 
-    for bn in basenames:
-        p = parent / bn
-        if p.exists():
-            return p
+    for name in basenames:
+        executable = parent / name
+        if executable.exists():
+            return executable
 
     raise Exception(f"Cannot find the Python interpreter in {venv_dir}.")
 
