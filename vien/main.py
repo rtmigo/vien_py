@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import *
 
 from vien import is_posix
-from vien._common import need_posix
+from vien._common import need_posix, is_windows
 from vien.arg_parser import Commands, Parsed
 from vien.bash_runner import run_as_bash_script
 from vien.call_parser import call_pyfile
@@ -71,25 +71,38 @@ def quote(arg: str) -> str:
 
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
-    for sub in ("bin/python", "bin/python3"):
-        p = venv_dir / sub
-        if p.exists():
-            return p
+    # this method is being tested indirectly each time the venv is created:
+    # vien prints the path to executable after running this function
+
+    if is_posix:
+        parent = venv_dir / "bin"
+        basenames = "python", "python3"
+    else:
+        parent = venv_dir / "Scripts"
+        basenames = "python.exe", "python3.exe"
+
+    for name in basenames:
+        executable = parent / name
+        if executable.exists():
+            return executable
+
     raise Exception(f"Cannot find the Python interpreter in {venv_dir}.")
 
 
-def get_python_interpreter(argument: str) -> str:
+def arg_to_python_interpreter(argument: Optional[str]) -> str:
+    if argument is None:
+        return sys.executable
     exe = shutil.which(argument)
     if not exe:
         raise CannotFindExecutableExit(argument)
     return exe
 
 
-def main_create(venv_dir: Path, version: str):
+def main_create(venv_dir: Path, interpreter: Optional[str]):
     if venv_dir.exists():
         raise VenvExistsExit("Virtualenv already exists.")
 
-    exe = get_python_interpreter(version)
+    exe = arg_to_python_interpreter(interpreter)
 
     print(f"Creating {venv_dir}")
 
@@ -107,20 +120,31 @@ def main_delete(venv_dir: Path):
         raise ValueError(venv_dir)
     if not venv_dir.exists():
         raise VenvDoesNotExistExit(venv_dir)
-    python_exe = venv_dir_to_python_exe(venv_dir)
+
+    # todo test we are not running the same executable we about to delete
+    # python_exe = venv_dir_to_python_exe(venv_dir)
     print(f"Clearing {venv_dir}")
 
-    result = subprocess.run([python_exe, "-m", "venv", str(venv_dir)])
+    result = subprocess.run(
+        [sys.executable, "-m", "venv", "--clear", str(venv_dir)],
+        capture_output=True, encoding=sys.stdout.encoding)
     if result.returncode != 0:
+        # if is_windows and "WinError 5" in result.stderr:
+        #     # we all love Windows
+        #     # Error: [WinError 5] Access is denied: '...python.exe'
+        #     pass
+        # else:
+        print(f"stdout: {result.stdout}")
+        print(f"stderr: {result.stderr}")
         raise FailedToClearVenvExit(venv_dir)
     print(f"Deleting {venv_dir}")
     shutil.rmtree(str(venv_dir))
 
 
-def main_recreate(venv_dir: Path, version: str):
+def main_recreate(venv_dir: Path, interpreter: Optional[str]):
     if venv_dir.exists():
         main_delete(venv_dir)
-    main_create(venv_dir=venv_dir, version=version)
+    main_create(venv_dir=venv_dir, interpreter=interpreter)
 
 
 def guess_bash_ps1():

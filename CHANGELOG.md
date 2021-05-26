@@ -1,7 +1,14 @@
+# 6.0
+
+- The `create` and `recreate` commands without arguments will create a virtual
+  environment with the same interpreter that started `vien`, instead of the
+  interpreter available as `python3`
+- Fixed: virtual environments were not cleared (`venv --clear`) before deletion  
+
 # 5.0
 
-- option `--project-dir` aka `-p` is now supported by all commands
-- the `vien call -p` format (with the `-p` option after the command) is deprecated but still works
+- Option `--project-dir` aka `-p` is now supported by all commands
+- The `vien call -p` format (with the `-p` option after the command) is deprecated but still works
 
 # 4.4
 

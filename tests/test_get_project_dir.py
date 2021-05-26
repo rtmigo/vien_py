@@ -9,7 +9,7 @@ from vien.arg_parser import Parsed
 
 
 def fix_paths(s: str):
-    if is_posix():
+    if is_posix:
         s = s.replace('W:/', '/')
     return s
 
