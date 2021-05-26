@@ -1,5 +1,6 @@
+# SPDX-FileCopyrightText: Holger Just
+# SPDX-License-Identifier: CC BY-SA 3.0
 # code from https://stackoverflow.com/a/29215357
-# CC BY-SA 3.0 Holger Just
 
 import re
 
