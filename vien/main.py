@@ -47,20 +47,22 @@ def get_vien_dir() -> Path:
 
 
 def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
-    need_posix()
+    #need_posix()
 
-    bash_lines = [
-        "#!/bin/bash"
+    # command || exit /b 666
+
+    lines = [
+        "#!/bin/bash" # necessary?
         "set -e",  # fail on first error
     ]
 
-    bash_lines.extend(commands)
+    lines.extend(commands)
 
     # Ubuntu really needs executable='/bin/bash'.
     # Otherwise the command is executed in /bin/sh, ignoring the hashbang,
     # but SH fails to execute commands like 'source'
 
-    return subprocess.call("\n".join(bash_lines),
+    return subprocess.call("\n".join(lines),
                            shell=True,
                            executable='/bin/bash',
                            env=env)
@@ -87,6 +89,18 @@ def venv_dir_to_python_exe(venv_dir: Path) -> Path:
             return executable
 
     raise Exception(f"Cannot find the Python interpreter in {venv_dir}.")
+
+
+def windows_cmdexe_activate(venv_dir: Path) -> Path:
+    # https://docs.python.org/3/library/venv.html
+    assert is_windows
+    return venv_dir / 'Scripts' / 'activate.bat'
+
+
+def posix_bash_activate(venv_dir: Path) -> Path:
+    # https://docs.python.org/3/library/venv.html
+    assert is_posix
+    return venv_dir / 'bin' / 'activate'
 
 
 def arg_to_python_interpreter(argument: Optional[str]) -> str:
@@ -121,7 +135,12 @@ def main_delete(venv_dir: Path):
     if not venv_dir.exists():
         raise VenvDoesNotExistExit(venv_dir)
 
-    # todo test we are not running the same executable we about to delete
+    # todo try to use the same executable that created the environment
+    # If we use sys.executable, we may clear the venv in some incompatible way.
+    # But we can't just use executable from the venv when clearing it:
+    # Windows will fail with [WinError 5] Access is denied: '...python.exe'
+
+    # todo check we are not running the same executable we about to delete
     # python_exe = venv_dir_to_python_exe(venv_dir)
     print(f"Clearing {venv_dir}")
 
@@ -129,11 +148,6 @@ def main_delete(venv_dir: Path):
         [sys.executable, "-m", "venv", "--clear", str(venv_dir)],
         capture_output=True, encoding=sys.stdout.encoding)
     if result.returncode != 0:
-        # if is_windows and "WinError 5" in result.stderr:
-        #     # we all love Windows
-        #     # Error: [WinError 5] Access is denied: '...python.exe'
-        #     pass
-        # else:
         print(f"stdout: {result.stdout}")
         print(f"stderr: {result.stderr}")
         raise FailedToClearVenvExit(venv_dir)

@@ -1,7 +1,10 @@
 import os
 
 is_windows = os.name == 'nt'
-is_posix = not is_windows
+is_posix = os.name == 'posix'
+
+if not is_windows and not is_posix:
+    raise SystemExit(f"System '{os.name}' is not supported.")
 
 
 class NotPosixOsError(Exception):
