@@ -10,15 +10,22 @@ from vien.arg_parser import Parsed, Commands
 
 
 def windows_too(args: List[str]) -> List[str]:
+    """For the Windows platform, appends a secret parameter to the arguments
+    so that Windows accepts even unsupported commands.
+
+    This allows testing functionality that is only partially
+    implemented for Windows.
+    """
     if is_windows:
         return [Parsed.PARAM_WINDOWS_ALL_ARGS] + args
     else:
         return args
 
 
-@unittest.skipUnless(is_windows, "Windows-only tests")
+
 class TestWindowsAllArgs(unittest.TestCase):
-    def test_all_args_accepted_only_on_windows(self):
+    @unittest.skipUnless(is_posix, "posix-only")
+    def test_windowsallargs_fails_on_posix(self):
         # is the PARAM_WINDOWS_ALL_ARGS is set, we must run windows.
         # Otherwise, AssertionError is thrown
         with self.assertRaises(AssertionError):
