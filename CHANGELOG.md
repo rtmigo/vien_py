@@ -1,7 +1,9 @@
+# 6.0
+
 - The `create` and `recreate` commands without arguments will create a virtual
   environment with the same interpreter that started `vien`, instead of the
   interpreter available as `python3`
-- Fixed: virtual environments were not cleared (`-m venv --clear`) before deletion  
+- Fixed: virtual environments were not cleared (`venv --clear`) before deletion  
 
 # 5.0
 

@@ -12,7 +12,6 @@ def is_posix_importable() -> bool:
 
 
 class Test(unittest.TestCase):
-
     def test_need_posix(self):
         if is_posix_importable():
             need_posix()  # no exception

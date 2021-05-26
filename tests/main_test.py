@@ -226,7 +226,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         main_entry_point(["recreate"])
         self.assertVenvExists()
 
-    # @unittest.skipUnless(is_posix, "not POSIX")
     def test_recreate_with_argument(self):
         self.assertVenvNotExists()
 
@@ -263,8 +262,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertVenvNotExists()
         main_entry_point(["recreate", "python3"])
         self.assertVenvExists()
-
-    # @unittest.skipUnless(is_posix, "not POSIX")
 
     ############################################################################
 
