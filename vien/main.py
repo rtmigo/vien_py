@@ -73,7 +73,7 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
 
     need_windows()
 
-    #raise NotImplemented
+    # raise NotImplemented
 
     # https://stackoverflow.com/questions/734598/how-do-i-make-a-batch-file-terminate-upon-encountering-an-error
 
@@ -101,7 +101,11 @@ def run_cmdexe_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
 
 
 def quote(arg: str) -> str:
-    return json.dumps(arg)
+    if is_posix:
+        return json.dumps(arg)
+    else:
+        if ' ' in arg:
+            return f'"{arg}"'  # todo is it correct?
 
 
 def venv_dir_to_python_exe(venv_dir: Path) -> Path:
