@@ -13,6 +13,11 @@ from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
+from typing import List
+
+from vien.arg_parser import Parsed
+
+from vien._common import is_windows
 
 from tests.common import is_posix
 from tests.time_limited import TimeLimited
@@ -64,6 +69,11 @@ class Test(unittest.TestCase):
     def test_path(self):
         os.chdir(Path(__file__).parent)
         main_entry_point(["path"])
+
+
+def windows_too(args: List[str]) -> List[str]:
+    if is_windows:
+        return [Parsed.PARAM_WINDOWS_ALL_ARGS] + args
 
 
 class TestsInsideTempProjectDir(unittest.TestCase):
@@ -266,9 +276,15 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
     ############################################################################
 
+    @unittest.skipUnless(is_windows, "testing windows limitations")
+    def test_no_run_in_windows(self):
+        with self.assertRaises(SystemExit) as cm:
+            main_entry_point(["run", "python", "-c", "pass"])
+        self.assertEqual(cm.exception.code, 2)
+
     def test_run_needs_venv(self):
         with self.assertRaises(VenvDoesNotExistExit) as cm:
-            main_entry_point(["run", "python", "-c", "pass"])
+            main_entry_point(windows_too(["run", "python", "-c", "pass"]))
         self.assertIsErrorExit(cm.exception)
 
     def test_run_exit_code_0(self):
@@ -276,7 +292,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         as the called command"""
         main_entry_point(["create"])  # need venv to run
         with self.assertRaises(ChildExit) as ce:
-            main_entry_point(["run", "python3", "-c", "exit(0)"])
+            main_entry_point(windows_too(["run", "python3", "-c", "exit(0)"]))
         self.assertEqual(ce.exception.code, 0)
 
     def test_run_exit_code_1(self):
@@ -284,7 +300,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         as the called command"""
         main_entry_point(["create"])  # need venv to run
         with self.assertRaises(ChildExit) as ce:
-            main_entry_point(["run", "python3", "-c", "exit(1)"])
+            main_entry_point(windows_too(["run", "python3", "-c", "exit(1)"]))
         self.assertEqual(ce.exception.code, 1)
 
     def test_run_exit_code_2(self):
@@ -292,7 +308,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         as the called command"""
         main_entry_point(["create"])  # need venv to run
         with self.assertRaises(ChildExit) as ce:
-            main_entry_point(["run", "python3", "-c", "exit(2)"])
+            main_entry_point(windows_too(["run", "python3", "-c", "exit(2)"]))
         self.assertEqual(ce.exception.code, 2)
 
     def test_run_python_version(self):
@@ -301,7 +317,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with self.assertRaises(ChildExit):
             # just check the argparser handles --version properly
             # (was failing with nargs='*', ok with nargs=argparse.REMAINDER)
-            main_entry_point(["run", "python3", "--version"])
+            main_entry_point(windows_too(["run", "python3", "--version"]))
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_p(self):

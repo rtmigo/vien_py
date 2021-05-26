@@ -3,6 +3,8 @@ import sys
 from enum import Enum
 from typing import List, Optional
 
+from vien import is_posix
+
 import vien
 from vien.call_parser import items_after
 
@@ -47,12 +49,24 @@ class Commands(Enum):
 
 
 class Parsed:
+    PARAM_WINDOWS_ALL_ARGS = "--windows-all-args"
+
     def __init__(self, args: Optional[List[str]]):
         super().__init__()
+
+        if args is None:
+            args = sys.argv[1:]
+
+        enable_windows_all_args = self.PARAM_WINDOWS_ALL_ARGS in args
 
         parser = argparse.ArgumentParser()
 
         parser.add_argument("--project-dir", "-p", default=None, type=str)
+
+        # the following parameter is added only to avoid parsing errors.
+        # Actually we use its value from `args` before running ArgumentParser
+        parser.add_argument(self.PARAM_WINDOWS_ALL_ARGS, action='store_true',
+                            help=argparse.SUPPRESS)
 
         subparsers = parser.add_subparsers(dest='command', required=True)
 
@@ -70,17 +84,19 @@ class Parsed:
         parser_reinit.add_argument('python', type=str, default=None,
                                    nargs='?')
 
-        shell_parser = subparsers.add_parser(
-            Commands.shell.name,
-            help="dive into Bash sub-shell using the virtualenv")
-        shell_parser.add_argument("--input", type=str, default=None)
-        shell_parser.add_argument("--delay", type=float, default=None,
-                                  help=argparse.SUPPRESS)
+        if is_posix or enable_windows_all_args:
+            shell_parser = subparsers.add_parser(
+                Commands.shell.name,
+                help="dive into Bash sub-shell using the virtualenv")
+            shell_parser.add_argument("--input", type=str, default=None)
+            shell_parser.add_argument("--delay", type=float, default=None,
+                                      help=argparse.SUPPRESS)
 
-        parser_run = subparsers.add_parser(
-            Commands.run.name,
-            help="run a command inside the virtualenv")
-        parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)
+        if is_posix or enable_windows_all_args:
+            parser_run = subparsers.add_parser(
+                Commands.run.name,
+                help="run a command inside the virtualenv")
+            parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)
 
         parser_call = subparsers.add_parser(
             Commands.call.name,
@@ -97,9 +113,6 @@ class Parsed:
             Commands.path.name,
             help="show the supposed path of the virtualenv "
                  "for the current directory")
-
-        if args is None:
-            args = sys.argv[1:]
 
         if not args:
             print(usage_doc())
@@ -164,7 +177,7 @@ class Parsed:
     def python_executable(self) -> Optional[str]:
         if self.command not in (Commands.create, Commands.recreate):
             raise RuntimeError
-        #assert self._ns.python is not None
+        # assert self._ns.python is not None
         return self._ns.python
 
     @property
@@ -184,5 +197,3 @@ class Parsed:
         if self.command != Commands.run:
             raise RuntimeError
         return self._ns.otherargs
-
-
