@@ -49,8 +49,10 @@ def get_vien_dir() -> Path:
 def run_bash_sequence(commands: List[str], env: Optional[Dict] = None) -> int:
     need_posix()
 
+    # command || exit /b 666
+
     bash_lines = [
-        "#!/bin/bash"
+        "#!/bin/bash" # necessary?
         "set -e",  # fail on first error
     ]
 
