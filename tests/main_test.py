@@ -428,7 +428,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["call", "main.py", "aaa", "bbb", "ccc"])
         self.assertEqual(ce.exception.code, 4)  # received len(argv)
 
-    @unittest.skipUnless(is_posix, "not POSIX")
+    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_call_project_dir_venv(self):
         """Tests that the -p parameter actually changes the project directory,
         so the correct virtual environment is found."""
@@ -483,7 +483,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             with self.assertRaises(VenvDoesNotExistExit):
                 main_entry_point(["call", "--project-dir", "../..", run_py_str])
 
-    @unittest.skipUnless(is_posix, "not POSIX")
+    #@unittest.skipUnless(is_posix, "not POSIX")
     def test_call_project_dir_relative_imports(self):
         """ Tests that modules are importable from the project dir
         set by -p parameter"""
@@ -504,6 +504,8 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             with self.assertRaises(ChildExit) as ce:
                 main_entry_point(["-p", "..", "call", run_py_str])
             self.assertEqual(ce.exception.code, 55)
+
+    ############################################################################
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_p(self):
