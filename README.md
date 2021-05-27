@@ -215,18 +215,55 @@ $ /path/to/the/venv/bin/deactivate
 
 `vien call PYFILE` executes a `.py` script in the virtual environment.
 
-``` bash 		
-$ cd /path/to/myProject
-$ vien call main.py
+### call: running file as a file
+
+``` bash
+$ cd /abc/myProject
+$ vien call pkg/module.py
+  
+# runs [python pkg/module.py]
 ```
 
-In fact, all arguments following the `call` command are passed directly to the
-python executable.
+### call: running file as a module
+
+If the file name is preceded by the `-m` parameter, we assume that it 
+should be run by calling `python -m MODULE`. This way of running a 
+program is often preferred: importing other modules from the file becomes easier.
+
+
+The module name will be generated based on the file name relative to the project 
+directory.
+
+``` bash
+$ cd /abc/myProject
+$ vien call -m /abc/myProject/pkg/module.py
+
+# runs [python -m pkg.module]
+```
+
+- `module.py` must be located somewhere inside the `/abc/myProject`
+- module parent subdirectories such as `pkg` must have `__init__.py` making them importable as packages
+
+Do not try to specify the module name directly. The `call` command only accepts 
+`.py` files.  
+
+``` bash
+# ERROR: there is no file named pkg.module
+$ vien call -m pkg.module 
+```
+
+### call: arguments to Python and to the program
+
+All arguments following the `call` command are passed directly to the python 
+executable.
 
 ``` bash 		
-# passing arguments [-B, -OO] to Python and [arg1, arg2] to main.py
-$ vien call -B -OO main.py arg1 arg2  
+$ vien call -B -OO package/main.py arg1 arg2  
+
+# runs [python -B -OO package/main.py arg1 arg2]
 ```
+
+### call: project directory
 
 The optional `-p` parameter can be specified before the `call` word. It allows
 you to set the project directory **relative** to the parent directory of the 
@@ -235,8 +272,8 @@ you to set the project directory **relative** to the parent directory of the
 ``` bash 		
 $ cd any/where  # working dir is irrelevant
 
-# both of the following calls consider /abc/myProject
-# the project directory
+# both of the following calls will use 
+# /abc/myProject as the project directory
 
 $ vien -p /abc/myProject call /abc/myProject/main.py
 $ vien -p . call /abc/myProject/main.py

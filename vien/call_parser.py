@@ -2,6 +2,7 @@ from typing import Iterable, List, Optional, Tuple
 
 
 def items_after(items: Iterable[str], x: str) -> Iterable[str]:
+    # todo remove?
     found = False
     for arg in items:
         if found:
@@ -31,7 +32,43 @@ def list_left_partition(items: Iterable[str], split: str) \
     return left, right
 
 
+class ParsedCall:
+    def __init__(self, args: List[str]):
+
+        self.args = args
+
+        call_found = False
+        file_found = False
+        for idx, arg in enumerate(args):
+            if not call_found:
+                if arg == "call":
+                    call_found = True
+                continue
+
+            if arg.lower().endswith(".py"):
+                self.file = arg
+                self.file_idx = idx
+                file_found = True
+                break
+
+        if not file_found:
+            raise ValueError("File name not found.")
+
+    @property
+    def before_filename(self) -> Optional[str]:
+        if self.file_idx <= 0:
+            return None
+        val = self.args[self.file_idx-1]
+        if val=="call":
+            return None
+        return val
+
+
+
+
+
 def call_pyfile(args: List[str]) -> Optional[str]:
+    # todo remove?
     for arg in items_after(args, "call"):
         if arg.lower().endswith(".py"):
             return arg
