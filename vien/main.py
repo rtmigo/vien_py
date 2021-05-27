@@ -369,13 +369,16 @@ def child_env(proj_path: Path) -> Optional[Dict]:
 
 
 def relative_fn_to_module_name(filename: str) -> str:
-    # todo test
     if not filename.lower().endswith('.py'):
         raise ValueError("The filename does not end with '.py'.")
     filename = filename[:-3]
+    if '.' in filename:
+        raise ValueError("The filename contains dots.")
+    if os.name == "nt":
+        filename = filename.replace('\\', '/')
     assert not os.path.isabs(filename)
-    assert not filename.split()[0] == ".."
-    return filename.replace(os.path.sep, '.')
+    # assert not filename.split()[0] == ".."
+    return filename.replace('/', '.')
 
 
 def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
@@ -482,8 +485,6 @@ def get_project_dir(parsed: Parsed) -> Path:
 
 def main_entry_point(args: Optional[List[str]] = None):
     parsed = Parsed(args)
-
-    # todo replace private _ns attrs with public properties
 
     dirs = Dirs(project_dir=get_project_dir(parsed))
 

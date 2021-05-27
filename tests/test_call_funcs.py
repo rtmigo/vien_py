@@ -1,7 +1,8 @@
 import os
 import unittest
 
-from vien.main import relative_inner_path, NotInnerPath
+from vien.main import relative_inner_path, NotInnerPath, \
+    relative_fn_to_module_name
 
 
 def rip(a: str, b: str) -> str:
@@ -57,6 +58,46 @@ class TestRelativeInnerPath(unittest.TestCase):
     def test_neighbor(self):
         with self.assertRaises(NotInnerPath):
             rip('W:/abc', 'W:/abc/myProject/x'),
+
+
+class TestFnToModuleName(unittest.TestCase):
+
+    def test_fwd(self):
+        self.assertEqual(
+            relative_fn_to_module_name('pkg/sub/module.py'),
+            'pkg.sub.module')
+
+    def test_py_uppercase(self):
+        self.assertEqual(
+            relative_fn_to_module_name('pkg/sub/module.PY'),
+            'pkg.sub.module')
+
+    def test_no_slashes(self):
+        self.assertEqual(
+            relative_fn_to_module_name('file.py'),
+            'file')
+
+    @unittest.skipUnless(os.name == 'nt', "windows-specific")
+    def test_back(self):
+        self.assertEqual(
+            relative_fn_to_module_name('pkg\\sub\\module.py'),
+            'pkg.sub.module')
+
+    def test_no_py(self):
+        with self.assertRaises(ValueError):
+            relative_fn_to_module_name('pkg/sub/module')
+
+    def test_dots_ext(self):
+        with self.assertRaises(ValueError):
+            relative_fn_to_module_name('pkg/sub/module.ext.py')
+
+    def test_dots_parent(self):
+        with self.assertRaises(ValueError):
+            relative_fn_to_module_name('../sub/module.ext.py')
+
+    def test_dots_name(self):
+        with self.assertRaises(ValueError):
+            relative_fn_to_module_name('sub/.module.py')
 
 
 if __name__ == "__main__":
