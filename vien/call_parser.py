@@ -1,5 +1,7 @@
 from typing import Iterable, List, Optional, Tuple
 
+from vien.exceptions import PyFileArgNotFoundExit
+
 
 def list_left_partition(items: Iterable[str], split: str) \
         -> Tuple[List[str], List[str]]:
@@ -21,6 +23,8 @@ def list_left_partition(items: Iterable[str], split: str) \
 
 
 class ParsedCall:
+    __slots__ = ['args', 'file', 'file_idx']
+
     def __init__(self, args: List[str]):
 
         self.args = args
@@ -40,7 +44,7 @@ class ParsedCall:
                 break
 
         if not file_found:
-            raise ValueError("File name not found.")
+            raise PyFileArgNotFoundExit
 
     @property
     def before_filename(self) -> Optional[str]:

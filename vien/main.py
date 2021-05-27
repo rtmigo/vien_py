@@ -16,7 +16,7 @@ from vien import is_posix
 from vien._common import need_posix, is_windows, need_windows
 from vien.arg_parser import Commands, Parsed
 from vien.bash_runner import run_as_bash_script
-from vien.call_parser import call_pyfile, ParsedCall, list_left_partition
+from vien.call_parser import ParsedCall, list_left_partition
 from vien.colors import Colors
 from vien.escaping_cmd import cmd_escape_arg
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
@@ -457,7 +457,7 @@ def get_project_dir(parsed: Parsed) -> Path:
     if parsed.project_dir_arg is not None:
         if parsed.command == Commands.call:
             # for the 'call' the reference dir is the parent or .py file
-            pyfile = call_pyfile(parsed.args)
+            pyfile = ParsedCall(parsed.args).file
             if pyfile is None:
                 raise PyFileArgNotFoundExit
             reference_dir = Path(pyfile).parent.absolute()

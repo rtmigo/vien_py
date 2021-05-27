@@ -29,6 +29,7 @@ from vien.call_parser import ParsedCall
 #         self.assertEqual(
 #             call_pyfile("vien aaa.py bbb.py call -d ccc.py arg1".split()),
 #             "ccc.py")
+from vien.exceptions import PyFileArgNotFoundExit
 
 
 class TestNew(unittest.TestCase):
@@ -42,7 +43,7 @@ class TestNew(unittest.TestCase):
         self.assertEqual(psr.file, "right.py")
 
     def test_file_not_found(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(PyFileArgNotFoundExit):
             ParsedCall("vien -p wrong.py call -d arg1".split())
 
     def test_before_exists(self):
