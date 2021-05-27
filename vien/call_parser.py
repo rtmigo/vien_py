@@ -1,16 +1,6 @@
 from typing import Iterable, List, Optional, Tuple
 
 
-def items_after(items: Iterable[str], x: str) -> Iterable[str]:
-    # todo remove?
-    found = False
-    for arg in items:
-        if found:
-            yield arg
-        elif arg == x:
-            found = True
-    if not found:
-        raise LookupError
 
 
 def list_left_partition(items: Iterable[str], split: str) \
@@ -67,9 +57,9 @@ class ParsedCall:
 
 
 
-def call_pyfile(args: List[str]) -> Optional[str]:
-    # todo remove?
-    for arg in items_after(args, "call"):
-        if arg.lower().endswith(".py"):
-            return arg
-    return None
+# def call_pyfile(args: List[str]) -> Optional[str]:
+#     # todo remove?
+#     for arg in items_after(args, "call"):
+#         if arg.lower().endswith(".py"):
+#             return arg
+#     return None

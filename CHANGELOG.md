@@ -1,3 +1,7 @@
+# 8.0
+
+- The `call` command now supports the `-m` option, that runs the file as a module.
+
 # 7.1
 
 - Fixed: `call` command sometimes received incorrect `$PYTHONPATH` values on systems 

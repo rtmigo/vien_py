@@ -6,7 +6,7 @@ from vien._common import is_windows
 
 from tests.common import is_posix
 from vien.main import get_project_dir
-from vien.arg_parser import Parsed, Commands
+from vien.arg_parser import Parsed, Commands, items_after
 
 
 def windows_too(args: List[str]) -> List[str]:
@@ -20,6 +20,18 @@ def windows_too(args: List[str]) -> List[str]:
         return [Parsed.PARAM_WINDOWS_ALL_ARGS] + args
     else:
         return args
+
+
+class TestItemsAfter(unittest.TestCase):
+    def test_items_after(self):
+        self.assertEqual(list(items_after(['A', 'B', 'C'], 'A')),
+                         ['B', 'C'])
+        self.assertEqual(list(items_after(['A', 'B', 'C'], 'B')),
+                         ['C'])
+        self.assertEqual(list(items_after(['A', 'B', 'C'], 'C')),
+                         [])
+        with self.assertRaises(LookupError):
+            list(items_after(['A', 'B', 'C'], 'X'))
 
 
 class TestWindowsAllArgs(unittest.TestCase):

@@ -397,12 +397,13 @@ def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
     return result
 
 
-def relative_inner_path(child: Union[str, Path], parent: Union[str, Path]) -> str:
+def relative_inner_path(child: Union[str, Path],
+                        parent: Union[str, Path]) -> str:
     """(/abc/parent/xyz/child, /abc/parent) -> xyz/child
     Not only returns the "relative" path, but also checks
     it is really relative.
     """
-    # todo test
+    # todo unit test
     rel_path = os.path.relpath(child, parent)
     if rel_path.split()[0] == ".." or os.path.isabs(rel_path):
         raise ValueError(f"The {child} is not a child of {parent}.")
@@ -418,9 +419,8 @@ def main_call(parsed: Parsed, dirs: Dirs):
     if not os.path.exists(parsed_call.file):
         raise PyFileNotFoundExit(Path(parsed_call.file))
 
-
-
     if parsed_call.before_filename == "-m":
+        # todo unit test
         # /abc/project/package/module.py -> package/module.py
         relative = relative_inner_path(parsed_call.file, dirs.project_dir)
         # package/module.py -> package.module
@@ -435,28 +435,6 @@ def main_call(parsed: Parsed, dirs: Dirs):
         assert module_name in args_to_python
     else:
         args_to_python = parsed.args_to_python
-
-        #replace_arg(args_to_python, pyfile_arg,
-        #            ['-m', module_path])
-
-    # rel_path = os.path.relpath(pyfile_arg, dirs.project_dir)
-
-    # if rel_path.split()[0] == ".."
-
-
-    # print("RRR", module_path)
-
-    # main_call(venv_dir=dirs.venv_dir,
-    ##          proj_path=dirs.project_dir,
-    #          other_args=parsed.args_to_python)
-
-    # def main_call(venv_dir: Path,
-    #              proj_path: Path,
-    #              other_args: List[str]):
-
-
-    #args_to_python = replace_arg(args_to_python, pyfile_arg,
-    #                             ['-m', module_name])
 
     python_exe = venv_dir_to_python_exe(dirs.venv_dir)
 

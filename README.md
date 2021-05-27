@@ -274,9 +274,12 @@ $ cd any/where  # working dir is irrelevant
 # both of the following calls will use 
 # /abc/myProject as the project directory
 
-$ vien -p /abc/myProject call /abc/myProject/main.py
-$ vien -p . call /abc/myProject/main.py
+$ vien -p /abc/myProject call /abc/myProject/pkg/main.py
+$ vien -p .. call /abc/myProject/pkg/main.py
 ```
+
+In the second case `..` means that the project directory is 
+`/abc/myProject/pkg/..`, that is `/abc/myProject`. 
 
 This parameter makes things like [shebang](#Shebang) possible.
 
@@ -377,10 +380,10 @@ Insert the shebang line to the top of the file you want to run. The value of the
 shebang depends on the location of the file relative to the project directory.
 
 File                            | Shebang line
---------------------------------|--------------------------------
-`myProject/runme.py`            | `#!/usr/bin/env vien -p . call`
-`myProject/pkg/runme.py`        | `#!/usr/bin/env vien -p .. call`
-`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien -p ../.. call`
+--------------------------------|--------------------------------------
+`myProject/runme.py`            | `#!/usr/bin/env vien -p . call -m`
+`myProject/pkg/runme.py`        | `#!/usr/bin/env vien -p .. call -m`
+`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien -p ../.. call -m`
 
 After inserting the shebang, make the file executable:
 
