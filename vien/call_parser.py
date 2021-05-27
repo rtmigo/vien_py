@@ -1,8 +1,6 @@
 from typing import Iterable, List, Optional, Tuple
 
 
-
-
 def list_left_partition(items: Iterable[str], split: str) \
         -> Tuple[List[str], List[str]]:
     # todo test
@@ -48,14 +46,10 @@ class ParsedCall:
     def before_filename(self) -> Optional[str]:
         if self.file_idx <= 0:
             return None
-        val = self.args[self.file_idx-1]
-        if val=="call":
+        val = self.args[self.file_idx - 1]
+        if val == "call":
             return None
         return val
-
-
-
-
 
 # def call_pyfile(args: List[str]) -> Optional[str]:
 #     # todo remove?
