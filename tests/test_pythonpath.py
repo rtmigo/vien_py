@@ -1,7 +1,10 @@
+# SPDX-FileCopyrightText: (c) 2021 Artëm IG <github.com/rtmigo>
+# SPDX-License-Identifier: BSD-3-Clause
+
 import os
 import unittest
 
-from vien.main import _insert_into_pythonpath
+from vien._main import _insert_into_pythonpath
 
 
 @unittest.skipUnless(os.name == 'posix', "posix colons format")

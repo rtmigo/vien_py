@@ -14,13 +14,13 @@ from typing import *
 
 from vien import is_posix
 from vien._common import need_posix, is_windows, need_windows
-from vien.arg_parser import Commands, Parsed
-from vien.bash_runner import run_as_bash_script
+from vien._parsed_args import Commands, Parsed
+from vien._bash_runner import run_as_bash_script
 from vien._call_funcs import relative_fn_to_module_name, relative_inner_path
-from vien.call_parser import ParsedCall, list_left_partition
-from vien.colors import Colors
-from vien.escaping_cmd import cmd_escape_arg
-from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
+from vien._parsed_call import ParsedCall, list_left_partition
+from vien._colors import Colors
+from vien._cmdexe_escape_args import cmd_escape_arg
+from vien._exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit, PyFileArgNotFoundExit, FailedToCreateVenvExit, \
     FailedToClearVenvExit, CannotFindExecutableExit
 

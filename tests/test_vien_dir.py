@@ -1,9 +1,12 @@
+# SPDX-FileCopyrightText: (c) 2021 Artëm IG <github.com/rtmigo>
+# SPDX-License-Identifier: BSD-3-Clause
+
 import os
 import unittest
 from pathlib import Path
 
 from tests.common import is_posix
-from vien.main import get_vien_dir
+from vien._main import get_vien_dir
 
 @unittest.skipUnless(is_posix, "not POSIX")
 class TestVenvsDir(unittest.TestCase):

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: (c) 2021 Artëm IG <github.com/rtmigo>
+# SPDX-License-Identifier: BSD-3-Clause
+
 import unittest
 from pathlib import Path
 from typing import List
@@ -5,8 +8,8 @@ from typing import List
 from vien._common import is_windows
 
 from tests.common import is_posix
-from vien.main import get_project_dir
-from vien.arg_parser import Parsed, Commands, items_after
+from vien._main import get_project_dir
+from vien._parsed_args import Parsed, Commands, items_after
 
 
 def windows_too(args: List[str]) -> List[str]:

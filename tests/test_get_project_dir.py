@@ -1,12 +1,15 @@
+# SPDX-FileCopyrightText: (c) 2021 Artëm IG <github.com/rtmigo>
+# SPDX-License-Identifier: BSD-3-Clause
+
 import os
 import unittest
 from pathlib import Path
 
 from tests.common import is_posix
 from tests.test_arg_parser import windows_too
-from vien.main import get_project_dir
-from vien.exceptions import PyFileArgNotFoundExit
-from vien.arg_parser import Parsed
+from vien._main import get_project_dir
+from vien._exceptions import PyFileArgNotFoundExit
+from vien._parsed_args import Parsed
 
 
 def fix_paths(s: str):
