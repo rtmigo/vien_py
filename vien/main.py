@@ -16,7 +16,7 @@ from vien import is_posix
 from vien._common import need_posix, is_windows, need_windows
 from vien.arg_parser import Commands, Parsed
 from vien.bash_runner import run_as_bash_script
-from vien.call_parser import call_pyfile
+from vien.call_parser import ParsedCall, list_left_partition
 from vien.colors import Colors
 from vien.escaping_cmd import cmd_escape_arg
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
@@ -368,15 +368,80 @@ def child_env(proj_path: Path) -> Optional[Dict]:
         return None
 
 
-def main_call(venv_dir: Path,
-              proj_path: Path,
-              other_args: List[str]):
-    python_exe = venv_dir_to_python_exe(venv_dir)
-    # print("EXE",python_exe)
-    assert len(other_args) > 0
-    args = [str(python_exe)] + other_args
+def relative_fn_to_module_name(filename: str) -> str:
+    # todo test
+    if not filename.lower().endswith('.py'):
+        raise ValueError("The filename does not end with '.py'.")
+    filename = filename[:-3]
+    assert not os.path.isabs(filename)
+    assert not filename.split()[0] == ".."
+    return filename.replace(os.path.sep, '.')
 
-    cp = subprocess.run(args, env=child_env(proj_path))
+
+def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
+    """Replaces first occurrence of `old` with a list of `new` items (zero or
+    more items). Raises exception if `old` not found.
+    """
+
+    # todo remove?
+    result = list()
+    replaced = False
+    for arg in args:
+        if not replaced and arg == old:
+            result.extend(new)
+            replaced = True
+        else:
+            result.append(arg)
+
+    assert replaced
+    return result
+
+
+def relative_inner_path(child: Union[str, Path],
+                        parent: Union[str, Path]) -> str:
+    """(/abc/parent/xyz/child, /abc/parent) -> xyz/child
+    Not only returns the "relative" path, but also checks
+    it is really relative.
+    """
+    # todo unit test
+    rel_path = os.path.relpath(child, parent)
+    if rel_path.split()[0] == ".." or os.path.isabs(rel_path):
+        raise ValueError(f"The {child} is not a child of {parent}.")
+    return rel_path
+
+
+def main_call(parsed: Parsed, dirs: Dirs):
+    dirs.venv_must_exist()
+
+    parsed_call = ParsedCall(parsed.args)
+    assert parsed_call.file is not None
+
+    if not os.path.exists(parsed_call.file):
+        raise PyFileNotFoundExit(Path(parsed_call.file))
+
+    if parsed_call.before_filename == "-m":
+        # todo unit test
+        # /abc/project/package/module.py -> package/module.py
+        relative = relative_inner_path(parsed_call.file, dirs.project_dir)
+        # package/module.py -> package.module
+        module_name = relative_fn_to_module_name(relative)
+        # replacing the filename in args with the module name.
+        # It is already prefixed with -m
+        args = parsed_call.args.copy()
+        args[parsed_call.file_idx] = module_name
+        # args to python are those after 'call' word
+        _, args_to_python = list_left_partition(args, 'call')
+        assert '-m' in args_to_python
+        assert module_name in args_to_python
+    else:
+        args_to_python = parsed.args_to_python
+
+    python_exe = venv_dir_to_python_exe(dirs.venv_dir)
+
+    assert len(args_to_python) > 0
+    args = [str(python_exe)] + args_to_python
+
+    cp = subprocess.run(args, env=child_env(dirs.project_dir))
 
     raise ChildExit(cp.returncode)
 
@@ -392,7 +457,7 @@ def get_project_dir(parsed: Parsed) -> Path:
     if parsed.project_dir_arg is not None:
         if parsed.command == Commands.call:
             # for the 'call' the reference dir is the parent or .py file
-            pyfile = call_pyfile(parsed.args)
+            pyfile = ParsedCall(parsed.args).file
             if pyfile is None:
                 raise PyFileArgNotFoundExit
             reference_dir = Path(pyfile).parent.absolute()
@@ -429,15 +494,8 @@ def main_entry_point(args: Optional[List[str]] = None):
         # todo allow running commands from strings
         main_run(dirs.venv_must_exist(), parsed.run_args)
     elif parsed.command == Commands.call:
-        # todo move in func
-        dirs.venv_must_exist()
-        pyfile_arg = call_pyfile(parsed.args)
-        assert pyfile_arg is not None
-        if not os.path.exists(pyfile_arg):
-            raise PyFileNotFoundExit(Path(pyfile_arg))
-        main_call(venv_dir=dirs.venv_dir,
-                  proj_path=dirs.project_dir,
-                  other_args=parsed.args_to_python)
+
+        main_call(parsed, dirs)
 
     elif parsed.command == Commands.shell:
         main_shell(dirs, parsed.shell_input, parsed.shell_delay)

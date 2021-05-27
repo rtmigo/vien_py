@@ -115,9 +115,7 @@ $ vien run pip install requests lxml
 $ vien call main.py
 ```
 
-# Commands
-
-## create
+# "create" command
 
 `vien create` сreates a virtual environment that will correspond the current
 working directory. The **working directory** in this case is assumed to be
@@ -146,7 +144,7 @@ be executed in the shell as `python3.8`, you can try
 $ vien create python3.8
 ```
 
-## shell
+# "shell" command
 
 `vien shell` starts interactive bash session in the virtual environment.
 
@@ -184,7 +182,7 @@ command line.
 $ echo 'which python3 && echo $PATH' | vien shell
 ```
 
-## run
+# "run" command
 
 `vien run COMMAND` runs a shell command in the virtual environment.
 
@@ -211,22 +209,56 @@ $ /path/to/the/venv/bin/deactivate
 
 </details>
 
-## call
+# "call" command
 
 `vien call PYFILE` executes a `.py` script in the virtual environment.
 
-``` bash 		
-$ cd /path/to/myProject
-$ vien call main.py
+### "call": running file as a file
+
+``` bash
+$ cd /abc/myProject
+$ vien call pkg/module.py
+  
+# runs [python pkg/module.py]
 ```
 
-In fact, all arguments following the `call` command are passed directly to the
-python executable.
+### "call": running file as a module
+
+If the `.py` file name is preceded by the `-m` parameter, we will run it with 
+`python -m MODULE`. Running in this manner often simplifies importing other modules 
+from the program.
+
+
+``` bash
+$ cd /abc/myProject
+$ vien call -m /abc/myProject/pkg/module.py
+
+# runs [python -m pkg.module]
+```
+
+- `module.py` must be located somewhere inside the `/abc/myProject`
+- parent subdirectories such as `pkg` must be importable, i.e. must contain 
+  `pkg/__init__.py` 
+
+
+The `call` command only accepts `.py` files, no module names.  
+
+``` bash
+# ERROR: there is no file named pkg.module
+$ vien call -m pkg.module 
+```
+
+### "call": passing arguments to Python and to the program
+
+Arguments following the `call` command are passed to the python executable.
 
 ``` bash 		
-# passing arguments [-B, -OO] to Python and [arg1, arg2] to main.py
-$ vien call -B -OO main.py arg1 arg2  
+$ vien call -B -OO -m package/main.py arg1 arg2  
+
+# runs [python -B -OO -m package.main arg1 arg2]
 ```
+
+### "call": project directory
 
 The optional `-p` parameter can be specified before the `call` word. It allows
 you to set the project directory **relative** to the parent directory of the 
@@ -235,16 +267,17 @@ you to set the project directory **relative** to the parent directory of the
 ``` bash 		
 $ cd any/where  # working dir is irrelevant
 
-# both of the following calls consider /abc/myProject
-# the project directory
+# both of the following calls will use 
+# /abc/myProject as the project directory
 
-$ vien -p /abc/myProject call /abc/myProject/main.py
-$ vien -p . call /abc/myProject/main.py
+$ vien -p /abc/myProject call /abc/myProject/pkg/main.py
+$ vien -p .. call /abc/myProject/pkg/main.py
 ```
 
-This parameter makes things like [shebang](#Shebang) possible.
+In the second case `..` means that the project directory is 
+`/abc/myProject/pkg/..`, which resolves to `/abc/myProject`. 
 
-## delete
+# "delete" command
 
 `vien delete` deletes the virtual environment.
 
@@ -253,7 +286,7 @@ $ cd /path/to/myProject
 $ vien delete 
 ```
 
-## recreate
+# "recreate" command
 
 `vien recreate` old and creates new virtual environment.
 
@@ -271,9 +304,7 @@ $ cd /path/to/myProject
 $ vien recreate /usr/local/opt/python@3.10/bin/python3
 ```
 
-# Options
-
-## --project-dir, -p
+# --project-dir, -p
 
 This option must appear after `vien`, but before the command.
 
@@ -341,10 +372,10 @@ Insert the shebang line to the top of the file you want to run. The value of the
 shebang depends on the location of the file relative to the project directory.
 
 File                            | Shebang line
---------------------------------|--------------------------------
-`myProject/runme.py`            | `#!/usr/bin/env vien -p . call`
-`myProject/pkg/runme.py`        | `#!/usr/bin/env vien -p .. call`
-`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien -p ../.. call`
+--------------------------------|--------------------------------------
+`myProject/runme.py`            | `#!/usr/bin/env vien -p . call -m`
+`myProject/pkg/runme.py`        | `#!/usr/bin/env vien -p .. call -m`
+`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien -p ../.. call -m`
 
 After inserting the shebang, make the file executable:
 
