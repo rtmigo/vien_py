@@ -14,12 +14,13 @@ from typing import *
 
 from vien import is_posix
 from vien._common import need_posix, is_windows, need_windows
-from vien.arg_parser import Commands, Parsed
-from vien.bash_runner import run_as_bash_script
-from vien.call_parser import ParsedCall, list_left_partition
-from vien.colors import Colors
-from vien.escaping_cmd import cmd_escape_arg
-from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
+from vien._parsed_args import Commands, Parsed
+from vien._bash_runner import run_as_bash_script
+from vien._call_funcs import relative_fn_to_module_name, relative_inner_path
+from vien._parsed_call import ParsedCall, list_left_partition
+from vien._colors import Colors
+from vien._cmdexe_escape_args import cmd_escape_arg
+from vien._exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit, PyFileArgNotFoundExit, FailedToCreateVenvExit, \
     FailedToClearVenvExit, CannotFindExecutableExit
 
@@ -368,16 +369,6 @@ def child_env(proj_path: Path) -> Optional[Dict]:
         return None
 
 
-def relative_fn_to_module_name(filename: str) -> str:
-    # todo test
-    if not filename.lower().endswith('.py'):
-        raise ValueError("The filename does not end with '.py'.")
-    filename = filename[:-3]
-    assert not os.path.isabs(filename)
-    assert not filename.split()[0] == ".."
-    return filename.replace(os.path.sep, '.')
-
-
 def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
     """Replaces first occurrence of `old` with a list of `new` items (zero or
     more items). Raises exception if `old` not found.
@@ -395,19 +386,6 @@ def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
 
     assert replaced
     return result
-
-
-def relative_inner_path(child: Union[str, Path],
-                        parent: Union[str, Path]) -> str:
-    """(/abc/parent/xyz/child, /abc/parent) -> xyz/child
-    Not only returns the "relative" path, but also checks
-    it is really relative.
-    """
-    # todo unit test
-    rel_path = os.path.relpath(child, parent)
-    if rel_path.split()[0] == ".." or os.path.isabs(rel_path):
-        raise ValueError(f"The {child} is not a child of {parent}.")
-    return rel_path
 
 
 def main_call(parsed: Parsed, dirs: Dirs):
@@ -476,8 +454,6 @@ def get_project_dir(parsed: Parsed) -> Path:
 
 def main_entry_point(args: Optional[List[str]] = None):
     parsed = Parsed(args)
-
-    # todo replace private _ns attrs with public properties
 
     dirs = Dirs(project_dir=get_project_dir(parsed))
 

@@ -24,10 +24,10 @@ def cmd_escape_arg(arg):
     if not arg or re.search(r'(["\s])', arg):
         arg = '"' + arg.replace('"', r'\"') + '"'
 
-    return _escape_for_cmd_exe(arg)
+    return _inner_escape(arg)
 
 
-def _escape_for_cmd_exe(arg):
+def _inner_escape(arg):
     # Escape an argument string to be suitable to be passed to
     # cmd.exe on Windows
     #

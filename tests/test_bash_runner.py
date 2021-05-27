@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 
 from tests.common import is_posix
-from vien.bash_runner import *
+from vien._bash_runner import *
 from tests.time_limited import TimeLimited
 
 

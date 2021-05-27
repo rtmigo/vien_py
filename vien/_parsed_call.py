@@ -1,6 +1,9 @@
+# SPDX-FileCopyrightText: (c) 2021 Artëm IG <github.com/rtmigo>
+# SPDX-License-Identifier: BSD-3-Clause
+
 from typing import Iterable, List, Optional, Tuple
 
-from vien.exceptions import PyFileArgNotFoundExit
+from vien._exceptions import PyFileArgNotFoundExit
 
 
 def list_left_partition(items: Iterable[str], split: str) \
@@ -23,6 +26,7 @@ def list_left_partition(items: Iterable[str], split: str) \
 
 
 class ParsedCall:
+    # todo cache to avoid parsing twice?
     __slots__ = ['args', 'file', 'file_idx']
 
     def __init__(self, args: List[str]):

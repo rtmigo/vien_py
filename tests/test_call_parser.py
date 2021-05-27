@@ -1,35 +1,11 @@
+# SPDX-FileCopyrightText: (c) 2021 Artëm IG <github.com/rtmigo>
+# SPDX-License-Identifier: BSD-3-Clause
+
 import unittest
 
-from tests.common import is_posix
-from vien.call_parser import ParsedCall
+from vien._parsed_call import ParsedCall
 
-
-# class TestOld(unittest.TestCase):
-#     # remove?
-#     def test_items_after(self):
-#         self.assertEqual(list(items_after(['A', 'B', 'C'], 'A')),
-#                          ['B', 'C'])
-#         self.assertEqual(list(items_after(['A', 'B', 'C'], 'B')),
-#                          ['C'])
-#         self.assertEqual(list(items_after(['A', 'B', 'C'], 'C')),
-#                          [])
-#         with self.assertRaises(LookupError):
-#             list(items_after(['A', 'B', 'C'], 'X'))
-#
-#     def test_call_pyfile(self):
-#         self.assertEqual(
-#             call_pyfile("vien -p zzz call -d file.py arg1".split()),
-#             "file.py")
-#         self.assertEqual(
-#             call_pyfile("vien -p zzz call -d arg1 arg2".split()),
-#             None)
-#         self.assertEqual(
-#             call_pyfile("vien -p zzz call -d File.PY arg1".split()),
-#             "File.PY")
-#         self.assertEqual(
-#             call_pyfile("vien aaa.py bbb.py call -d ccc.py arg1".split()),
-#             "ccc.py")
-from vien.exceptions import PyFileArgNotFoundExit
+from vien._exceptions import PyFileArgNotFoundExit
 
 
 class TestNew(unittest.TestCase):
