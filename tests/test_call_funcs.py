@@ -1,8 +1,8 @@
 import os
 import unittest
 
-from vien.main import relative_inner_path, NotInnerPath, \
-    relative_fn_to_module_name
+from vien._call_funcs import relative_fn_to_module_name, NotInnerPath, \
+    relative_inner_path
 
 
 def rip(a: str, b: str) -> str:
