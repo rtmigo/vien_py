@@ -115,9 +115,7 @@ $ vien run pip install requests lxml
 $ vien call main.py
 ```
 
-# Commands
-
-## create
+# "create" command
 
 `vien create` сreates a virtual environment that will correspond the current
 working directory. The **working directory** in this case is assumed to be
@@ -146,7 +144,7 @@ be executed in the shell as `python3.8`, you can try
 $ vien create python3.8
 ```
 
-## shell
+# "shell" command
 
 `vien shell` starts interactive bash session in the virtual environment.
 
@@ -184,7 +182,7 @@ command line.
 $ echo 'which python3 && echo $PATH' | vien shell
 ```
 
-## run
+# "run" command
 
 `vien run COMMAND` runs a shell command in the virtual environment.
 
@@ -211,11 +209,11 @@ $ /path/to/the/venv/bin/deactivate
 
 </details>
 
-## The [call] command
+# "call" command
 
 `vien call PYFILE` executes a `.py` script in the virtual environment.
 
-### [call] running file as a file
+### "call": running file as a file
 
 ``` bash
 $ cd /abc/myProject
@@ -224,14 +222,12 @@ $ vien call pkg/module.py
 # runs [python pkg/module.py]
 ```
 
-### [call] running file as a module
+### "call": running file as a module
 
-This way of running a program is often preferred: importing other modules from 
-the program becomes easier.
+If the `.py` file name is preceded by the `-m` parameter, we will run it with 
+`python -m MODULE`. Running in this manner often simplifies importing other modules 
+from the program.
 
-If the file name is preceded by the `-m` parameter, we assume that it 
-should be run by calling `python -m MODULE`. The module name will be generated 
-based on the file name relative to the project directory.
 
 ``` bash
 $ cd /abc/myProject
@@ -241,28 +237,28 @@ $ vien call -m /abc/myProject/pkg/module.py
 ```
 
 - `module.py` must be located somewhere inside the `/abc/myProject`
-- module parent subdirectories such as `pkg` must have `__init__.py` making them importable as packages
+- parent subdirectories such as `pkg` must be importable, i.e. must contain 
+  `pkg/__init__.py` 
 
-Do not try to specify the module name directly. The `call` command only accepts 
-`.py` files.  
+
+The `call` command only accepts `.py` files, no module names.  
 
 ``` bash
 # ERROR: there is no file named pkg.module
 $ vien call -m pkg.module 
 ```
 
-### [call] passing arguments to Python and to the program
+### "call": passing arguments to Python and to the program
 
-All arguments following the `call` command are passed directly to the python 
-executable.
+Arguments following the `call` command are passed to the python executable.
 
 ``` bash 		
-$ vien call -B -OO package/main.py arg1 arg2  
+$ vien call -B -OO -m package/main.py arg1 arg2  
 
-# runs [python -B -OO package/main.py arg1 arg2]
+# runs [python -B -OO -m package.main arg1 arg2]
 ```
 
-### [call] project directory
+### "call": project directory
 
 The optional `-p` parameter can be specified before the `call` word. It allows
 you to set the project directory **relative** to the parent directory of the 
@@ -279,11 +275,9 @@ $ vien -p .. call /abc/myProject/pkg/main.py
 ```
 
 In the second case `..` means that the project directory is 
-`/abc/myProject/pkg/..`, that is `/abc/myProject`. 
+`/abc/myProject/pkg/..`, which resolves to `/abc/myProject`. 
 
-This parameter makes things like [shebang](#Shebang) possible.
-
-## delete
+# "delete" command
 
 `vien delete` deletes the virtual environment.
 
@@ -292,7 +286,7 @@ $ cd /path/to/myProject
 $ vien delete 
 ```
 
-## recreate
+# "recreate" command
 
 `vien recreate` old and creates new virtual environment.
 
@@ -310,9 +304,7 @@ $ cd /path/to/myProject
 $ vien recreate /usr/local/opt/python@3.10/bin/python3
 ```
 
-# Options
-
-## --project-dir, -p
+# --project-dir, -p
 
 This option must appear after `vien`, but before the command.
 
