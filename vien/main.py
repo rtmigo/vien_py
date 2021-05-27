@@ -394,12 +394,18 @@ def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
     assert replaced
     return result
 
-def relative_inner_path(child: str, parent: str) -> str:
+
+def relative_inner_path(child: Union[str, Path], parent: Union[str, Path]) -> str:
+    """(/abc/parent/xyz/child, /abc/parent) -> xyz/child
+    Not only returns the "relative" path, but also checks
+    it is really relative.
+    """
     # todo test
     rel_path = os.path.relpath(child, parent)
     if rel_path.split()[0] == ".." or os.path.isabs(rel_path):
         raise ValueError(f"The {child} is not a child of {parent}.")
     return rel_path
+
 
 def main_call(parsed: Parsed, dirs: Dirs):
     dirs.venv_must_exist()
@@ -408,11 +414,12 @@ def main_call(parsed: Parsed, dirs: Dirs):
     if not os.path.exists(pyfile_arg):
         raise PyFileNotFoundExit(Path(pyfile_arg))
 
-    #rel_path = os.path.relpath(pyfile_arg, dirs.project_dir)
+    # rel_path = os.path.relpath(pyfile_arg, dirs.project_dir)
 
-    #if rel_path.split()[0] == ".."
+    # if rel_path.split()[0] == ".."
 
-    module_path = relative_fn_to_module_name(relative_inner_path(pyfile_arg, dirs.project_dir))
+    module_path = relative_fn_to_module_name(
+        relative_inner_path(pyfile_arg, dirs.project_dir))
 
     # print("RRR", module_path)
 
