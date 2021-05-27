@@ -407,7 +407,6 @@ def relative_inner_path(child: Union[str, Path],
     Not only returns the "relative" path, but also checks
     it is really relative.
     """
-    # todo unit test
     rel_path = os.path.relpath(child, parent)
 
     first = rel_path.split(os.path.sep)[0]

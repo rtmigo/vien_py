@@ -23,7 +23,7 @@ class TestRelativeInnerPath(unittest.TestCase):
                 'W:/abc/myProject'),
             'pkg/sub/file.py')
 
-    @unittest.skipUnless(os.name == 'posix', "windows-specific")
+    @unittest.skipUnless(os.name == 'nt', "windows-specific")
     def test_sub_child_back(self):
         self.assertEqual(
             rip(r'W:\abc\myProject\pkg\sub\file.py',
@@ -44,7 +44,7 @@ class TestRelativeInnerPath(unittest.TestCase):
         with self.assertRaises(NotInnerPath):
             rip('W:/abc', 'W:/abc/myProject/x'),
 
-    @unittest.skipUnless(os.name == 'posix', "windows-specific")
+    @unittest.skipUnless(os.name == 'nt', "windows-specific")
     def test_swapped_backslash(self):
         with self.assertRaises(NotInnerPath):
             rip(r'W:\abc', r'W:\abc\myProject\x'),
