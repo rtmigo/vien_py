@@ -242,7 +242,7 @@ $ vien call -m /abc/myProject/pkg/sub/module.py
 - parent subdirectories such as `pkg` an `sub` must be importable, i.e. must contain 
   `__init__.py`
 - the project directory will be inserted into `$PYTHONPATH` making the module 
-  visible regardless of the working directory   
+  visible  
   
 The project directory can be specified not only by the working directory, 
 but also by the `-p` parameter.
