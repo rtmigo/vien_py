@@ -11,7 +11,8 @@ from vien._common import is_windows
 from vien import is_posix
 
 import vien
-#from vien.call_parser import items_after
+# from vien.call_parser import items_after
+from vien._parsed_call import ParsedCall
 
 
 def version_message() -> str:
@@ -69,6 +70,8 @@ class ParsedArgs:
 
     def __init__(self, args: Optional[List[str]]):
         super().__init__()
+
+        self._call: Optional[ParsedCall] = None
 
         if args is None:
             args = sys.argv[1:]
@@ -160,12 +163,11 @@ class ParsedArgs:
         unknown: List[str]
 
         self._ns, unknown = parser.parse_known_args(self.args)
-        if self.command == Commands.call:
+        if self._ns.command == 'call':
             self.args_to_python = list(_iter_after(args, 'call'))
 
             # if some of the unknown args are NOT after the 'call',
-            # then we're failed to interpret the command. Parsing
-            # it stricter
+            # then we're failed to interpret the command
             bad_unrecognized = [unk for unk in unknown if
                                 unk not in self.args_to_python]
             if bad_unrecognized:
@@ -174,14 +176,24 @@ class ParsedArgs:
 
             # todo Remove later. [call -p] is outdated since 2021-05
             self.args_to_python = _remove_leading_p(self.args_to_python)
+            self._call = ParsedCall(args)
         else:
             # if some args were not recognized, parsing everything stricter
             if unknown:
                 self._ns = parser.parse_args(self.args)
 
+        self.command = Commands(self._ns.command)
+
+    # @property
+    # def command(self) -> Commands:
+    #     return Commands(self._ns.command)
+
     @property
-    def command(self) -> Commands:
-        return Commands(self._ns.command)
+    def call(self) -> ParsedCall:
+        if self.command != Commands.call:
+            raise RuntimeError("The current command is not 'call'")
+        assert self._call is not None
+        return self._call
 
     @property
     def project_dir_arg(self) -> Optional[str]:

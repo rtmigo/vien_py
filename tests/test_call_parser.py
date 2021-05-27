@@ -12,11 +12,11 @@ class TestNew(unittest.TestCase):
 
     def test_file_after_call(self):
         psr = ParsedCall("vien -p zzz call -d FiLe.Py arg1".split())
-        self.assertEqual(psr.file, "FiLe.Py")
+        self.assertEqual(psr.filename, "FiLe.Py")
 
     def test_file_before_and_after_call(self):
         psr = ParsedCall("vien -p wrong.py call -d right.py arg1".split())
-        self.assertEqual(psr.file, "right.py")
+        self.assertEqual(psr.filename, "right.py")
 
     def test_file_not_found(self):
         with self.assertRaises(PyFileArgNotFoundExit):
