@@ -115,9 +115,7 @@ $ vien run pip install requests lxml
 $ vien call main.py
 ```
 
-# Commands
-
-## create
+# " create " command
 
 `vien create` сreates a virtual environment that will correspond the current
 working directory. The **working directory** in this case is assumed to be
@@ -146,7 +144,7 @@ be executed in the shell as `python3.8`, you can try
 $ vien create python3.8
 ```
 
-## shell
+# " shell " command
 
 `vien shell` starts interactive bash session in the virtual environment.
 
@@ -184,7 +182,7 @@ command line.
 $ echo 'which python3 && echo $PATH' | vien shell
 ```
 
-## run
+## vien run
 
 `vien run COMMAND` runs a shell command in the virtual environment.
 
@@ -211,7 +209,7 @@ $ /path/to/the/venv/bin/deactivate
 
 </details>
 
-## The [call] command
+## vien call
 
 `vien call PYFILE` executes a `.py` script in the virtual environment.
 
