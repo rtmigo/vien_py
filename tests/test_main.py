@@ -16,7 +16,7 @@ from timeit import default_timer as timer
 from typing import List, Optional
 
 from tests.test_arg_parser import windows_too
-from vien._parsed_args import Parsed
+from vien._parsed_args import ParsedArgs
 
 from vien._common import is_windows
 

@@ -9,7 +9,7 @@ from vien._common import is_windows
 
 from tests.common import is_posix
 from vien._main import get_project_dir
-from vien._parsed_args import Parsed, Commands, items_after
+from vien._parsed_args import ParsedArgs, Commands, _iter_after
 
 
 def windows_too(args: List[str]) -> List[str]:
@@ -20,21 +20,21 @@ def windows_too(args: List[str]) -> List[str]:
     implemented for Windows.
     """
     if is_windows:
-        return [Parsed.PARAM_WINDOWS_ALL_ARGS] + args
+        return [ParsedArgs.PARAM_WINDOWS_ALL_ARGS] + args
     else:
         return args
 
 
 class TestItemsAfter(unittest.TestCase):
     def test_items_after(self):
-        self.assertEqual(list(items_after(['A', 'B', 'C'], 'A')),
+        self.assertEqual(list(_iter_after(['A', 'B', 'C'], 'A')),
                          ['B', 'C'])
-        self.assertEqual(list(items_after(['A', 'B', 'C'], 'B')),
+        self.assertEqual(list(_iter_after(['A', 'B', 'C'], 'B')),
                          ['C'])
-        self.assertEqual(list(items_after(['A', 'B', 'C'], 'C')),
+        self.assertEqual(list(_iter_after(['A', 'B', 'C'], 'C')),
                          [])
         with self.assertRaises(LookupError):
-            list(items_after(['A', 'B', 'C'], 'X'))
+            list(_iter_after(['A', 'B', 'C'], 'X'))
 
 
 class TestWindowsAllArgs(unittest.TestCase):
@@ -43,106 +43,112 @@ class TestWindowsAllArgs(unittest.TestCase):
         # is the PARAM_WINDOWS_ALL_ARGS is set, we must run windows.
         # Otherwise, AssertionError is thrown
         with self.assertRaises(AssertionError):
-            Parsed([Parsed.PARAM_WINDOWS_ALL_ARGS, 'shell'])
+            ParsedArgs([ParsedArgs.PARAM_WINDOWS_ALL_ARGS, 'shell'])
 
 
 class TestProjectDir(unittest.TestCase):
 
     def test_run_short_left(self):
-        pd = Parsed(windows_too('-p a/b/c run python3 myfile.py'.split()))
+        pd = ParsedArgs(windows_too('-p a/b/c run python3 myfile.py'.split()))
         self.assertEqual(pd.project_dir_arg, 'a/b/c')
 
     def test_run_long_left(self):
-        pd = Parsed(
+        pd = ParsedArgs(
             windows_too('--project-dir a/b/c run python3 myfile.py'.split()))
         self.assertEqual(pd.project_dir_arg, 'a/b/c')
 
     def test_call_short_right(self):
-        pd = Parsed('call -p a/b/c myfile.py'.split())
+        pd = ParsedArgs('call -p a/b/c myfile.py'.split())
         self.assertEqual(pd.project_dir_arg, 'a/b/c')
 
     def test_call_long_right(self):
-        pd = Parsed('call --project-dir a/b/c myfile.py'.split())
+        pd = ParsedArgs('call --project-dir a/b/c myfile.py'.split())
         self.assertEqual(pd.project_dir_arg, 'a/b/c')
 
     def test_call_short_left(self):
-        pd = Parsed('-p a/b/c call myfile.py'.split())
+        pd = ParsedArgs('-p a/b/c call myfile.py'.split())
         self.assertEqual(pd.project_dir_arg, 'a/b/c')
 
     def test_call_long_left(self):
-        pd = Parsed('--project-dir a/b/c call myfile.py'.split())
+        pd = ParsedArgs('--project-dir a/b/c call myfile.py'.split())
         self.assertEqual(pd.project_dir_arg, 'a/b/c')
 
     def test_call_short_both(self):
-        pd = Parsed('-p a/b/c call -p d/e/f myfile.py'.split())
+        pd = ParsedArgs('-p a/b/c call -p d/e/f myfile.py'.split())
         self.assertEqual(pd.project_dir_arg, 'd/e/f')
 
 
 class TestParseCall(unittest.TestCase):
 
     def test_outdated_p(self):
-        pd = Parsed('-p a/b/c call -p d/e/f myfile.py arg1 arg2'.split())
+        pd = ParsedArgs('-p a/b/c call -p d/e/f myfile.py arg1 arg2'.split())
         self.assertEqual(pd.args_to_python, ['myfile.py', 'arg1', 'arg2'])
 
     def test_p(self):
-        pd = Parsed('-p a/b/c call -d myfile.py a b c'.split())
+        pd = ParsedArgs('-p a/b/c call -d myfile.py a b c'.split())
         self.assertEqual(pd.args_to_python, ['-d', 'myfile.py', 'a', 'b', 'c'])
 
     def test_unrecoginzed(self):
         """Unrecognized arguments that are NOT after the 'call' word."""
         with self.assertRaises(SystemExit) as ce:
-            Parsed('-labuda call myfile.py a b c'.split())
+            ParsedArgs('-labuda call myfile.py a b c'.split())
         self.assertEqual(ce.exception.code, 2)
+
+    def test_call_field(self):
+        pd = ParsedArgs('-p a/b/c call -m myfile.py arg1 arg2'.split())
+        self.assertIsNotNone(pd.call)
+        self.assertEqual(pd.call.filename, "myfile.py")
+        self.assertEqual(pd.call.before_filename, "-m")
 
 
 class TestParseShell(unittest.TestCase):
     def test_no_args(self):
-        pd = Parsed(windows_too('shell'.split()))
+        pd = ParsedArgs(windows_too('shell'.split()))
         self.assertEqual(pd.command, Commands.shell)
         self.assertEqual(pd.shell_delay, None)
         self.assertEqual(pd.shell_input, None)
 
     def test_input(self):
-        pd = Parsed(windows_too(['shell', '--input', 'cd / && ls']))
+        pd = ParsedArgs(windows_too(['shell', '--input', 'cd / && ls']))
         self.assertEqual(pd.shell_input, 'cd / && ls')
 
     def test_delay(self):
-        pd = Parsed(windows_too('shell --delay 1.2'.split()))
+        pd = ParsedArgs(windows_too('shell --delay 1.2'.split()))
         self.assertEqual(pd.shell_delay, 1.2)
 
     def test_labuda(self):
         with self.assertRaises(SystemExit) as ce:
-            pd = Parsed(windows_too('shell --labuda'.split()))
+            pd = ParsedArgs(windows_too('shell --labuda'.split()))
         self.assertEqual(ce.exception.code, 2)
 
 
 class TestParseRun(unittest.TestCase):
     def test(self):
-        pd = Parsed(windows_too(['run', 'python3', '-OO', 'file.py']))
+        pd = ParsedArgs(windows_too(['run', 'python3', '-OO', 'file.py']))
         self.assertEqual(pd.command, Commands.run)
         self.assertEqual(pd.run_args, ['python3', '-OO', 'file.py'])
 
 
 class TestParseCreate(unittest.TestCase):
     def test_with_arg(self):
-        pd = Parsed(['create', 'python3'])
+        pd = ParsedArgs(['create', 'python3'])
         self.assertEqual(pd.command, Commands.create)
         self.assertEqual(pd.python_executable, "python3")
 
     def test_without_arg(self):
-        pd = Parsed(['create'])
+        pd = ParsedArgs(['create'])
         self.assertEqual(pd.command, Commands.create)
         self.assertEqual(pd.python_executable, None)
 
 
 class TestParseRecreate(unittest.TestCase):
     def test_with_arg(self):
-        pd = Parsed(['recreate', 'python3'])
+        pd = ParsedArgs(['recreate', 'python3'])
         self.assertEqual(pd.command, Commands.recreate)
         self.assertEqual(pd.python_executable, "python3")
 
     def test_without_arg(self):
-        pd = Parsed(['recreate'])
+        pd = ParsedArgs(['recreate'])
         self.assertEqual(pd.command, Commands.recreate)
         self.assertEqual(pd.python_executable, None)
 

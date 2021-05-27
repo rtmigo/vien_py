@@ -14,7 +14,7 @@ from typing import *
 
 from vien import is_posix
 from vien._common import need_posix, is_windows, need_windows
-from vien._parsed_args import Commands, Parsed
+from vien._parsed_args import Commands, ParsedArgs
 from vien._bash_runner import run_as_bash_script
 from vien._call_funcs import relative_fn_to_module_name, relative_inner_path
 from vien._parsed_call import ParsedCall, list_left_partition
@@ -388,25 +388,27 @@ def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
     return result
 
 
-def main_call(parsed: Parsed, dirs: Dirs):
+def main_call(parsed: ParsedArgs, dirs: Dirs):
     dirs.venv_must_exist()
 
-    parsed_call = ParsedCall(parsed.args)
-    assert parsed_call.file is not None
+    #parsed_call = ParsedCall(parsed.args)
+    #assert parsed_call.file is not None
 
-    if not os.path.exists(parsed_call.file):
-        raise PyFileNotFoundExit(Path(parsed_call.file))
+    assert parsed.call is not None
 
-    if parsed_call.before_filename == "-m":
+    if not os.path.exists(parsed.call.filename):
+        raise PyFileNotFoundExit(Path(parsed.call.filename))
+
+    if parsed.call.before_filename == "-m":
         # todo unit test
         # /abc/project/package/module.py -> package/module.py
-        relative = relative_inner_path(parsed_call.file, dirs.project_dir)
+        relative = relative_inner_path(parsed.call.filename, dirs.project_dir)
         # package/module.py -> package.module
         module_name = relative_fn_to_module_name(relative)
         # replacing the filename in args with the module name.
         # It is already prefixed with -m
-        args = parsed_call.args.copy()
-        args[parsed_call.file_idx] = module_name
+        args = parsed.call.args.copy()
+        args[parsed.call.filename_idx] = module_name
         # args to python are those after 'call' word
         _, args_to_python = list_left_partition(args, 'call')
         assert '-m' in args_to_python
@@ -431,14 +433,14 @@ def normalize_path(reference: Path, path: Path) -> Path:
     return Path(os.path.normpath(reference / path))
 
 
-def get_project_dir(parsed: Parsed) -> Path:
+def get_project_dir(parsed: ParsedArgs) -> Path:
     if parsed.project_dir_arg is not None:
         if parsed.command == Commands.call:
             # for the 'call' the reference dir is the parent or .py file
-            pyfile = ParsedCall(parsed.args).file
-            if pyfile is None:
+            assert parsed.call is not None
+            if parsed.call.filename is None:
                 raise PyFileArgNotFoundExit
-            reference_dir = Path(pyfile).parent.absolute()
+            reference_dir = Path(parsed.call.filename).parent.absolute()
         else:
             # for other commands the reference dir is cwd
             reference_dir = Path(".").absolute()
@@ -453,7 +455,7 @@ def get_project_dir(parsed: Parsed) -> Path:
 
 
 def main_entry_point(args: Optional[List[str]] = None):
-    parsed = Parsed(args)
+    parsed = ParsedArgs(args)
 
     dirs = Dirs(project_dir=get_project_dir(parsed))
 

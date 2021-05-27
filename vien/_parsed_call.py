@@ -26,8 +26,7 @@ def list_left_partition(items: Iterable[str], split: str) \
 
 
 class ParsedCall:
-    # todo cache to avoid parsing twice?
-    __slots__ = ['args', 'file', 'file_idx']
+    __slots__ = ['args', 'filename', 'filename_idx']
 
     def __init__(self, args: List[str]):
 
@@ -41,9 +40,9 @@ class ParsedCall:
                     call_found = True
                 continue
 
-            if arg.lower().endswith(".py"):
-                self.file = arg
-                self.file_idx = idx
+            if len(arg) > 3 and arg[-3:].lower() == ".py":
+                self.filename = arg
+                self.filename_idx = idx
                 file_found = True
                 break
 
@@ -52,16 +51,13 @@ class ParsedCall:
 
     @property
     def before_filename(self) -> Optional[str]:
-        if self.file_idx <= 0:
+        """Returns the argument before the filename, but after the 'call'.
+        For command 'vien call -m file.py' it is '-m'.
+        For command 'vien call file.py' it is None.
+        """
+        if self.filename_idx <= 0:
             return None
-        val = self.args[self.file_idx - 1]
+        val = self.args[self.filename_idx - 1]
         if val == "call":
             return None
         return val
-
-# def call_pyfile(args: List[str]) -> Optional[str]:
-#     # todo remove?
-#     for arg in items_after(args, "call"):
-#         if arg.lower().endswith(".py"):
-#             return arg
-#     return None
