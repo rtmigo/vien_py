@@ -12,26 +12,31 @@ def rip(a: str, b: str) -> str:
 
 
 class TestRelativeInnerPath(unittest.TestCase):
+
+    def assertEqualAnyslash(self, a: str, b: str):
+        self.assertEqual(a.replace('\\', '/'),
+                         b.replace('\\', '/'))
+
     def test_child(self):
-        self.assertEqual(
+        self.assertEqualAnyslash(
             rip('W:/abc/myProject/file.py', 'W:/abc/myProject'),
             'file.py')
 
     def test_sub_child(self):
-        self.assertEqual(
+        self.assertEqualAnyslash(
             rip('W:/abc/myProject/pkg/sub/file.py',
                 'W:/abc/myProject'),
             'pkg/sub/file.py')
 
     @unittest.skipUnless(os.name == 'nt', "windows-specific")
     def test_sub_child_back(self):
-        self.assertEqual(
+        self.assertEqualAnyslash(
             rip(r'W:\abc\myProject\pkg\sub\file.py',
                 r'W:\abc\myProject'),
             'pkg/sub/file.py')
 
     def test_both_relative(self):
-        self.assertEqual(
+        self.assertEqualAnyslash(
             rip('myProject/pkg/sub/file.py',
                 'myProject'),
             'pkg/sub/file.py')
