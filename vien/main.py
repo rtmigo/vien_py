@@ -16,7 +16,7 @@ from vien import is_posix
 from vien._common import need_posix, is_windows, need_windows
 from vien.arg_parser import Commands, Parsed
 from vien.bash_runner import run_as_bash_script
-from vien.call_parser import call_pyfile
+from vien.call_parser import call_pyfile, ParsedCall, list_left_partition
 from vien.colors import Colors
 from vien.escaping_cmd import cmd_escape_arg
 from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
@@ -382,6 +382,8 @@ def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
     """Replaces first occurrence of `old` with a list of `new` items (zero or
     more items). Raises exception if `old` not found.
     """
+
+    # todo remove?
     result = list()
     replaced = False
     for arg in args:
@@ -409,17 +411,38 @@ def relative_inner_path(child: Union[str, Path], parent: Union[str, Path]) -> st
 
 def main_call(parsed: Parsed, dirs: Dirs):
     dirs.venv_must_exist()
-    pyfile_arg = call_pyfile(parsed.args)
-    assert pyfile_arg is not None
-    if not os.path.exists(pyfile_arg):
-        raise PyFileNotFoundExit(Path(pyfile_arg))
+
+    parsed_call = ParsedCall(parsed.args)
+    assert parsed_call.file is not None
+
+    if not os.path.exists(parsed_call.file):
+        raise PyFileNotFoundExit(Path(parsed_call.file))
+
+
+
+    if parsed_call.before_filename == "-m":
+        # /abc/project/package/module.py -> package/module.py
+        relative = relative_inner_path(parsed_call.file, dirs.project_dir)
+        # package/module.py -> package.module
+        module_name = relative_fn_to_module_name(relative)
+        # replacing the filename in args with the module name.
+        # It is already prefixed with -m
+        args = parsed_call.args.copy()
+        args[parsed_call.file_idx] = module_name
+        # args to python are those after 'call' word
+        _, args_to_python = list_left_partition(args, 'call')
+        assert '-m' in args_to_python
+        assert module_name in args_to_python
+    else:
+        args_to_python = parsed.args_to_python
+
+        #replace_arg(args_to_python, pyfile_arg,
+        #            ['-m', module_path])
 
     # rel_path = os.path.relpath(pyfile_arg, dirs.project_dir)
 
     # if rel_path.split()[0] == ".."
 
-    module_path = relative_fn_to_module_name(
-        relative_inner_path(pyfile_arg, dirs.project_dir))
 
     # print("RRR", module_path)
 
@@ -431,9 +454,9 @@ def main_call(parsed: Parsed, dirs: Dirs):
     #              proj_path: Path,
     #              other_args: List[str]):
 
-    args_to_python = parsed.args_to_python
-    args_to_python = replace_arg(args_to_python, pyfile_arg,
-                                 ['-m', module_path])
+
+    #args_to_python = replace_arg(args_to_python, pyfile_arg,
+    #                             ['-m', module_name])
 
     python_exe = venv_dir_to_python_exe(dirs.venv_dir)
 

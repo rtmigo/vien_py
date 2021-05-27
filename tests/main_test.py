@@ -13,7 +13,7 @@ from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
-from typing import List
+from typing import List, Optional
 
 from tests.test_arg_parser import windows_too
 from vien.arg_parser import Parsed
@@ -72,6 +72,24 @@ class Test(unittest.TestCase):
         main_entry_point(["path"])
 
 
+class TempCwd:
+    """Context manager that creates temp directory and makes it the current
+    working directory until exit."""
+
+    def __init__(self):
+        self.prev_cwd: Optional[str] = None
+        self.temp_dir: Optional[str] = None
+
+    def __enter__(self):
+        self.prev_cwd = os.getcwd()
+        self.temp_dir = tempfile.mkdtemp()
+        os.chdir(self.temp_dir)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        os.chdir(self.prev_cwd)
+        shutil.rmtree(self.temp_dir)
+
+
 class TestsInsideTempProjectDir(unittest.TestCase):
 
     def setUp(self):
@@ -86,6 +104,15 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         self.projectDir.mkdir()
         self.svetDir.mkdir()
+
+        # creating two empty packages: pkg and pkg.sub
+        self.project_pkg = self.projectDir / "pkg"
+        self.project_pkg_sub = self.project_pkg / "sub"
+        self.project_pkg_sub.mkdir(parents=True)
+        (self.project_pkg_sub / "__init__.py").touch()
+        (self.project_pkg / "__init__.py").touch()
+
+        self.json_report_file: Optional[Path] = None
 
         os.chdir(self.projectDir)
 
@@ -162,19 +189,44 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         self.assertIsInstance(exc, SystemExit)
         self.assertTrue(exc.code is None or exc.code == 0)
 
-    def write_program(self, py_file_path: Path) -> Path:
-        out_file_path = py_file_path.parent / 'output.json'
-        out_file_path_str = repr(str(out_file_path))
+    def write_reporting_program(self, py_file_path: Path) -> Path:
+        self.json_report_file = py_file_path.parent / 'output.json'
+        out_file_path_str = repr(str(self.json_report_file))
         code = "import pathlib, sys, json\n" \
                "d={'sys.path': sys.path, \n" \
-               "   'sys.executable': sys.executable}\n" \
+               "   'sys.executable': sys.executable, \n" \
+               "   'sys.argv': sys.argv\n" \
+               "}\n" \
                "js=json.dumps(d)\n" \
                f"file=pathlib.Path({out_file_path_str})\n" \
                'file.write_text(js, encoding="utf-8")'
         py_file_path.write_text(code, encoding='utf-8')
 
-        assert not out_file_path.exists()
-        return out_file_path
+        assert not self.json_report_file.exists()
+        return self.json_report_file
+
+    @property
+    def report_exists(self) -> bool:
+        return self.json_report_file is not None and \
+               self.json_report_file.exists()
+
+    @property
+    def reported_syspath(self) -> List[str]:
+        assert self.json_report_file is not None
+        d = json.loads(self.json_report_file.read_text(encoding="utf-8"))
+        return d["sys.path"]
+
+    @property
+    def reported_executable(self) -> Path:
+        assert self.json_report_file is not None
+        d = json.loads(self.json_report_file.read_text(encoding="utf-8"))
+        return Path(d["sys.executable"])
+
+    @property
+    def reported_argv(self) -> List[str]:
+        assert self.json_report_file is not None
+        d = json.loads(self.json_report_file.read_text(encoding="utf-8"))
+        return d["sys.argv"]
 
     ############################################################################
 
@@ -320,6 +372,11 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             # (was failing with nargs='*', ok with nargs=argparse.REMAINDER)
             main_entry_point(windows_too(["run", "python3", "--version"]))
 
+    def _run_and_check(self, args: List[str], expected_exit_code=0):
+        with self.assertRaises(ChildExit) as ce:
+            main_entry_point(args)
+        self.assertEqual(ce.exception.code, expected_exit_code)
+
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_p(self):
         """Checking the -p changes both venv directory and the first item
@@ -331,21 +388,17 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
             # creating .py file to run
             code_py = Path(temp_cwd) / "code.py"
-            output_file = self.write_program(code_py)
+            self.write_reporting_program(code_py)
 
             # running the code that will create a json file
             self.assertProjectDirIsNotCwd()
-            with self.assertRaises(ChildExit) as ce:
-                main_entry_point(
-                    ["-p", str(self.projectDir.absolute()),
-                     "run", "python3",
-                     str(code_py)])
-            self.assertEqual(ce.exception.code, 0)
+            self._run_and_check(
+                ["-p", str(self.projectDir.absolute()),
+                 "run", "python3", str(code_py)])
 
-            # loading json and checking the values
-            d = json.loads(output_file.read_text(encoding="utf-8"))
-            self.assertIn(str(self.projectDir.absolute()), d["sys.path"])
-            self.assertInVenv(Path(d["sys.executable"]))
+            self.assertInVenv(self.reported_executable)
+            self.assertIn(str(self.projectDir.absolute()),
+                          self.reported_syspath)
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_python_code(self):
@@ -414,20 +467,75 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         Testing whether it runs and whether we get correct exit code."""
         self._call_for_exit_code(23)
 
+    def test_call_file_as_module(self):
+        main_entry_point(["create"])
+
+        # creating pkg/sub/module.py
+        file_py = self.project_pkg_sub / "module.py"
+        self.write_reporting_program(file_py)
+
+        self.assertFalse(self.report_exists)
+
+        # running from random CWD
+        with TempCwd():
+            self.assertProjectDirIsNotCwd()
+            self._run_and_check(
+                ["-p", str(self.projectDir.absolute()),
+                 "call", "-m", str(file_py.absolute())])
+
+        self.assertTrue(self.report_exists)
+        self.assertInVenv(self.reported_executable)
+        self.assertIn(str(self.projectDir.absolute()),
+                      self.reported_syspath)
+
+    def test_call_file_as_file(self):
+        main_entry_point(["create"])
+
+        # creating pkg/sub/module.py
+        file_py = self.project_pkg_sub / "module.py"
+        self.write_reporting_program(file_py)
+
+        self.assertFalse(self.report_exists)
+
+        # running from random CWD
+        with TempCwd():
+            self.assertProjectDirIsNotCwd()
+            self._run_and_check(
+                ["-p", str(self.projectDir.absolute()),
+                 "call", str(file_py.absolute())])  # no -m
+
+        self.assertTrue(self.report_exists)
+        self.assertInVenv(self.reported_executable)
+        self.assertIn(str(self.projectDir.absolute()),
+                      self.reported_syspath)
+
     def test_call_parameters(self):
         """Testing that call really passes parameters to child."""
 
         main_entry_point(["create"])
-        (self.projectDir / "main.py").write_text(
-            f"import sys; exit(len(sys.argv))")
 
-        with self.assertRaises(ChildExit) as ce:
-            main_entry_point(["call", "main.py"])
-        self.assertEqual(ce.exception.code, 1)  # received len(argv)
+        self.write_reporting_program(self.projectDir/"file.py")
 
-        with self.assertRaises(ChildExit) as ce:
-            main_entry_point(["call", "main.py", "aaa", "bbb", "ccc"])
-        self.assertEqual(ce.exception.code, 4)  # received len(argv)
+        self.assertFalse(self.report_exists)
+        self._run_and_check(["call", "file.py", "hello", "program"])
+        self.assertTrue(self.report_exists)
+
+        self.assertEqual(self.reported_argv[-2], "hello")
+        self.assertEqual(self.reported_argv[-1], "program")
+
+
+
+        # main_entry_point(["create"])
+        # (self.projectDir / "main.py").write_text(
+        #     f"import sys; exit(len(sys.argv))")
+        #
+        # with self.assertRaises(ChildExit) as ce:
+        #     main_entry_point(["call", "main.py"])
+        # self.assertEqual(ce.exception.code, 1)  # received len(argv)
+        #
+        # with self.assertRaises(ChildExit) as ce:
+        #     main_entry_point(["call", "main.py", "aaa", "bbb", "ccc"])
+        # self.assertEqual(ce.exception.code, 4)  # received len(argv)
 
     def test_call_project_dir_venv(self):
         """Tests that the -p parameter actually changes the project directory,
@@ -532,7 +640,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
             # creating .py file to run
             code_py = Path(temp_cwd) / "code.py"
-            output_file = self.write_program(code_py)
+            output_file = self.write_reporting_program(code_py)
 
             # running the code that will create a json file
             self.assertProjectDirIsNotCwd()
