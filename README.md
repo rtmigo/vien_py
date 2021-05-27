@@ -211,7 +211,7 @@ $ /path/to/the/venv/bin/deactivate
 
 </details>
 
-## call
+## CALL command
 
 `vien call PYFILE` executes a `.py` script in the virtual environment.
 
