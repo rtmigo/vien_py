@@ -9,7 +9,7 @@ from tests.common import is_posix
 from tests.test_arg_parser import windows_too
 from vien._main import get_project_dir
 from vien._exceptions import PyFileArgNotFoundExit
-from vien._parsed_args import Parsed
+from vien._parsed_args import ParsedArgs
 
 
 def fix_paths(s: str):
@@ -25,7 +25,7 @@ class TestGetProjectDir(unittest.TestCase):
 
     def _gpd(self, cmd: str) -> Path:
         cmd = fix_paths(cmd)
-        result = get_project_dir(Parsed(windows_too(cmd.split())))
+        result = get_project_dir(ParsedArgs(windows_too(cmd.split())))
         self.assertTrue(result.is_absolute())
         return result
 

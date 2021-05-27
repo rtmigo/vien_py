@@ -34,7 +34,7 @@ https://github.com/rtmigo/vien_py#readme
     return f"{above_first_line}\n{doc}\n"
 
 
-def items_after(items: Iterable[str], x: str) -> Iterable[str]:
+def _iter_after(items: Iterable[str], x: str) -> Iterable[str]:
     found = False
     for arg in items:
         if found:
@@ -45,7 +45,7 @@ def items_after(items: Iterable[str], x: str) -> Iterable[str]:
         raise LookupError
 
 
-def remove_leading_p(args: List[str]) -> List[str]:
+def _remove_leading_p(args: List[str]) -> List[str]:
     # fixing a problem that is outdated since 2021-05
     if len(args) < 2:
         return args
@@ -64,7 +64,7 @@ class Commands(Enum):
     path = "path"
 
 
-class Parsed:
+class ParsedArgs:
     PARAM_WINDOWS_ALL_ARGS = "--vien-secret-windows-all-args"
 
     def __init__(self, args: Optional[List[str]]):
@@ -161,7 +161,7 @@ class Parsed:
 
         self._ns, unknown = parser.parse_known_args(self.args)
         if self.command == Commands.call:
-            self.args_to_python = list(items_after(args, 'call'))
+            self.args_to_python = list(_iter_after(args, 'call'))
 
             # if some of the unknown args are NOT after the 'call',
             # then we're failed to interpret the command. Parsing
@@ -173,7 +173,7 @@ class Parsed:
                 raise AssertionError("Not expected to run this line")
 
             # todo Remove later. [call -p] is outdated since 2021-05
-            self.args_to_python = remove_leading_p(self.args_to_python)
+            self.args_to_python = _remove_leading_p(self.args_to_python)
         else:
             # if some args were not recognized, parsing everything stricter
             if unknown:

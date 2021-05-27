@@ -1,4 +1,4 @@
-# Code taken from https://stackoverflow.com/a/29215357
+# taken from https://stackoverflow.com/a/29215357
 # SPDX-FileCopyrightText: Holger Just
 # SPDX-License-Identifier: CC BY-SA 3.0
 
