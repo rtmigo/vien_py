@@ -127,7 +127,9 @@ $ vien create
 ```
 
 By default, the current **working directory** is assumed to be the 
-**project directory**. This can be changed using the `-p` parameter.
+**project directory**. 
+
+Alternatively you can use `-p` parameter.
 
 ``` bash
 $ vien -p /abc/myProject create 
@@ -135,6 +137,12 @@ $ vien -p /abc/myProject create
 
 
 The `-p` parameter works with all commands, not just `create`.
+
+``` bash
+$ cd /other/working/dir
+$ vien -p /abc/myProject create
+$ vien -p /abc/myProject shell
+```
 
 ### "create": choose the Python version
 
@@ -255,8 +263,8 @@ $ vien call -m /abc/myProject/pkg/sub/module.py
 - `module.py` must be located somewhere inside the `/abc/myProject`
 - parent subdirectories such as `pkg` and `sub` must be importable, i.e. must contain 
   `__init__.py`
-- the project directory will be inserted into `$PYTHONPATH` making the module 
-  visible  
+- the project directory will be inserted into `$PYTHONPATH`, making 
+  `pkg.sub.module` resolvable from `/abc/myProject` to a file
   
 The project directory can be specified not only by the working directory, 
 but also by the `-p` parameter.
