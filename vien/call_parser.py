@@ -23,6 +23,7 @@ def list_left_partition(items: Iterable[str], split: str) \
 
 
 class ParsedCall:
+    # todo cache to avoid parsing twice?
     __slots__ = ['args', 'file', 'file_idx']
 
     def __init__(self, args: List[str]):
