@@ -14,7 +14,7 @@ from typing import *
 
 from vien import is_posix
 from vien._common import need_posix, is_windows, need_windows
-from vien._parsed_args import Commands, Parsed
+from vien._parsed_args import Commands, ParsedArgs
 from vien._bash_runner import run_as_bash_script
 from vien._call_funcs import relative_fn_to_module_name, relative_inner_path
 from vien._parsed_call import ParsedCall, list_left_partition
@@ -388,7 +388,7 @@ def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
     return result
 
 
-def main_call(parsed: Parsed, dirs: Dirs):
+def main_call(parsed: ParsedArgs, dirs: Dirs):
     dirs.venv_must_exist()
 
     parsed_call = ParsedCall(parsed.args)
@@ -431,7 +431,7 @@ def normalize_path(reference: Path, path: Path) -> Path:
     return Path(os.path.normpath(reference / path))
 
 
-def get_project_dir(parsed: Parsed) -> Path:
+def get_project_dir(parsed: ParsedArgs) -> Path:
     if parsed.project_dir_arg is not None:
         if parsed.command == Commands.call:
             # for the 'call' the reference dir is the parent or .py file
@@ -453,7 +453,7 @@ def get_project_dir(parsed: Parsed) -> Path:
 
 
 def main_entry_point(args: Optional[List[str]] = None):
-    parsed = Parsed(args)
+    parsed = ParsedArgs(args)
 
     dirs = Dirs(project_dir=get_project_dir(parsed))
 
