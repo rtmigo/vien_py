@@ -231,14 +231,21 @@ from the program.
 
 ``` bash
 $ cd /abc/myProject
-$ vien call -m /abc/myProject/pkg/module.py
+$ vien call -m /abc/myProject/pkg/sub/module.py
 
-# runs [python -m pkg.module]
+# runs [python -m pkg.sub.module]
+# project dir: /abc/myProject
+# working dir: /abc/myProject
 ```
 
 - `module.py` must be located somewhere inside the `/abc/myProject`
-- parent subdirectories such as `pkg` must be importable, i.e. must contain 
-  `pkg/__init__.py` 
+- parent subdirectories such as `pkg` an `sub` must be importable, i.e. must contain 
+  `__init__.py`
+- the project directory will be inserted into `$PYTHONPATH` making the module 
+  visible  
+  
+The project directory can be specified not only by the working directory, 
+but also by the `-p` parameter.
 
 
 The `call` command only accepts `.py` files, no module names.  
@@ -264,18 +271,37 @@ The optional `-p` parameter can be specified before the `call` word. It allows
 you to set the project directory **relative** to the parent directory of the 
 **file** being run.
 
-``` bash 		
-$ cd any/where  # working dir is irrelevant
+``` bash
+$ cd /far/away
+$ vien -p /abc/myProject call -m /abc/myProject/pkg/sub/module.py
 
-# both of the following calls will use 
-# /abc/myProject as the project directory
-
-$ vien -p /abc/myProject call /abc/myProject/pkg/main.py
-$ vien -p .. call /abc/myProject/pkg/main.py
+# runs [python -m pkg.sub.module]
+# project dir: /abc/myProject
+# working dir: /far/away
 ```
 
-In the second case `..` means that the project directory is 
-`/abc/myProject/pkg/..`, which resolves to `/abc/myProject`. 
+``` bash
+$ cd /far/away
+$ vien -p ../.. call -m /abc/myProject/pkg/sub/module.py
+
+# runs [python -m pkg.sub.module]
+# project dir: /abc/myProject  (/abc/myProject/pkg/sub/../..)
+# working dir: /far/away
+```
+
+``` bash
+$ cd /abc/myProject/pkg
+$ vien -p ../.. call -m sub/module.py
+
+# runs [python -m pkg.sub.module]
+# project dir: /abc/myProject  (/abc/myProject/pkg/sub/../..)
+# working dir: /abc/myProject/pkg
+```
+
+
+
+
+
 
 # "delete" command
 
