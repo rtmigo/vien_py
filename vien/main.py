@@ -368,15 +368,79 @@ def child_env(proj_path: Path) -> Optional[Dict]:
         return None
 
 
-def main_call(venv_dir: Path,
-              proj_path: Path,
-              other_args: List[str]):
-    python_exe = venv_dir_to_python_exe(venv_dir)
-    # print("EXE",python_exe)
-    assert len(other_args) > 0
-    args = [str(python_exe)] + other_args
+def relative_fn_to_module_name(filename: str) -> str:
+    # todo test
+    if not filename.lower().endswith('.py'):
+        raise ValueError("The filename does not end with '.py'.")
+    filename = filename[:-3]
+    assert not os.path.isabs(filename)
+    assert not filename.split()[0] == ".."
+    return filename.replace(os.path.sep, '.')
 
-    cp = subprocess.run(args, env=child_env(proj_path))
+
+def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
+    """Replaces first occurrence of `old` with a list of `new` items (zero or
+    more items). Raises exception if `old` not found.
+    """
+    result = list()
+    replaced = False
+    for arg in args:
+        if not replaced and arg == old:
+            result.extend(new)
+            replaced = True
+        else:
+            result.append(arg)
+
+    assert replaced
+    return result
+
+
+def relative_inner_path(child: Union[str, Path], parent: Union[str, Path]) -> str:
+    """(/abc/parent/xyz/child, /abc/parent) -> xyz/child
+    Not only returns the "relative" path, but also checks
+    it is really relative.
+    """
+    # todo test
+    rel_path = os.path.relpath(child, parent)
+    if rel_path.split()[0] == ".." or os.path.isabs(rel_path):
+        raise ValueError(f"The {child} is not a child of {parent}.")
+    return rel_path
+
+
+def main_call(parsed: Parsed, dirs: Dirs):
+    dirs.venv_must_exist()
+    pyfile_arg = call_pyfile(parsed.args)
+    assert pyfile_arg is not None
+    if not os.path.exists(pyfile_arg):
+        raise PyFileNotFoundExit(Path(pyfile_arg))
+
+    # rel_path = os.path.relpath(pyfile_arg, dirs.project_dir)
+
+    # if rel_path.split()[0] == ".."
+
+    module_path = relative_fn_to_module_name(
+        relative_inner_path(pyfile_arg, dirs.project_dir))
+
+    # print("RRR", module_path)
+
+    # main_call(venv_dir=dirs.venv_dir,
+    ##          proj_path=dirs.project_dir,
+    #          other_args=parsed.args_to_python)
+
+    # def main_call(venv_dir: Path,
+    #              proj_path: Path,
+    #              other_args: List[str]):
+
+    args_to_python = parsed.args_to_python
+    args_to_python = replace_arg(args_to_python, pyfile_arg,
+                                 ['-m', module_path])
+
+    python_exe = venv_dir_to_python_exe(dirs.venv_dir)
+
+    assert len(args_to_python) > 0
+    args = [str(python_exe)] + args_to_python
+
+    cp = subprocess.run(args, env=child_env(dirs.project_dir))
 
     raise ChildExit(cp.returncode)
 
@@ -429,15 +493,8 @@ def main_entry_point(args: Optional[List[str]] = None):
         # todo allow running commands from strings
         main_run(dirs.venv_must_exist(), parsed.run_args)
     elif parsed.command == Commands.call:
-        # todo move in func
-        dirs.venv_must_exist()
-        pyfile_arg = call_pyfile(parsed.args)
-        assert pyfile_arg is not None
-        if not os.path.exists(pyfile_arg):
-            raise PyFileNotFoundExit(Path(pyfile_arg))
-        main_call(venv_dir=dirs.venv_dir,
-                  proj_path=dirs.project_dir,
-                  other_args=parsed.args_to_python)
+
+        main_call(parsed, dirs)
 
     elif parsed.command == Commands.shell:
         main_shell(dirs, parsed.shell_input, parsed.shell_delay)
