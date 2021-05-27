@@ -224,10 +224,9 @@ $ vien call pkg/module.py
 
 ### "call": running file as a module
 
-This way of running a program is often preferred: importing other modules from 
-the program becomes easier.
+Running in this way sometimes makes it easier to import modules from the program.
 
-If the file name is preceded by the `-m` parameter, we assume that it 
+If the `.py` file name is preceded by the `-m` parameter, we assume that it 
 should be run by calling `python -m MODULE`. The module name will be generated 
 based on the file name relative to the project directory.
 
