@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: (c) 2021 Artëm IG <github.com/rtmigo>
+# SPDX-License-Identifier: BSD-3-Clause
+
 import os
 from pathlib import Path
 from typing import Union

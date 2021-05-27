@@ -16,14 +16,14 @@ from timeit import default_timer as timer
 from typing import List, Optional
 
 from tests.test_arg_parser import windows_too
-from vien.arg_parser import Parsed
+from vien._parsed_args import Parsed
 
 from vien._common import is_windows
 
 from tests.common import is_posix
 from tests.time_limited import TimeLimited
 from vien import main_entry_point
-from vien.exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
+from vien._exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit, FailedToCreateVenvExit, CannotFindExecutableExit
 
 

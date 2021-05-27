@@ -1,8 +1,11 @@
+# SPDX-FileCopyrightText: (c) 2021 Artëm IG <github.com/rtmigo>
+# SPDX-License-Identifier: BSD-3-Clause
+
 import unittest
 
-from vien.call_parser import ParsedCall
+from vien._parsed_call import ParsedCall
 
-from vien.exceptions import PyFileArgNotFoundExit
+from vien._exceptions import PyFileArgNotFoundExit
 
 
 class TestNew(unittest.TestCase):
