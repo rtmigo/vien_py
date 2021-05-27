@@ -31,8 +31,8 @@ class TestRelativeInnerPath(unittest.TestCase):
     @unittest.skipUnless(os.name == 'nt', "windows-specific")
     def test_sub_child_back(self):
         self.assertEqualAnyslash(
-            rip(r'W:\abc\myProject\pkg\sub\file.py',
-                r'W:\abc\myProject'),
+            rip('W:\\abc\\myProject\\pkg\\sub\\file.py',
+                'W:\\abc\\myProject'),
             'pkg/sub/file.py')
 
     def test_both_relative(self):
@@ -52,7 +52,7 @@ class TestRelativeInnerPath(unittest.TestCase):
     @unittest.skipUnless(os.name == 'nt', "windows-specific")
     def test_swapped_backslash(self):
         with self.assertRaises(NotInnerPath):
-            rip(r'W:\abc', r'W:\abc\myProject\x'),
+            rip('W:\\abc', 'W:\\abc\\myProject\\x'),
 
     def test_neighbor(self):
         with self.assertRaises(NotInnerPath):
