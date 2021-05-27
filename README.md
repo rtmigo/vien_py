@@ -282,7 +282,7 @@ $ vien -p /abc/myProject call -m /abc/myProject/pkg/sub/module.py
 
 ``` bash
 $ cd /far/away
-$ vien -p .. call -m /abc/myProject/pkg/module.py
+$ vien -p ../.. call -m /abc/myProject/pkg/sub/module.py
 
 # runs [python -m pkg.sub.module]
 # project dir: /abc/myProject  (/abc/myProject/pkg/sub/../..)
