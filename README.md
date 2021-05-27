@@ -215,7 +215,7 @@ $ /path/to/the/venv/bin/deactivate
 
 `vien call PYFILE` executes a `.py` script in the virtual environment.
 
-### call: running file as a file
+### `call`: running file as a file
 
 ``` bash
 $ cd /abc/myProject
@@ -224,15 +224,14 @@ $ vien call pkg/module.py
 # runs [python pkg/module.py]
 ```
 
-### call: running file as a module
+### `call`: running file as a module
+
+This way of running a program is often preferred: importing other modules from 
+the program becomes easier.
 
 If the file name is preceded by the `-m` parameter, we assume that it 
-should be run by calling `python -m MODULE`. This way of running a 
-program is often preferred: importing other modules from the file becomes easier.
-
-
-The module name will be generated based on the file name relative to the project 
-directory.
+should be run by calling `python -m MODULE`. The module name will be generated 
+based on the file name relative to the project directory.
 
 ``` bash
 $ cd /abc/myProject
@@ -252,7 +251,7 @@ Do not try to specify the module name directly. The `call` command only accepts
 $ vien call -m pkg.module 
 ```
 
-### call: arguments to Python and to the program
+### `call`: passing arguments to Python and to the program
 
 All arguments following the `call` command are passed directly to the python 
 executable.
@@ -263,7 +262,7 @@ $ vien call -B -OO package/main.py arg1 arg2
 # runs [python -B -OO package/main.py arg1 arg2]
 ```
 
-### call: project directory
+### `call`: project directory
 
 The optional `-p` parameter can be specified before the `call` word. It allows
 you to set the project directory **relative** to the parent directory of the 
