@@ -397,6 +397,10 @@ def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
     return result
 
 
+class NotInnerPath(ValueError):
+    pass
+
+
 def relative_inner_path(child: Union[str, Path],
                         parent: Union[str, Path]) -> str:
     """(/abc/parent/xyz/child, /abc/parent) -> xyz/child
@@ -405,8 +409,11 @@ def relative_inner_path(child: Union[str, Path],
     """
     # todo unit test
     rel_path = os.path.relpath(child, parent)
-    if rel_path.split()[0] == ".." or os.path.isabs(rel_path):
-        raise ValueError(f"The {child} is not a child of {parent}.")
+
+    first = rel_path.split(os.path.sep)[0]
+    print(first)
+    if first == ".." or first == "." or os.path.isabs(rel_path):
+        raise NotInnerPath(f"The {child} is not a child of {parent}.")
     return rel_path
 
 
