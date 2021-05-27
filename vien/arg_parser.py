@@ -1,14 +1,14 @@
 import argparse
 import sys
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Iterable
 
 from vien._common import is_windows
 
 from vien import is_posix
 
 import vien
-from vien.call_parser import items_after
+#from vien.call_parser import items_after
 
 
 def version_message() -> str:
@@ -29,6 +29,17 @@ https://github.com/rtmigo/vien_py#readme
     doc = text.strip()
     above_first_line = ("-" * len(doc.splitlines()[0]))
     return f"{above_first_line}\n{doc}\n"
+
+
+def items_after(items: Iterable[str], x: str) -> Iterable[str]:
+    found = False
+    for arg in items:
+        if found:
+            yield arg
+        elif arg == x:
+            found = True
+    if not found:
+        raise LookupError
 
 
 def remove_leading_p(args: List[str]) -> List[str]:

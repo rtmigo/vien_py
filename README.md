@@ -211,11 +211,11 @@ $ /path/to/the/venv/bin/deactivate
 
 </details>
 
-## call
+## The [call] command
 
 `vien call PYFILE` executes a `.py` script in the virtual environment.
 
-### call: running file as a file
+### [call] running file as a file
 
 ``` bash
 $ cd /abc/myProject
@@ -224,15 +224,14 @@ $ vien call pkg/module.py
 # runs [python pkg/module.py]
 ```
 
-### call: running file as a module
+### [call] running file as a module
+
+This way of running a program is often preferred: importing other modules from 
+the program becomes easier.
 
 If the file name is preceded by the `-m` parameter, we assume that it 
-should be run by calling `python -m MODULE`. This way of running a 
-program is often preferred: importing other modules from the file becomes easier.
-
-
-The module name will be generated based on the file name relative to the project 
-directory.
+should be run by calling `python -m MODULE`. The module name will be generated 
+based on the file name relative to the project directory.
 
 ``` bash
 $ cd /abc/myProject
@@ -252,7 +251,7 @@ Do not try to specify the module name directly. The `call` command only accepts
 $ vien call -m pkg.module 
 ```
 
-### call: arguments to Python and to the program
+### [call] passing arguments to Python and to the program
 
 All arguments following the `call` command are passed directly to the python 
 executable.
@@ -263,7 +262,7 @@ $ vien call -B -OO package/main.py arg1 arg2
 # runs [python -B -OO package/main.py arg1 arg2]
 ```
 
-### call: project directory
+### [call] project directory
 
 The optional `-p` parameter can be specified before the `call` word. It allows
 you to set the project directory **relative** to the parent directory of the 
@@ -275,9 +274,12 @@ $ cd any/where  # working dir is irrelevant
 # both of the following calls will use 
 # /abc/myProject as the project directory
 
-$ vien -p /abc/myProject call /abc/myProject/main.py
-$ vien -p . call /abc/myProject/main.py
+$ vien -p /abc/myProject call /abc/myProject/pkg/main.py
+$ vien -p .. call /abc/myProject/pkg/main.py
 ```
+
+In the second case `..` means that the project directory is 
+`/abc/myProject/pkg/..`, that is `/abc/myProject`. 
 
 This parameter makes things like [shebang](#Shebang) possible.
 
@@ -378,10 +380,10 @@ Insert the shebang line to the top of the file you want to run. The value of the
 shebang depends on the location of the file relative to the project directory.
 
 File                            | Shebang line
---------------------------------|--------------------------------
-`myProject/runme.py`            | `#!/usr/bin/env vien -p . call`
-`myProject/pkg/runme.py`        | `#!/usr/bin/env vien -p .. call`
-`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien -p ../.. call`
+--------------------------------|--------------------------------------
+`myProject/runme.py`            | `#!/usr/bin/env vien -p . call -m`
+`myProject/pkg/runme.py`        | `#!/usr/bin/env vien -p .. call -m`
+`myProject/pkg/subpkg/runme.py` | `#!/usr/bin/env vien -p ../.. call -m`
 
 After inserting the shebang, make the file executable:
 
