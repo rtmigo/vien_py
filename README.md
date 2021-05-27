@@ -239,7 +239,7 @@ $ vien call -m /abc/myProject/pkg/sub/module.py
 ```
 
 - `module.py` must be located somewhere inside the `/abc/myProject`
-- parent subdirectories such as `pkg` an `sub` must be importable, i.e. must contain 
+- parent subdirectories such as `pkg` and `sub` must be importable, i.e. must contain 
   `__init__.py`
 - the project directory will be inserted into `$PYTHONPATH` making the module 
   visible  
