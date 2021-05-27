@@ -94,6 +94,12 @@ class TestParseCall(unittest.TestCase):
             ParsedArgs('-labuda call myfile.py a b c'.split())
         self.assertEqual(ce.exception.code, 2)
 
+    def test_call_field(self):
+        pd = ParsedArgs('-p a/b/c call -m myfile.py arg1 arg2'.split())
+        self.assertIsNotNone(pd.call)
+        self.assertEqual(pd.call.filename, "myfile.py")
+        self.assertEqual(pd.call.before_filename, "-m")
+
 
 class TestParseShell(unittest.TestCase):
     def test_no_args(self):

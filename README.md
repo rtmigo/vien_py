@@ -117,20 +117,28 @@ $ vien call main.py
 
 # "create" command
 
-`vien create` сreates a virtual environment that will correspond the current
-working directory. The **working directory** in this case is assumed to be
-your **project directory**. Subsequent calls to other `vien` commands in the
-same directory will use the same virtual environment.
+`vien create` сreates a virtual environment that will correspond the 
+**project directory**. Subsequent calls to `vien` 
+with the same project directory will use the same virtual environment.
 
 ``` bash
-$ cd /path/to/myProject
+$ cd /abc/myProject
 $ vien create 
 ```
 
-By default `vien` will use the Python interpreter that running `vien` itself as
-the interpreter for the virtual environment.
+By default, the current **working directory** is assumed to be the 
+**project directory**. This can be changed using the `-p` parameter.
 
-If you have more than one Python version, you can provide an argument to point
+``` bash
+$ vien -p /abc/myProject create 
+```
+
+
+The `-p` parameter works with all commands, not just `create`.
+
+### "create": choose the Python version
+
+If you have more than one Python installed, you can provide an argument to point
 to the proper interpreter.
 
 ``` bash
@@ -143,6 +151,12 @@ be executed in the shell as `python3.8`, you can try
 ``` bash
 $ vien create python3.8
 ```
+
+When `create` is called with no argument, `vien` will use the Python
+interpreter that is running `vien` itself. For example, if you used Python 3.9 
+to `pip install vien`, then it is the Python 3.9 runs `vien`, and this 
+Python 3.9 will be used in the virtual environment.
+
 
 # "shell" command
 
@@ -361,9 +375,11 @@ vien -p /abc/myProject run python3 /abc/myProject/main.py
 
 
 If `--project-dir` is specified as a **relative path**, its interpretation depends 
-on the command. For the `call` command, this is considered a path relative to 
-the parent directory of the `.py` file being run. For other commands, this is 
-a path relative to the current working directory.
+on the command.
+- For the `call` command, this is a path relative to 
+the parent directory of the `.py` file being run 
+- For other commands, this is 
+a path relative to the current working directory
 
 # Virtual environments location
 
