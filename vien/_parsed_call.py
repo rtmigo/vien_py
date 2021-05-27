@@ -26,7 +26,7 @@ def list_left_partition(items: Iterable[str], split: str) \
 
 
 class ParsedCall:
-    # todo cache to avoid parsing twice?
+    # todo make a part of ParsedArgs
     __slots__ = ['args', 'file', 'file_idx']
 
     def __init__(self, args: List[str]):
@@ -58,10 +58,3 @@ class ParsedCall:
         if val == "call":
             return None
         return val
-
-# def call_pyfile(args: List[str]) -> Optional[str]:
-#     # todo remove?
-#     for arg in items_after(args, "call"):
-#         if arg.lower().endswith(".py"):
-#             return arg
-#     return None
