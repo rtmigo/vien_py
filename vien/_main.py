@@ -139,7 +139,7 @@ def arg_to_python_interpreter(argument: Optional[str]) -> str:
 
 def main_create(venv_dir: Path, interpreter: Optional[str]):
     if venv_dir.exists():
-        raise VenvExistsExit("Virtualenv already exists.")
+        raise VenvExistsExit(venv_dir)
 
     exe = arg_to_python_interpreter(interpreter)
 
