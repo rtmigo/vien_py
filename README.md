@@ -117,8 +117,8 @@ $ vien call main.py
 
 # "create" command
 
-`vien create` сreates a virtual environment that will correspond the 
-**project directory**. Subsequent calls to `vien` 
+`vien create` сreates a virtual environment that will correspond the
+**project directory**. Subsequent calls to `vien`
 with the same project directory will use the same virtual environment.
 
 ``` bash
@@ -126,17 +126,14 @@ $ cd /abc/myProject
 $ vien create 
 ```
 
-By default, the current **working directory** is assumed to be the 
-**project directory**. 
-
-Alternatively you can use `-p` parameter.
+By default, the current **working directory** is assumed to be the
+**project directory**. You can override this with `-p` argument.
 
 ``` bash
 $ vien -p /abc/myProject create 
 ```
 
-
-The `-p` parameter works with all commands, not just `create`.
+The `-p` argument works with all commands, not only `create`.
 
 ``` bash
 $ cd /other/working/dir
@@ -146,8 +143,21 @@ $ vien -p /abc/myProject shell
 
 ### "create": choose the Python version
 
-If you have more than one Python installed, you can provide an argument to point
-to the proper interpreter.
+If you have several versions of Python installed, then virtual environments can
+help you switch not only between dependencies, but also between interpreters.
+
+``` bash
+$ cd /abc/my_old_project
+$ vien run python --version  # 3.7  
+
+$ cd /abc/my_newer_project
+$ vien run python --version  # 3.9 
+```
+
+A project directory can be bound to only one specific interpreter.
+
+To indicate which interpreter to use with the project, provide an argument
+pointing the executable.
 
 ``` bash
 $ vien create /usr/local/opt/python@3.8/bin/python3
@@ -160,11 +170,10 @@ be executed in the shell as `python3.8`, you can try
 $ vien create python3.8
 ```
 
-When `create` is called with no argument, `vien` will use the Python
-interpreter that is running `vien` itself. For example, if you used Python 3.9 
-to `pip install vien`, then it is the Python 3.9 runs `vien`, and this 
-Python 3.9 will be used in the virtual environment.
-
+When `create` is called with no argument, `vien` will use the Python interpreter
+that is running `vien` itself. For example, if you used Python 3.9
+to `pip install vien`, then it is the Python 3.9 runs `vien`, and this Python
+3.9 will be used in the virtual environment.
 
 # "shell" command
 
@@ -197,7 +206,7 @@ $ _
 
 Now you're back.
 
-With shell pipes, you can specify what the shell should execute right in the 
+With shell pipes, you can specify what the shell should execute right in the
 command line.
 
 ``` bash
@@ -246,10 +255,9 @@ $ vien call pkg/module.py
 
 ### "call": running file as a module
 
-If the `.py` file name is preceded by the `-m` parameter, we will run it with 
-`python -m MODULE`. Running in this manner often simplifies importing other modules 
-from the program.
-
+If the `.py` file name is preceded by the `-m` argument, we will run it with
+`python -m MODULE`. Running in this manner often simplifies importing other
+modules from the program.
 
 ``` bash
 $ cd /abc/myProject
@@ -261,16 +269,16 @@ $ vien call -m /abc/myProject/pkg/sub/module.py
 ```
 
 - `module.py` must be located somewhere inside the `/abc/myProject`
-- parent subdirectories such as `pkg` and `sub` must be importable, i.e. must contain 
+- parent subdirectories such as `pkg` and `sub` must be importable, i.e. must
+  contain
   `__init__.py`
-- the project directory will be inserted into `$PYTHONPATH`, making 
+- the project directory will be inserted into `$PYTHONPATH`, making
   `pkg.sub.module` resolvable from `/abc/myProject` to a file
-  
-The project directory can be specified not only by the working directory, 
-but also by the `-p` parameter.
 
+The project directory can be specified not only by the working directory, but
+also by the `-p` argument.
 
-The `call` command only accepts `.py` files, no module names.  
+The `call` command only accepts `.py` files, no module names.
 
 ``` bash
 # ERROR: there is no file named pkg.module
@@ -289,8 +297,8 @@ $ vien call -B -OO -m package/main.py arg1 arg2
 
 ### "call": project directory
 
-The optional `-p` parameter can be specified before the `call` word. It allows
-you to set the project directory **relative** to the parent directory of the 
+The optional `-p` argument can be specified before the `call` word. It allows
+you to set the project directory **relative** to the parent directory of the
 **file** being run.
 
 ``` bash
@@ -319,11 +327,6 @@ $ vien -p ../.. call -m sub/module.py
 # project dir: /abc/myProject  (/abc/myProject/pkg/sub/../..)
 # working dir: /abc/myProject/pkg
 ```
-
-
-
-
-
 
 # "delete" command
 
@@ -364,7 +367,7 @@ vien -p /abc/myProject shell ...
 
 If `--project-dir` is specified, it is the project directory.
 
-If `--project-dir` is not specified, then all commands assume that the current 
+If `--project-dir` is not specified, then all commands assume that the current
 working directory is the project directory.
 
 The next two calls use the same project directory and the same virtual
@@ -380,14 +383,12 @@ cd /any/where
 vien -p /abc/myProject run python3 /abc/myProject/main.py
 ```
 
+If `--project-dir` is specified as a **relative path**, its interpretation
+depends on the command.
 
-
-If `--project-dir` is specified as a **relative path**, its interpretation depends 
-on the command.
-- For the `call` command, this is a path relative to 
-the parent directory of the `.py` file being run 
-- For other commands, this is 
-a path relative to the current working directory
+- For the `call` command, this is a path relative to the parent directory of
+  the `.py` file being run
+- For other commands, this is a path relative to the current working directory
 
 # Virtual environments location
 

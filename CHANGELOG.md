@@ -1,3 +1,8 @@
+# 8.1
+
+- The `create` and `recreate` commands show more detailed information about the created 
+  virtual environment
+
 # 8.0
 
 - The `call` command now supports the `-m` option, that runs the file as a module.
