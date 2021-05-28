@@ -714,10 +714,11 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
             start = timer()
             with TimeLimited(10):  # safety net
-                with self.assertRaises(ChildExit) as ce:
-                    main_entry_point(
-                        ["shell", "--input", bash_input, "--delay", "1"])
-                self.assertFalse(ce.exception.code, 0)
+                self._run_and_check(["shell", "--input", bash_input, "--delay", "1"])
+                # with self.assertRaises(ChildExit) as ce:
+                #     main_entry_point(
+                #         ["shell", "--input", bash_input, "--delay", "1"])
+                # self.assertFalse(ce.exception.code, 0)
             end = timer()
 
             self.assertGreater(end - start, 0.5)
@@ -728,23 +729,28 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def test_shell_exit_code_non_zero(self):
         main_entry_point(["create"])
         with TimeLimited(10):  # safety net
-            with self.assertRaises(ChildExit) as ce:
-                main_entry_point(["shell", "--input", "exit 42"])
-            self.assertEqual(ce.exception.code, 42)
+            self._run_and_check(["shell", "--input", "exit 42"],
+                                expected_exit_code=42)
+            #with self.assertRaises(ChildExit) as ce:
+            #    main_entry_point(["shell", "--input", "exit 42"])
+            #self.assertEqual(ce.exception.code, 42)
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_exit_code_zero(self):
         main_entry_point(["create"])
         with TimeLimited(10):  # safety net
-            with self.assertRaises(ChildExit) as ce:
-                main_entry_point(["shell", "--input", "exit"])
-            self.assertFalse(ce.exception.code, 0)
+            #with self.assertRaises(ChildExit) as ce:
+            self._run_and_check(["shell", "--input", "exit"], expected_exit_code=0)
+                #main_entry_point(["shell", "--input", "exit"])
+            #self.as(ce.exception)
+            #self.assertFalse(ce.exception.code, 0)
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_but_no_venv(self):
         with TimeLimited(10):  # safety net
             with self.assertRaises(VenvDoesNotExistExit) as cm:
                 main_entry_point(["shell"])
+            self.assertIsErrorExit(cm.exception)
 
 
 if __name__ == "__main__":
