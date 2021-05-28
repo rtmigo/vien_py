@@ -86,7 +86,11 @@ class ParsedArgs:
 
         parser = argparse.ArgumentParser()
 
-        parser.add_argument("--project-dir", "-p", default=None, type=str)
+        parser.add_argument("--project-dir", "-p", default=None, type=str,
+                            help="the Python project directory "
+                                 "(default: current working directory). "
+                                 "Implicitly determines which virtual "
+                                 "environment should be used for the command")
 
         # the following parameter is added only to avoid parsing errors.
         # Actually we use its value from `args` before running ArgumentParser
@@ -96,23 +100,23 @@ class ParsedArgs:
         subparsers = parser.add_subparsers(dest='command', required=True)
 
         parser_init = subparsers.add_parser(Commands.create.name,
-                                            help="create new virtualenv")
+                                            help="create new virtual environment")
         parser_init.add_argument('python', type=str, default=None,
                                  nargs='?')
 
         subparsers.add_parser(Commands.delete.name,
-                              help="delete existing virtualenv")
+                              help="delete existing environment")
 
         parser_reinit = subparsers.add_parser(
             Commands.recreate.name,
-            help="delete existing virtualenv and create new")
+            help="delete existing environment and create new")
         parser_reinit.add_argument('python', type=str, default=None,
                                    nargs='?')
 
         if is_posix or enable_windows_all_args:
             shell_parser = subparsers.add_parser(
                 Commands.shell.name,
-                help="dive into Bash sub-shell using the virtualenv")
+                help="dive into Bash sub-shell with the environment")
             shell_parser.add_argument("--input", type=str, default=None)
             shell_parser.add_argument("--delay", type=float, default=None,
                                       help=argparse.SUPPRESS)
@@ -120,12 +124,12 @@ class ParsedArgs:
         if is_posix or enable_windows_all_args:
             parser_run = subparsers.add_parser(
                 Commands.run.name,
-                help="run a command inside the virtualenv")
+                help="run a shell command in the environment")
             parser_run.add_argument('otherargs', nargs=argparse.REMAINDER)
 
         parser_call = subparsers.add_parser(
             Commands.call.name,
-            help="run a script inside the virtualenv")
+            help="run a .py file in the environment")
         # todo Remove it later. [call -p] is outdated since 2021-05
         parser_call.add_argument("--project-dir", "-p", default=None, type=str,
                                  dest="outdated_call_project_dir",
@@ -136,8 +140,8 @@ class ParsedArgs:
 
         subparsers.add_parser(
             Commands.path.name,
-            help="show the supposed path of the virtualenv "
-                 "for the current directory")
+            help="show the path of the environment "
+                 "for the project")
 
         if not args:
             print(usage_doc())
