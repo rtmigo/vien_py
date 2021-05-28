@@ -20,8 +20,9 @@ class ChildExit(VienExit):
         super().__init__(exit_code)
 
 
-class VenvExistsExit(VienExit):  # todo does it return error code?
-    pass
+class VenvExistsExit(VienExit):
+    def __init__(self, path: Path):
+        super().__init__(f'Virtual environment "{path}" already exists.')
 
 
 class VenvDoesNotExistExit(VienExit):
@@ -43,12 +44,12 @@ class PyFileArgNotFoundExit(VienExit):
 
 class FailedToCreateVenvExit(VienExit):
     def __init__(self, path: Path):
-        super().__init__(f"Failed to create virtualenv {path}.")
+        super().__init__(f"Failed to create virtual environment {path}.")
 
 
 class FailedToClearVenvExit(VienExit):
     def __init__(self, path: Path):
-        super().__init__(f"Failed to clear virtualenv {path}.")
+        super().__init__(f"Failed to clear virtual environment {path}.")
 
 
 class CannotFindExecutableExit(VienExit):
