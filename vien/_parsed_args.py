@@ -67,6 +67,7 @@ class Commands(Enum):
 
 
 class TempColumns:
+    """Temporary changes os.environ['COLUMNS'] to a smaller value."""
     def __init__(self, width: int):
         self.width = width
         self._old_value: Optional[str] = None
@@ -110,7 +111,7 @@ class ParsedArgs:
 
             parser = argparse.ArgumentParser()
 
-            parser.add_argument("--project-dir", "-p", default=None, type=str,
+            parser.add_argument("-p", "--project-dir", default=None, type=str,
                                 help="the Python project directory "
                                      "(default: current working directory). "
                                      "Implicitly determines which virtual "
@@ -159,7 +160,7 @@ class ParsedArgs:
                 Commands.call.name,
                 help="run a .py file in the environment")
             # todo Remove it later. [call -p] is outdated since 2021-05
-            parser_call.add_argument("--project-dir", "-p", default=None,
+            parser_call.add_argument("-p", "--project-dir", default=None,
                                      type=str,
                                      dest="outdated_call_project_dir",
                                      help=argparse.SUPPRESS)

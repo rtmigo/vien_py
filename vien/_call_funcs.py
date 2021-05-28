@@ -32,7 +32,6 @@ def relative_inner_path(child: Union[str, Path],
     rel_path = os.path.relpath(child, parent)
 
     first = rel_path.split(os.path.sep)[0]
-    print(first)
     if first == ".." or first == "." or os.path.isabs(rel_path):
         raise NotInnerPath(f"The {child} is not a child of {parent}.")
     return rel_path
