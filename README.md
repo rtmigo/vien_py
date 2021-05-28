@@ -255,7 +255,7 @@ $ vien call pkg/module.py
 
 ### "call": running file as a module
 
-If the `.py` file name is preceded by the `-m` parameter, we will run it with
+If the `.py` file name is preceded by the `-m` argument, we will run it with
 `python -m MODULE`. Running in this manner often simplifies importing other
 modules from the program.
 
@@ -276,7 +276,7 @@ $ vien call -m /abc/myProject/pkg/sub/module.py
   `pkg.sub.module` resolvable from `/abc/myProject` to a file
 
 The project directory can be specified not only by the working directory, but
-also by the `-p` parameter.
+also by the `-p` argument.
 
 The `call` command only accepts `.py` files, no module names.
 
@@ -297,7 +297,7 @@ $ vien call -B -OO -m package/main.py arg1 arg2
 
 ### "call": project directory
 
-The optional `-p` parameter can be specified before the `call` word. It allows
+The optional `-p` argument can be specified before the `call` word. It allows
 you to set the project directory **relative** to the parent directory of the
 **file** being run.
 
