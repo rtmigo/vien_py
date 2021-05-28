@@ -27,7 +27,7 @@ class VenvExistsExit(VienExit):  # todo does it return error code?
 class VenvDoesNotExistExit(VienExit):
     def __init__(self, path: Path):
         super().__init__(f'Virtual environment "{path}" does not exist.\n'
-                         f'You can create it with "create" command.')
+                         f'You can create it with "vien create".')
 
 
 class PyFileNotFoundExit(VienExit):
