@@ -90,6 +90,9 @@ class TempCwd:
         shutil.rmtree(self.temp_dir)
 
 
+EXPECTED_CREATE_LINES_COUNT = 10
+
+
 class TestsInsideTempProjectDir(unittest.TestCase):
 
     def setUp(self):
@@ -234,7 +237,8 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         # actually this is not a good test: we are not testing whether
         # argument is really used and not ignored
         self.assertVenvNotExists()
-        main_entry_point(["create", sys.executable])
+        self._run_and_check(["create", sys.executable], expected_exit_code=None,
+                            expected_stdout_lines=EXPECTED_CREATE_LINES_COUNT)
         self.assertVenvExists()
 
     def test_create_fails_with_unresolvable_argument(self):
@@ -372,10 +376,36 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             # (was failing with nargs='*', ok with nargs=argparse.REMAINDER)
             main_entry_point(windows_too(["run", "python3", "--version"]))
 
-    def _run_and_check(self, args: List[str], expected_exit_code=0):
-        with self.assertRaises(ChildExit) as ce:
-            main_entry_point(args)
-        self.assertEqual(ce.exception.code, expected_exit_code)
+    def assertLinesCount(self, txt: str, count: int, string_name=''):
+        real_count = len(txt.splitlines())
+        if real_count != count:
+            if string_name:
+                string_name += ' '
+            self.fail(f"The {string_name}string contains {real_count} lines "
+                      f"(not {count}):\n"
+                      "=====\n"
+                      f"{txt}"
+                      "\n====="
+                      )
+
+    def _run_and_check(self,
+                       args: List[str],
+                       expected_exit_code: Optional[int] = 0,
+                       expected_stdout_lines: Optional[int] = 0,
+                       expected_stderr_lines: Optional[int] = 0):
+        with CapturedOutput() as out:
+            if expected_exit_code is not None:
+                with self.assertRaises(ChildExit) as ce:
+                    main_entry_point(args)
+                self.assertEqual(ce.exception.code, expected_exit_code)
+            else:
+                main_entry_point(args)  # no exceptions expected
+
+        if expected_stdout_lines is not None:
+            self.assertLinesCount(out.std, expected_stdout_lines, "stdout")
+
+        if expected_stderr_lines is not None:
+            self.assertLinesCount(out.err, expected_stderr_lines, "stderr")
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_p(self):
@@ -514,7 +544,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         main_entry_point(["create"])
 
-        self.write_reporting_program(self.projectDir/"file.py")
+        self.write_reporting_program(self.projectDir / "file.py")
 
         self.assertFalse(self.report_exists)
         self._run_and_check(["call", "file.py", "hello", "program"])
@@ -522,8 +552,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         self.assertEqual(self.reported_argv[-2], "hello")
         self.assertEqual(self.reported_argv[-1], "program")
-
-
 
         # main_entry_point(["create"])
         # (self.projectDir / "main.py").write_text(
@@ -721,5 +749,5 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
-    suite.addTest(TestsInsideTempProjectDir("test_shell_p"))
+    suite.addTest(TestsInsideTempProjectDir("test_create_with_argument"))
     unittest.TextTestRunner().run(suite)
