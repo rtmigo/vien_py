@@ -22,13 +22,15 @@ class ChildExit(VienExit):
 
 class VenvExistsExit(VienExit):
     def __init__(self, path: Path):
-        super().__init__(f'Virtual environment "{path}" already exists.')
+        super().__init__(
+            f'Virtual environment "{path}" already exists.')
 
 
 class VenvDoesNotExistExit(VienExit):
     def __init__(self, path: Path):
-        super().__init__(f'Virtual environment "{path}" does not exist.\n'
-                         f'You can create it with "vien create".')
+        super().__init__(
+            f'Virtual environment "{path}" does not exist.\n'
+            f'Run "vien create" to create it.')
 
 
 class PyFileNotFoundExit(VienExit):

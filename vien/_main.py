@@ -137,21 +137,28 @@ def arg_to_python_interpreter(argument: Optional[str]) -> str:
     return exe
 
 
-def main_create(venv_dir: Path, interpreter: Optional[str]):
-    if venv_dir.exists():
-        raise VenvExistsExit(venv_dir)
+def main_create(dirs: Dirs, interpreter: Optional[str]):
+    if dirs.venv_dir.exists():
+        raise VenvExistsExit(dirs.venv_dir)
 
     exe = arg_to_python_interpreter(interpreter)
 
-    print(f"Creating {venv_dir}")
+    print(f"Creating {dirs.venv_dir}")
 
-    result = subprocess.run([exe, "-m", "venv", str(venv_dir)])
+    result = subprocess.run([exe, "-m", "venv", str(dirs.venv_dir)])
     if result.returncode == 0:
         print()
-        print("The Python executable:")
-        print(str(venv_dir_to_python_exe(venv_dir)))
+        print("PROJECT DIR (unmodified)")
+        print(f"  {dirs.project_dir}")
+        print()
+        #  (for projects named '{os.path.basename(dirs.project_dir)}')
+        print(f"VIRTUAL ENVIRONMENT (created)")
+        print(f"  {dirs.venv_dir}")
+        print()
+        print("PYTHON EXECUTABLE (virtual)")
+        print(f"  {venv_dir_to_python_exe(dirs.venv_dir)}")
     else:
-        raise FailedToCreateVenvExit(venv_dir)
+        raise FailedToCreateVenvExit(dirs.venv_dir)
 
 
 def main_delete(venv_dir: Path):
@@ -180,10 +187,10 @@ def main_delete(venv_dir: Path):
     shutil.rmtree(str(venv_dir))
 
 
-def main_recreate(venv_dir: Path, interpreter: Optional[str]):
-    if venv_dir.exists():
-        main_delete(venv_dir)
-    main_create(venv_dir=venv_dir, interpreter=interpreter)
+def main_recreate(dirs: Dirs, interpreter: Optional[str]):
+    if dirs.venv_dir.exists():
+        main_delete(dirs.venv_dir)
+    main_create(dirs, interpreter=interpreter)
 
 
 def guess_bash_ps1():
@@ -460,9 +467,9 @@ def main_entry_point(args: Optional[List[str]] = None):
     dirs = Dirs(project_dir=get_project_dir(parsed))
 
     if parsed.command == Commands.create:
-        main_create(dirs.venv_dir, parsed.python_executable)
+        main_create(dirs, parsed.python_executable)
     elif parsed.command == Commands.recreate:
-        main_recreate(dirs.venv_dir,
+        main_recreate(dirs,
                       parsed.python_executable)  # todo .existing()?
     elif parsed.command == Commands.delete:  # todo move 'existing' check from func?
         main_delete(dirs.venv_dir)
