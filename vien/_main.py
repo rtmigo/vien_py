@@ -269,7 +269,7 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     if bashrc_file.exists():
         # Ubuntu
         # ps1q =_quoted(new_ps1)
-        ps1q = _quoted(f'PS1={_quoted(new_ps1)}')
+        # ps1q = _quoted(f'PS1={_quoted(new_ps1)}')
         commands.append(
             f"exec bash --rcfile <(cat {_quoted(str(bashrc_file))} "
             f"&& echo {_quoted(f'PS1={_quoted(new_ps1)}')})")
