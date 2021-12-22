@@ -5,24 +5,24 @@ from __future__ import annotations
 
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
-import shlex
 from pathlib import Path
 from typing import *
 
 from vien import is_posix
-from vien._common import need_posix, is_windows, need_windows
-from vien._parsed_args import Commands, ParsedArgs
 from vien._bash_runner import run_as_bash_script
 from vien._call_funcs import relative_fn_to_module_name, relative_inner_path
-from vien._parsed_call import ParsedCall, list_left_partition
-from vien._colors import Colors
 from vien._cmdexe_escape_args import cmd_escape_arg
+from vien._colors import Colors
+from vien._common import need_posix, is_windows, need_windows
 from vien._exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit, PyFileArgNotFoundExit, FailedToCreateVenvExit, \
     FailedToClearVenvExit, CannotFindExecutableExit
+from vien._parsed_args import Commands, ParsedArgs
+from vien._parsed_call import ParsedCall, list_left_partition
 
 verbose = False
 
@@ -241,6 +241,10 @@ def guess_bash_ps1():
         ['/bin/bash', '-i', '-c', 'echo $PS1']).decode().rstrip()
 
 
+def _quoted(txt: str) -> str:
+    # return json.dumps(txt)
+    return shlex.quote(txt)
+
 def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     dirs.venv_must_exist()
 
@@ -264,12 +268,14 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
 
     if bashrc_file.exists():
         # Ubuntu
+        # ps1q =_quoted(new_ps1)
+        ps1q = _quoted(f'PS1={_quoted(new_ps1)}')
         commands.append(
-            f"exec bash --rcfile <(cat {json.dumps(str(bashrc_file))} "
-            f"&& echo 'PS1={json.dumps(new_ps1)}')")
+            f"exec bash --rcfile <(cat {_quoted(str(bashrc_file))} "
+            f"&& echo {_quoted(f'PS1={_quoted(new_ps1)}')})")
     else:
         # MacOS
-        commands.append(f"PS1={json.dumps(new_ps1)} exec bash")
+        commands.append(f"PS1={_quoted(new_ps1)} exec bash")
 
     # we will use [input] for testing: we will send a command to the stdin of
     # the interactive sub-shell and later check whether the command was
