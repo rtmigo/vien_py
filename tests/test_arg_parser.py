@@ -5,9 +5,8 @@ import unittest
 from pathlib import Path
 from typing import List
 
-from vien._common import is_windows
-
 from tests.common import is_posix
+from vien._common import is_windows
 from vien._main import get_project_dir
 from vien._parsed_args import ParsedArgs, Commands, _iter_after
 

@@ -3,9 +3,8 @@
 
 import unittest
 
-from vien._parsed_call import ParsedCall
-
 from vien._exceptions import PyFileArgNotFoundExit
+from vien._parsed_call import ParsedCall
 
 
 class TestNew(unittest.TestCase):

@@ -7,11 +7,9 @@ import sys
 from enum import Enum
 from typing import List, Optional, Iterable
 
-from vien._common import is_windows
-
-from vien import is_posix
-
 import vien
+from vien import is_posix
+from vien._common import is_windows
 # from vien.call_parser import items_after
 from vien._parsed_call import ParsedCall
 

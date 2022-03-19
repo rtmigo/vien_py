@@ -15,16 +15,13 @@ from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
 from typing import List, Optional
 
-from tests.test_arg_parser import windows_too
-from vien._parsed_args import ParsedArgs
-
-from vien._common import is_windows
-
 from tests.common import is_posix
+from tests.test_arg_parser import windows_too
 from tests.time_limited import TimeLimited
 from vien import main_entry_point
+from vien._common import is_windows
 from vien._exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
-    PyFileNotFoundExit, FailedToCreateVenvExit, CannotFindExecutableExit
+    PyFileNotFoundExit, CannotFindExecutableExit
 
 
 class CapturedOutput:
@@ -84,10 +81,14 @@ class TempCwd:
         self.prev_cwd = os.getcwd()
         self.temp_dir = tempfile.mkdtemp()
         os.chdir(self.temp_dir)
+        return self.temp_dir
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         os.chdir(self.prev_cwd)
         shutil.rmtree(self.temp_dir)
+
+
+EXPECTED_CREATE_LINES_COUNT = 10
 
 
 class TestsInsideTempProjectDir(unittest.TestCase):
@@ -95,7 +96,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
     def setUp(self):
 
         self._old_cwd = Path.cwd()
-        # №self._td = TemporaryDirectory()
 
         self._temp_dir = tempfile.mkdtemp()
 
@@ -148,9 +148,8 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         if (os.path.commonpath([outer_str]) != os.path.commonpath(
                 [outer_str, inner_str])):
-            # if not (len(inner_str) > len(outer_str)
-            #       and inner_str.startswith(outer_str)):
-            self.fail(f"{inner_str} is not in {outer_str}")
+            self.fail(f"Path '{inner_str}' is not inside the "
+                      f"venv dir '{outer_str}'")
 
     def assertVenvBinExists(self):
         self.assertTrue(
@@ -234,7 +233,8 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         # actually this is not a good test: we are not testing whether
         # argument is really used and not ignored
         self.assertVenvNotExists()
-        main_entry_point(["create", sys.executable])
+        self._run_and_check(["create", sys.executable], expected_exit_code=None,
+                            expected_stdout_lines=EXPECTED_CREATE_LINES_COUNT)
         self.assertVenvExists()
 
     def test_create_fails_with_unresolvable_argument(self):
@@ -372,10 +372,43 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             # (was failing with nargs='*', ok with nargs=argparse.REMAINDER)
             main_entry_point(windows_too(["run", "python3", "--version"]))
 
-    def _run_and_check(self, args: List[str], expected_exit_code=0):
-        with self.assertRaises(ChildExit) as ce:
-            main_entry_point(args)
-        self.assertEqual(ce.exception.code, expected_exit_code)
+    def assertLinesCount(self, txt: str, count: int, string_name=''):
+        real_count = len(txt.splitlines())
+        if real_count != count:
+            if string_name:
+                string_name += ' '
+            self.fail(f"The {string_name}string contains {real_count} lines "
+                      f"(not {count}):\n"
+                      "=====\n"
+                      f"{txt}"
+                      "\n====="
+                      )
+
+    def _run_and_get_stdout(self, args: List[str]) -> str:
+        with TimeLimited(10):  # if the child does not stop, fail own process
+            with CapturedOutput() as out:
+                main_entry_point(args)
+                return out.std
+
+    def _run_and_check(self,
+                       args: List[str],
+                       expected_exit_code: Optional[int] = 0,
+                       expected_stdout_lines: Optional[int] = 0,
+                       expected_stderr_lines: Optional[int] = 0):
+        with TimeLimited(10):  # if the child does not stop, fail own process
+            with CapturedOutput() as out:
+                if expected_exit_code is not None:
+                    with self.assertRaises(ChildExit) as ce:
+                        main_entry_point(args)
+                    self.assertEqual(ce.exception.code, expected_exit_code)
+                else:
+                    main_entry_point(args)  # no exceptions expected
+
+        if expected_stdout_lines is not None:
+            self.assertLinesCount(out.std, expected_stdout_lines, "stdout")
+
+        if expected_stderr_lines is not None:
+            self.assertLinesCount(out.err, expected_stderr_lines, "stderr")
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_run_p(self):
@@ -514,7 +547,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         main_entry_point(["create"])
 
-        self.write_reporting_program(self.projectDir/"file.py")
+        self.write_reporting_program(self.projectDir / "file.py")
 
         self.assertFalse(self.report_exists)
         self._run_and_check(["call", "file.py", "hello", "program"])
@@ -522,20 +555,6 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         self.assertEqual(self.reported_argv[-2], "hello")
         self.assertEqual(self.reported_argv[-1], "program")
-
-
-
-        # main_entry_point(["create"])
-        # (self.projectDir / "main.py").write_text(
-        #     f"import sys; exit(len(sys.argv))")
-        #
-        # with self.assertRaises(ChildExit) as ce:
-        #     main_entry_point(["call", "main.py"])
-        # self.assertEqual(ce.exception.code, 1)  # received len(argv)
-        #
-        # with self.assertRaises(ChildExit) as ce:
-        #     main_entry_point(["call", "main.py", "aaa", "bbb", "ccc"])
-        # self.assertEqual(ce.exception.code, 4)  # received len(argv)
 
     def test_call_project_dir_venv(self):
         """Tests that the -p parameter actually changes the project directory,
@@ -549,53 +568,50 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         run_py.write_text("exit(5)")
 
         run_py_str = str(run_py.absolute())
-        with TemporaryDirectory() as td:
-            try:
-                os.chdir(td)
+        with TempCwd():
+            # NORMAL format
 
-                # NORMAL format
+            # this call specifies project dir relative to run.py.
+            # It runs the file successfully
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(["-p", "..", "call", run_py_str])
+            self.assertEqual(ce.exception.code, 5)
 
-                # this call specifies project dir relative to run.py.
-                # It runs the file successfully
-                with self.assertRaises(ChildExit) as ce:
-                    main_entry_point(["-p", "..", "call", run_py_str])
-                self.assertEqual(ce.exception.code, 5)
+            # this call specifies project dir relative to run.py.
+            # It runs the file successfully
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(
+                    ["--project-dir", "..", "call", run_py_str])
+            self.assertEqual(ce.exception.code, 5)
 
-                # this call specifies project dir relative to run.py.
-                # It runs the file successfully
-                with self.assertRaises(ChildExit) as ce:
-                    main_entry_point(
-                        ["--project-dir", "..", "call", run_py_str])
-                self.assertEqual(ce.exception.code, 5)
+            # OUTDATED format
 
-                # OUTDATED format
+            # this call specifies project dir relative to run.py.
+            # It runs the file successfully
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(["call", "-p", "..", run_py_str])
+            self.assertEqual(ce.exception.code, 5)
 
-                # this call specifies project dir relative to run.py.
-                # It runs the file successfully
-                with self.assertRaises(ChildExit) as ce:
-                    main_entry_point(["call", "-p", "..", run_py_str])
-                self.assertEqual(ce.exception.code, 5)
+            # this call specifies project dir relative to run.py.
+            # It runs the file successfully
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(
+                    ["call", "--project-dir", "..", run_py_str])
+            self.assertEqual(ce.exception.code, 5)
 
-                # this call specifies project dir relative to run.py.
-                # It runs the file successfully
-                with self.assertRaises(ChildExit) as ce:
-                    main_entry_point(
-                        ["call", "--project-dir", "..", run_py_str])
-                self.assertEqual(ce.exception.code, 5)
+            # ERRORS
 
-                # ERRORS
+            # without -p we assume that the current dir is the project dir,
+            # but the current is temp. So we must get an exception
+            with self.assertRaises(VenvDoesNotExistExit):
+                main_entry_point(["call", run_py_str])
 
-                # without -p we assume that the current dir is the project dir,
-                # but the current is temp. So we must get an exception
-                with self.assertRaises(VenvDoesNotExistExit):
-                    main_entry_point(["call", run_py_str])
-
-                # this call specifies INCORRECT project dir relative to run.py
-                with self.assertRaises(VenvDoesNotExistExit):
-                    main_entry_point(
-                        ["call", "--project-dir", "../..", run_py_str])
-            finally:
-                os.chdir(self._old_cwd)  # to safely delete the temp dir
+            # this call specifies INCORRECT project dir relative to run.py
+            with self.assertRaises(VenvDoesNotExistExit):
+                main_entry_point(
+                    ["call", "--project-dir", "../..", run_py_str])
+            # finally:
+            #     os.chdir(self._old_cwd)  # to safely delete the temp dir
 
     def test_call_project_dir_relative_imports(self):
         """ Tests that modules are importable from the project dir
@@ -612,14 +628,11 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                           "exit(subpkg.constant.FIFTY_FIVE)")
 
         run_py_str = str(run_py.absolute())
-        with TemporaryDirectory() as td:
-            try:
-                os.chdir(td)
-                with self.assertRaises(ChildExit) as ce:
-                    main_entry_point(["-p", "..", "call", run_py_str])
-                self.assertEqual(ce.exception.code, 55)
-            finally:
-                os.chdir(self._old_cwd)  # to safely delete the temp dir
+        with TempCwd():
+            self.assertProjectDirIsNotCwd()
+            with self.assertRaises(ChildExit) as ce:
+                main_entry_point(["-p", "..", "call", run_py_str])
+            self.assertEqual(ce.exception.code, 55)
 
     ############################################################################
 
@@ -634,10 +647,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         """Checking the -p changes both venv directory and the first item
         in PYTHONPATH"""
         main_entry_point(["create"])
-        with TemporaryDirectory() as temp_cwd:
-            # we will run it NOT from the project dir as CWD
-            os.chdir(temp_cwd)
-
+        with TempCwd() as temp_cwd:
             # creating .py file to run
             code_py = Path(temp_cwd) / "code.py"
             output_file = self.write_reporting_program(code_py)
@@ -685,41 +695,54 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             # be run without parameters.
 
             start = timer()
-            with TimeLimited(10):  # safety net
-                with self.assertRaises(ChildExit) as ce:
-                    main_entry_point(
-                        ["shell", "--input", bash_input, "--delay", "1"])
-                self.assertFalse(ce.exception.code, 0)
+            self._run_and_check(
+                ["shell", "--input", bash_input, "--delay", "1"])
             end = timer()
 
             self.assertGreater(end - start, 0.5)
-            self.assertLess(end - start, 3)
+            self.assertLess(end - start, 5)
             self.assertTrue(dir_to_create.exists())
 
-    @unittest.skipUnless(is_posix, "not POSIX")
+    @unittest.skipUnless(is_posix, "features implemented only for POSIX yet")
     def test_shell_exit_code_non_zero(self):
         main_entry_point(["create"])
-        with TimeLimited(10):  # safety net
-            with self.assertRaises(ChildExit) as ce:
-                main_entry_point(["shell", "--input", "exit 42"])
-            self.assertEqual(ce.exception.code, 42)
+        self._run_and_check(["shell", "--input", "exit 42"],
+                            expected_exit_code=42)
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_exit_code_zero(self):
         main_entry_point(["create"])
         with TimeLimited(10):  # safety net
-            with self.assertRaises(ChildExit) as ce:
-                main_entry_point(["shell", "--input", "exit"])
-            self.assertFalse(ce.exception.code, 0)
+            self._run_and_check(["shell", "--input", "exit"],
+                                expected_exit_code=0)
 
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_but_no_venv(self):
-        with TimeLimited(10):  # safety net
-            with self.assertRaises(VenvDoesNotExistExit) as cm:
-                main_entry_point(["shell"])
+        with self.assertRaises(VenvDoesNotExistExit) as cm:
+            main_entry_point(["shell"])
+        self.assertIsErrorExit(cm.exception)
+
+    @unittest.skipUnless(is_posix, "not POSIX")
+    def test_shell_uses_modified_path(self):
+        with TemporaryDirectory() as tds:
+            file_with_path = Path(tds) / "path.txt"
+
+            main_entry_point(["create"])
+            try:
+                main_entry_point(
+                    ["-p", str(self.projectDir.absolute()),
+                     "shell",
+                     "--delay", "3",
+                     "--input", f'echo $PATH > {file_with_path}'])
+            except ChildExit:
+                pass
+
+            path = file_with_path.read_text()
+            self.assertTrue(path.startswith(str(self.expectedVenvDir)),
+                            path)
 
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
-    suite.addTest(TestsInsideTempProjectDir("test_shell_p"))
+    suite.addTest(TestsInsideTempProjectDir("test_create_with_argument"))
     unittest.TextTestRunner().run(suite)

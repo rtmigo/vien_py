@@ -10,6 +10,7 @@ def relative_fn_to_module_name(filename: str) -> str:
     if not filename.lower().endswith('.py'):
         raise ValueError("The filename does not end with '.py'.")
     filename = filename[:-3]
+    #print(filename)
     if '.' in filename:
         raise ValueError("The filename contains dots.")
     if os.name == "nt":

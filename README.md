@@ -1,6 +1,7 @@
 [![PyPI version shields.io](https://img.shields.io/pypi/v/vien.svg)](https://pypi.python.org/pypi/vien/)
 [![Generic badge](https://img.shields.io/badge/Python-3.7+-blue.svg)](#)
 [![Generic badge](https://img.shields.io/badge/OS-Linux%20|%20macOS-blue.svg)](#)
+[![Downloads](https://pepy.tech/badge/vien/month)](https://pepy.tech/project/vien)
 
 # [vien](https://github.com/rtmigo/vien_py#readme)
 
@@ -239,6 +240,11 @@ $ /path/to/the/venv/bin/deactivate
 ```
 
 </details>
+
+call                            | run
+--------------------------------|-----------------------------------------------
+Runs only `python file.py` or `python -m module` | Can run any shell command: `pip3`, `cd`, etc.
+Starts one python process       | Starts two processes: parent shell and child python
 
 # "call" command
 
