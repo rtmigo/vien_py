@@ -7,8 +7,8 @@ from pathlib import Path
 
 from tests.common import is_posix
 from tests.test_arg_parser import windows_too
-from vien._main import get_project_dir
 from vien._exceptions import PyFileArgNotFoundExit
+from vien._main import get_project_dir
 from vien._parsed_args import ParsedArgs
 
 

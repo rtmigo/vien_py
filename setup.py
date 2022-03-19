@@ -52,11 +52,12 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Environment :: Console",
         "Typing :: Typed",
         "Topic :: Software Development :: Build Tools",
         "Operating System :: POSIX",
-        #"Operating System :: Microsoft :: Windows"
+        # "Operating System :: Microsoft :: Windows"
     ],
 
     test_suite="test_unit.suite"

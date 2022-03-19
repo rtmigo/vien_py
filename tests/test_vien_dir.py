@@ -8,6 +8,7 @@ from pathlib import Path
 from tests.common import is_posix
 from vien._main import get_vien_dir
 
+
 @unittest.skipUnless(is_posix, "not POSIX")
 class TestVenvsDir(unittest.TestCase):
 
