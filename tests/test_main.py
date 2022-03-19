@@ -700,7 +700,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             end = timer()
 
             self.assertGreater(end - start, 0.5)
-            self.assertLess(end - start, 3)
+            self.assertLess(end - start, 5)
             self.assertTrue(dir_to_create.exists())
 
     @unittest.skipUnless(is_posix, "features implemented only for POSIX yet")

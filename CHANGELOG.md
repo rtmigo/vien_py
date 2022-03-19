@@ -1,15 +1,24 @@
+# 8.1.2
+
+- fixed `PATH` issue on Linux
+
+# 8.1.1
+
+- fixed shell prompt color bug on Linux
+
 # 8.1
 
-- The `create` and `recreate` commands show more detailed information about the created 
-  virtual environment
+- The `create` and `recreate` commands show more detailed information about the
+  created virtual environment
 
 # 8.0
 
-- The `call` command now supports the `-m` option, that runs the file as a module.
+- The `call` command now supports the `-m` option, that runs the file as a
+  module.
 
 # 7.1
 
-- Fixed: `call` command sometimes received incorrect `$PYTHONPATH` values on systems 
+- Fixed: `call` command sometimes received incorrect `$PYTHONPATH` values on systems
   with multiple versions of Python
 
 # 7.0
@@ -22,9 +31,9 @@
   environment with the same interpreter that started `vien`, instead of the
   interpreter available as `python3`
 - Fixed: virtual environments were not cleared (`venv --clear`) before deletion  
-- Attempting to run the program on Windows will display a message stating that 
+- Attempting to run the program on Windows will display a message stating that
   the system is not fully supported
-  
+
 # 5.0
 
 - Option `--project-dir` aka `-p` is now supported by all commands
@@ -32,7 +41,7 @@
 
 # 4.4
 
-- `call` is now faster as it launches Python directly without spawning an extra 
+- `call` is now faster as it launches Python directly without spawning an extra
   shell process
 
 # 4.3
@@ -42,8 +51,7 @@
 
 # 4.2
 
-- Trying to `call` a non-existent file now prints a short error message 
-  instead of an exception
+- Trying to `call` a non-existent file now prints a short error message instead of an exception
 - A message about a nonexistent environment displays a hint on how to create it  
 
 # 4.1
