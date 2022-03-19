@@ -21,8 +21,7 @@ from tests.time_limited import TimeLimited
 from vien import main_entry_point
 from vien._common import is_windows
 from vien._exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
-    PyFileNotFoundExit, FailedToCreateVenvExit, CannotFindExecutableExit
-from vien._parsed_args import ParsedArgs
+    PyFileNotFoundExit, CannotFindExecutableExit
 
 
 class CapturedOutput:
@@ -149,7 +148,8 @@ class TestsInsideTempProjectDir(unittest.TestCase):
 
         if (os.path.commonpath([outer_str]) != os.path.commonpath(
                 [outer_str, inner_str])):
-            self.fail(f"{inner_str} is not in {outer_str}")
+            self.fail(f"Path '{inner_str}' is not inside the "
+                      f"venv dir '{outer_str}'")
 
     def assertVenvBinExists(self):
         self.assertTrue(
@@ -383,6 +383,12 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                       f"{txt}"
                       "\n====="
                       )
+
+    def _run_and_get_stdout(self, args: List[str]) -> str:
+        with TimeLimited(10):  # if the child does not stop, fail own process
+            with CapturedOutput() as out:
+                main_entry_point(args)
+                return out.std
 
     def _run_and_check(self,
                        args: List[str],
@@ -715,6 +721,25 @@ class TestsInsideTempProjectDir(unittest.TestCase):
         with self.assertRaises(VenvDoesNotExistExit) as cm:
             main_entry_point(["shell"])
         self.assertIsErrorExit(cm.exception)
+
+    @unittest.skipUnless(is_posix, "not POSIX")
+    def test_shell_uses_modified_path(self):
+        with TemporaryDirectory() as tds:
+            file_with_path = Path(tds) / "path.txt"
+
+            main_entry_point(["create"])
+            try:
+                main_entry_point(
+                    ["-p", str(self.projectDir.absolute()),
+                     "shell",
+                     "--delay", "3",
+                     "--input", f'echo $PATH > {file_with_path}'])
+            except ChildExit:
+                pass
+
+            path = file_with_path.read_text()
+            self.assertTrue(path.startswith(str(self.expectedVenvDir)),
+                            path)
 
 
 if __name__ == "__main__":

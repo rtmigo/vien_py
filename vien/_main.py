@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import json
 import os
 import shlex
 import shutil
@@ -22,7 +21,7 @@ from vien._exceptions import ChildExit, VenvExistsExit, VenvDoesNotExistExit, \
     PyFileNotFoundExit, PyFileArgNotFoundExit, FailedToCreateVenvExit, \
     FailedToClearVenvExit, CannotFindExecutableExit
 from vien._parsed_args import Commands, ParsedArgs
-from vien._parsed_call import ParsedCall, list_left_partition
+from vien._parsed_call import list_left_partition
 
 verbose = False
 
@@ -245,11 +244,11 @@ def _quoted(txt: str) -> str:
     # return json.dumps(txt)
     return shlex.quote(txt)
 
+
 def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     dirs.venv_must_exist()
 
-    activate_path_quoted = shlex.quote(
-        str(dirs.venv_dir / "bin" / "activate"))
+    activate_path_quoted = shlex.quote(str(dirs.venv_dir / "bin" / "activate"))
 
     old_ps1 = os.environ.get("PS1") or guess_bash_ps1()
 
@@ -262,19 +261,29 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     venv_name = dirs.project_dir.name
     new_ps1 = f"{color_start}({venv_name}){color_end}:{old_ps1} "
 
-    commands = [f'source {activate_path_quoted}']
+    # commands = [f'source {activate_path_quoted}']
 
     bashrc_file = Path(os.path.expanduser("~/.bashrc"))
 
+    commands = []
+
     if bashrc_file.exists():
         # Ubuntu
-        # ps1q =_quoted(new_ps1)
-        # ps1q = _quoted(f'PS1={_quoted(new_ps1)}')
+
+        # There are probably more elegant ways to do this. But here we are
+        # actually running the same activate script twice: before 'exec bash'
+        # adn inside the 'exec bash'
+
+        commands.append(f'source {activate_path_quoted}')
         commands.append(
             f"exec bash --rcfile <(cat {_quoted(str(bashrc_file))} "
-            f"&& echo {_quoted(f'PS1={_quoted(new_ps1)}')})")
+            f"&& echo {_quoted(f'PS1={_quoted(new_ps1)}')} "
+            f"&& source {activate_path_quoted}"
+            f")")
+
     else:
         # MacOS
+        commands.append(f'source {activate_path_quoted}')
         commands.append(f"PS1={_quoted(new_ps1)} exec bash")
 
     # we will use [input] for testing: we will send a command to the stdin of
@@ -404,8 +413,8 @@ def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
 def main_call(parsed: ParsedArgs, dirs: Dirs):
     dirs.venv_must_exist()
 
-    #parsed_call = ParsedCall(parsed.args)
-    #assert parsed_call.file is not None
+    # parsed_call = ParsedCall(parsed.args)
+    # assert parsed_call.file is not None
 
     assert parsed.call is not None
 
