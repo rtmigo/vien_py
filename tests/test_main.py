@@ -732,7 +732,7 @@ class TestsInsideTempProjectDir(unittest.TestCase):
                 main_entry_point(
                     ["-p", str(self.projectDir.absolute()),
                      "shell",
-                     "--delay", "3",
+                     "--delay", "1",
                      "--input", f'echo $PATH > {file_with_path}'])
             except ChildExit:
                 pass

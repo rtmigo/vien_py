@@ -284,35 +284,47 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
         venv_name = dirs.project_dir.name
         new_ps1 = f"{color_start}({venv_name}){color_end}:{old_ps1} "
 
-        bashrc_file = Path(os.path.expanduser("~/.bashrc"))
+        bashrc_file = Path(os.path.expanduser("~/.bashrc")).absolute()
 
-        commands = []
+        # stdin_commands = []
 
-        run_in_shell: List[str] = list()
+        executable: Optional[str] = None
+        args: Union[str, List[str]]
 
         if bashrc_file.exists():
             # Ubuntu
-
-            f = opt_temp_dir.path / "bash.rc"
-            f.write_bytes(
+            temp_bash_rc = opt_temp_dir.path / "bash.rc"
+            temp_bash_rc.write_bytes(
                 b'\n'.join([
-                    bashrc_file.read_bytes(),
-                    activate_path.read_bytes(),
+                    # f"# from {bashrc_file}".encode(),
+                    # bashrc_file.read_bytes(),
+                    f"source {bashrc_file}".encode(),
+                    f"source {activate_path}".encode(),
+                    # activate_path.read_bytes(),
+                    # f"# added by vien".encode(),
+                    # f"export PATH".encode(),
                     f'PS1={_quoted(new_ps1)}'.encode()]))
+            #
+            # #print(temp_bash_rc.read_text())
+            # commands.append(f"exec bash --rcfile <(cat {str(temp_bash_rc)})")
+            # stdin_commands.append(f'source {shlex.quote(str(bashrc_file))}')
+            # stdin_commands.append(f'source {shlex.quote(str(activate_path))}')
+            # stdin_commands.append(f"PS1={_quoted(new_ps1)}")
+            # stdin_commands.append(f"echo HAHA")
+            # stdin_commands.append(f"echo $PATH")
+            # a
 
-            commands.append(f"exec bash --rcfile <(cat {str(f)}) ")  #
+            args = ["/bin/bash", "--rcfile", str(temp_bash_rc), "-i"]
 
         else:
             # MacOS
-            commands.append(f'source {shlex.quote(str(activate_path))}')
-            commands.append(f"PS1={_quoted(new_ps1)} exec bash")
+            executable = "/bin/bash"
+            args = "\n".join([
+                f'source {shlex.quote(str(activate_path))}',
+                f"PS1={_quoted(new_ps1)}"])
 
-        if input is not None:
-            run_in_shell.append(input)
-
-        run_in_shell_str = "\n".join(run_in_shell)
-        input_bytes = (
-                run_in_shell_str + "\n").encode() if run_in_shell_str else None
+        # if input:
+        #    stdin_commands.append(input)
 
         # we will use [input] for testing: we will send a command to the stdin
         # of the interactive sub-shell and later check whether the command was
@@ -327,19 +339,21 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
         # closes the stdin. So it will not wait for "exit". But it serves the
         # task well
 
+        # python3 -m unittest tests.test_main.TestsInsideTempProjectDir.test_shell_uses_modified_path
+
         cp = run_as_bash_script(
-            "\n".join(commands),
-            input=input_bytes,
+            args,
+            executable=executable,
+
+            # "-i",
+            # "\n".join(arg_commands),
+            # stdin=("\n".join(stdin_commands)+"\n").encode() if stdin_commands else None,
+            input=input.encode() if input else None,
             input_delay=input_delay,
             env=child_env(dirs.project_dir))
 
         # the vien will return the same exit code as the shell returned
         raise ChildExit(cp.returncode)
-
-
-#    finally:
-#        if tempdir is not None:
-#           tempdir.cleanup()
 
 
 def bash_args_to_str(args: List[str]) -> str:

@@ -1,27 +1,34 @@
-# SPDX-FileCopyrightText: (c) 2021 Artëm IG <github.com/rtmigo>
+# SPDX-FileCopyrightText: (c) 2021-2022 Artëm IG <github.com/rtmigo>
 # SPDX-License-Identifier: BSD-3-Clause
 
 import subprocess
 import time
 from subprocess import Popen, TimeoutExpired, CalledProcessError, \
     CompletedProcess, PIPE
+from typing import Optional, Union, List
 
 from vien._common import need_posix
 
 
-def run_as_bash_script(script: str, timeout: float = None,
+def run_as_bash_script(args: Union[str, List[str]],
+                       #                       commands_before: List[str],
+                       timeout: float = None,
                        input_delay: float = None,
                        capture_output: bool = False,
                        input: bytes = None,
-                       **kwargs
-                       ) -> subprocess.CompletedProcess:
+                       executable: Optional[str] = None,
+                       **kwargs) -> subprocess.CompletedProcess:
     """Runs the provided string as a .sh script."""
 
     need_posix()
 
+    # print("Running", script)
+
     # we need executable='/bin/bash' for Ubuntu 18.04, it will run '/bin/sh'
     # otherwise. For MacOS 10.13 it seems to be optional
-    return _run_with_input_delay(script, shell=True, executable='/bin/bash',
+    return _run_with_input_delay(args,
+                                 # shell=True,
+                                 executable=executable,
                                  timeout=timeout,
                                  input=input,
                                  capture_output=capture_output,
@@ -29,8 +36,13 @@ def run_as_bash_script(script: str, timeout: float = None,
                                  **kwargs)
 
 
-def _run_with_input_delay(*popenargs, input_delay: float = None,
-                          input=None, timeout: float = None,
+#subprocess.run()
+
+def _run_with_input_delay(*popenargs,
+                          input_delay: float = None,
+                          input: Optional[bytes] = None,
+                          # stdin: Optional[bytes] = None,
+                          timeout: float = None,
                           check: bool = False,
                           capture_output: bool = False,
                           **kwargs):
