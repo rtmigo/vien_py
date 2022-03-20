@@ -722,6 +722,8 @@ class TestsInsideTempProjectDir(unittest.TestCase):
             main_entry_point(["shell"])
         self.assertIsErrorExit(cm.exception)
 
+    # python3 -m unittest tests.test_main.TestsInsideTempProjectDir.test_shell_uses_modified_path
+
     @unittest.skipUnless(is_posix, "not POSIX")
     def test_shell_uses_modified_path(self):
         with TemporaryDirectory() as tds:
