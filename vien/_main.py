@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: (c) 2020 Artëm IG <github.com/rtmigo>
+# SPDX-FileCopyrightText: (c) 2020-2022 Artëm IG <github.com/rtmigo>
 # SPDX-License-Identifier: BSD-3-Clause
 
 from __future__ import annotations
@@ -269,10 +269,7 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     dirs.venv_must_exist()
 
     with OptionalTempDir() as opt_temp_dir:
-
         activate_path = dirs.venv_dir / "bin" / "activate"
-        # activate_path_quoted =
-
         old_ps1 = os.environ.get("PS1") or guess_bash_ps1()
 
         if not old_ps1:
@@ -286,8 +283,6 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
 
         bashrc_file = Path(os.path.expanduser("~/.bashrc")).absolute()
 
-        # stdin_commands = []
-
         executable: Optional[str] = None
         args: Union[str, List[str]]
 
@@ -296,24 +291,9 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
             temp_bash_rc = opt_temp_dir.path / "bash.rc"
             temp_bash_rc.write_bytes(
                 b'\n'.join([
-                    # f"# from {bashrc_file}".encode(),
-                    # bashrc_file.read_bytes(),
                     f"source {bashrc_file}".encode(),
                     f"source {activate_path}".encode(),
-                    # activate_path.read_bytes(),
-                    # f"# added by vien".encode(),
-                    # f"export PATH".encode(),
                     f'PS1={_quoted(new_ps1)}'.encode()]))
-            #
-            # #print(temp_bash_rc.read_text())
-            # commands.append(f"exec bash --rcfile <(cat {str(temp_bash_rc)})")
-            # stdin_commands.append(f'source {shlex.quote(str(bashrc_file))}')
-            # stdin_commands.append(f'source {shlex.quote(str(activate_path))}')
-            # stdin_commands.append(f"PS1={_quoted(new_ps1)}")
-            # stdin_commands.append(f"echo HAHA")
-            # stdin_commands.append(f"echo $PATH")
-            # a
-
             args = ["/bin/bash", "--rcfile", str(temp_bash_rc), "-i"]
 
         else:
@@ -323,9 +303,6 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
                 f'source {shlex.quote(str(activate_path))}',
                 f"PS1={_quoted(new_ps1)}"])
 
-        # if input:
-        #    stdin_commands.append(input)
-
         # we will use [input] for testing: we will send a command to the stdin
         # of the interactive sub-shell and later check whether the command was
         # executed.
@@ -334,20 +311,14 @@ def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
         # whether
         # the sub-shell was really interactive: did it wait for the input
         #
-        # Surprisingly, the sub-shell will immediately close after executing the
-        # command.  It seems it closes immediately after the subprocess.Popen
-        # closes the stdin. So it will not wait for "exit". But it serves the
-        # task well
-
-        # python3 -m unittest tests.test_main.TestsInsideTempProjectDir.test_shell_uses_modified_path
+        # Surprisingly, the sub-shell will immediately close after executing
+        # the command. It seems it closes immediately after the subprocess.
+        # Popen closes the stdin. So it will not wait for "exit". But it serves
+        # the task well
 
         cp = run_as_bash_script(
             args,
             executable=executable,
-
-            # "-i",
-            # "\n".join(arg_commands),
-            # stdin=("\n".join(stdin_commands)+"\n").encode() if stdin_commands else None,
             input=input.encode() if input else None,
             input_delay=input_delay,
             env=child_env(dirs.project_dir))
@@ -460,9 +431,6 @@ def replace_arg(args: List[str], old: str, new: List[str]) -> List[str]:
 
 def main_call(parsed: ParsedArgs, dirs: Dirs):
     dirs.venv_must_exist()
-
-    # parsed_call = ParsedCall(parsed.args)
-    # assert parsed_call.file is not None
 
     assert parsed.call is not None
 
