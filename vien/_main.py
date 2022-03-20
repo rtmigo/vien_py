@@ -9,11 +9,10 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from tempfile import TemporaryDirectory
 from typing import *
 
 from vien import is_posix
-from vien._bash_runner import run_as_bash_script
+from vien._bash_runner import start_bash_shell
 from vien._call_funcs import relative_fn_to_module_name, relative_inner_path
 from vien._cmdexe_escape_args import cmd_escape_arg
 from vien._colors import Colors
@@ -246,85 +245,45 @@ def _quoted(txt: str) -> str:
     return shlex.quote(txt)
 
 
-class OptionalTempDir:
-    def __init__(self):
-        self._temp_dir: Optional[TemporaryDirectory] = None
-
-    @property
-    def path(self) -> Path:
-        if self._temp_dir is None:
-            self._temp_dir = TemporaryDirectory()
-        return Path(self._temp_dir.name)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self._temp_dir is not None:
-            self._temp_dir.cleanup()
-            self._temp_dir = None
-
-
 def main_shell(dirs: Dirs, input: Optional[str], input_delay: Optional[float]):
     dirs.venv_must_exist()
 
-    with OptionalTempDir() as opt_temp_dir:
-        activate_path = dirs.venv_dir / "bin" / "activate"
-        old_ps1 = os.environ.get("PS1") or guess_bash_ps1()
+    # with OptionalTempDir() as opt_temp_dir:
+    activate_path = dirs.venv_dir / "bin" / "activate"
+    old_ps1 = os.environ.get("PS1") or guess_bash_ps1()
 
-        if not old_ps1:
-            old_ps1 = r"\h:\W \u\$"  # default from MacOS
+    if not old_ps1:
+        old_ps1 = r"\h:\W \u\$"  # default from MacOS
 
-        color_start = Colors.YELLOW
-        color_end = Colors.NOCOLOR
+    color_start = Colors.YELLOW
+    color_end = Colors.NOCOLOR
 
-        venv_name = dirs.project_dir.name
-        new_ps1 = f"{color_start}({venv_name}){color_end}:{old_ps1} "
+    venv_name = dirs.project_dir.name
+    new_ps1 = f"{color_start}({venv_name}){color_end}:{old_ps1} "
 
-        bashrc_file = Path(os.path.expanduser("~/.bashrc")).absolute()
+    # we use [input] for testing: we send a command to the stdin of the
+    # interactive sub-shell and later check whether the command was
+    # executed.
+    #
+    # We will also provide [input_delay] parameter. This allows the check
+    # whether the sub-shell was really interactive: did it wait for
+    # the input
+    #
+    # Surprisingly, the sub-shell will immediately close after executing
+    # the command. It seems it closes immediately after the subprocess.
+    # Popen closes the stdin. So it will not wait for "exit". But it serves
+    # the task well
 
-        executable: Optional[str] = None
-        args: Union[str, List[str]]
+    cp = start_bash_shell(init_commands=[
+        f'source {shlex.quote(str(activate_path))}',
+        f"PS1={_quoted(new_ps1)}"],
+        input=input,
+        input_delay=input_delay,
+        env=child_env(dirs.project_dir)
+    )
 
-        if bashrc_file.exists():
-            # Ubuntu
-            temp_bash_rc = opt_temp_dir.path / "bash.rc"
-            temp_bash_rc.write_bytes(
-                b'\n'.join([
-                    f"source {bashrc_file}".encode(),
-                    f"source {activate_path}".encode(),
-                    f'PS1={_quoted(new_ps1)}'.encode()]))
-            args = ["/bin/bash", "--rcfile", str(temp_bash_rc), "-i"]
-
-        else:
-            # MacOS
-            executable = "/bin/bash"
-            args = "\n".join([
-                f'source {shlex.quote(str(activate_path))}',
-                f"PS1={_quoted(new_ps1)}"])
-
-        # we will use [input] for testing: we will send a command to the stdin
-        # of the interactive sub-shell and later check whether the command was
-        # executed.
-        #
-        # We will also provide [input_delay] parameter. This allows the check
-        # whether
-        # the sub-shell was really interactive: did it wait for the input
-        #
-        # Surprisingly, the sub-shell will immediately close after executing
-        # the command. It seems it closes immediately after the subprocess.
-        # Popen closes the stdin. So it will not wait for "exit". But it serves
-        # the task well
-
-        cp = run_as_bash_script(
-            args,
-            executable=executable,
-            input=input.encode() if input else None,
-            input_delay=input_delay,
-            env=child_env(dirs.project_dir))
-
-        # the vien will return the same exit code as the shell returned
-        raise ChildExit(cp.returncode)
+    # the vien will return the same exit code as the shell returned
+    raise ChildExit(cp.returncode)
 
 
 def bash_args_to_str(args: List[str]) -> str:
