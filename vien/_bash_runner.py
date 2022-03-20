@@ -14,7 +14,6 @@ from typing import Optional, List, Dict
 def _run_with_input_delay(*popenargs,
                           input_delay: float = None,
                           input: Optional[bytes] = None,
-                          # stdin: Optional[bytes] = None,
                           timeout: float = None,
                           check: bool = False,
                           capture_output: bool = False,
@@ -96,11 +95,11 @@ def start_bash_shell(init_commands: List[str],
 
     if ubuntu_bashrc_path.exists():
         # Ubuntu
-        with NamedTemporaryFile('r', suffix=".rc") as tdf:
+        with NamedTemporaryFile('r', suffix=".rc") as ntf:
             init_commands = [f"source {ubuntu_bashrc_path}"] + init_commands
 
             # creating temporary init script (like bash.rc)
-            temp_bash_rc = Path(tdf.name)
+            temp_bash_rc = Path(ntf.name)
             temp_bash_rc.write_text('\n'.join(init_commands))
 
             return _run_with_input_delay(
