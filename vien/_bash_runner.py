@@ -1,47 +1,19 @@
 # SPDX-FileCopyrightText: (c) 2021-2022 Artëm IG <github.com/rtmigo>
 # SPDX-License-Identifier: BSD-3-Clause
+from __future__ import annotations
 
-import subprocess
+import os
 import time
+from pathlib import Path
 from subprocess import Popen, TimeoutExpired, CalledProcessError, \
     CompletedProcess, PIPE
-from typing import Optional, Union, List
+from tempfile import NamedTemporaryFile
+from typing import Optional, List, Dict
 
-from vien._common import need_posix
-
-
-def run_as_bash_script(args: Union[str, List[str]],
-                       #                       commands_before: List[str],
-                       timeout: float = None,
-                       input_delay: float = None,
-                       capture_output: bool = False,
-                       input: bytes = None,
-                       executable: Optional[str] = None,
-                       **kwargs) -> subprocess.CompletedProcess:
-    """Runs the provided string as a .sh script."""
-
-    need_posix()
-
-    # print("Running", script)
-
-    # we need executable='/bin/bash' for Ubuntu 18.04, it will run '/bin/sh'
-    # otherwise. For MacOS 10.13 it seems to be optional
-    return _run_with_input_delay(args,
-                                 # shell=True,
-                                 executable=executable,
-                                 timeout=timeout,
-                                 input=input,
-                                 capture_output=capture_output,
-                                 input_delay=input_delay,
-                                 **kwargs)
-
-
-#subprocess.run()
 
 def _run_with_input_delay(*popenargs,
                           input_delay: float = None,
                           input: Optional[bytes] = None,
-                          # stdin: Optional[bytes] = None,
                           timeout: float = None,
                           check: bool = False,
                           capture_output: bool = False,
@@ -113,3 +85,34 @@ def _run_with_input_delay(*popenargs,
                                      output=stdout, stderr=stderr)
 
     return CompletedProcess(process.args, exit_code, stdout, stderr)
+
+
+def start_bash_shell(init_commands: List[str],
+                     input: Optional[str] = None,
+                     input_delay: Optional[float] = None,
+                     env: Optional[Dict] = None) -> CompletedProcess:
+    ubuntu_bashrc_path = Path(os.path.expanduser("~/.bashrc")).absolute()
+
+    if ubuntu_bashrc_path.exists():
+        # Ubuntu
+        with NamedTemporaryFile('r', suffix=".rc") as ntf:
+            init_commands = [f"source {ubuntu_bashrc_path}"] + init_commands
+
+            # creating temporary init script (like bash.rc)
+            temp_bash_rc = Path(ntf.name)
+            temp_bash_rc.write_text('\n'.join(init_commands))
+
+            return _run_with_input_delay(
+                ["/bin/bash", "--rcfile", str(temp_bash_rc), "-i"],
+                executable=None,
+                input=input.encode() if input else None,
+                input_delay=input_delay,
+                env=env)
+    else:
+        # MacOS
+        return _run_with_input_delay(
+            "\n".join(init_commands),
+            executable="/bin/bash",
+            input=input.encode() if input else None,
+            input_delay=input_delay,
+            env=env)
